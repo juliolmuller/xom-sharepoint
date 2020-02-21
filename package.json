@@ -1,0 +1,29 @@
+{
+  "name": "xom-sharepoint",
+  "version": "0.1.0",
+  "description": "",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "parcel build src/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "sharepoint",
+    "api",
+    "rest",
+    "restful",
+    "xom"
+  ],
+  "author": "Julio L. Muller",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "*"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "2.*",
+    "@typescript-eslint/parser": "2.*",
+    "eslint": "6.*",
+    "eslint-config-google": "*",
+    "parcel-bundler": "1.*"
+  }
+}
