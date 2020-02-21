@@ -1,21 +1,23 @@
 {
   "name": "xom-sharepoint",
   "version": "0.1.0",
-  "description": "",
-  "main": "dist/index.js",
-  "scripts": {
-    "build": "parcel build src/index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+  "description": "HTTTP client to easily fetch SharePoint through its REST API.",
+  "author": "Julio L. Muller",
+  "license": "MIT",
   "keywords": [
     "sharepoint",
     "api",
     "rest",
     "restful",
+    "fetch",
     "xom"
   ],
-  "author": "Julio L. Muller",
-  "license": "MIT",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "parcel build src/*.ts",
+    "watch": "parcel watch src/index.ts",
+    "test": "node test/index.js"
+  },
   "dependencies": {
     "axios": "*"
   },
@@ -24,6 +26,7 @@
     "@typescript-eslint/parser": "2.*",
     "eslint": "6.*",
     "eslint-config-google": "*",
-    "parcel-bundler": "1.*"
+    "parcel-bundler": "1.*",
+    "typescript": "3.*"
   }
 }
