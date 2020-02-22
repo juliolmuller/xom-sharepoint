@@ -12,6 +12,14 @@
     "fetch",
     "xom"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/juliolmuller/xom-sharepoint.git"
+  },
+  "bugs": {
+    "url": "https://github.com/juliolmuller/xom-sharepoint/issues"
+  },
+  "homepage": "https://github.com/juliolmuller/xom-sharepoint#readme",
   "main": "index.js",
   "scripts": {
     "build": "npm run build:dist && npm run build:node",
