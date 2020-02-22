@@ -1,6 +1,7 @@
 {
   "env": {
-    "es5": true,
+    "es6": true,
+    "browser": true,
     "node": true
   },
   "extends": ["google"],
@@ -16,5 +17,10 @@
   "plugins": [
     "@typescript-eslint"
   ],
-  "rules": {}
+  "rules": {
+    "semi": "off",
+    "padded-blocks": "off",
+    "arrow-parens": "off",
+    "object-curly-spacing": "off"
+  }
 }
