@@ -23,7 +23,7 @@
   "main": "index.js",
   "scripts": {
     "build": "npm run build:dist && npm run build:node",
-    "build:dist": "parcel build src/XomSharePoint.js --no-minify && parcel build src/XomSharePoint.js -o XomSharePoint.min.js",
+    "build:dist": "parcel build src/XomSharePoint.js --no-minify -o xom-sharepoint.js && parcel build src/XomSharePoint.js -o xom-sharepoint.min.js",
     "build:node": "parcel build src/index.js --no-source-maps --no-minify -d ./ --target node",
     "watch": "parcel watch src/index.js",
     "test": "node test/index.js"
