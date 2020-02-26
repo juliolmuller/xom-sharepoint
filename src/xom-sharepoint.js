@@ -1,0 +1,1 @@
+window.XomSharePoint = require('./index')
