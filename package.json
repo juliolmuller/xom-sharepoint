@@ -1,6 +1,6 @@
 {
   "name": "xom-sharepoint",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "HTTTP client to easily fetch SharePoint through its REST API.",
   "author": "Julio L. Muller",
   "license": "MIT",
@@ -22,14 +22,19 @@
   "homepage": "https://github.com/juliolmuller/xom-sharepoint#readme",
   "main": "src/index.js",
   "scripts": {
-    "build": "parcel build src/dist.js --no-minify -o xom-sharepoint.js && parcel build src/dist.js -o xom-sharepoint.min.js",
-    "watch": "parcel watch src/index.js",
+    "build": "npm run build:node && npm run build:dist",
+    "build:dist": "parcel build src/dist.js --no-minify -o xom-sharepoint.js && parcel build src/dist.js -o xom-sharepoint.min.js",
+    "build:node": "babel src/sharepoint/XomSharePoint.js -o src/index.js --presets=@babel/preset-env",
+    "watch": "parcel watch src/sharepoint/XomSharePoint.js",
     "test": "echo \"No tests yet\" && exit 1"
   },
   "peerDependencies": {
     "axios": "0.19.*"
   },
   "devDependencies": {
+    "@babel/cli": "7.*",
+    "@babel/core": "7.*",
+    "@babel/preset-env": "7.*",
     "axios": "0.19.*",
     "eslint": "6.*",
     "eslint-config-google": "*",
