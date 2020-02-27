@@ -1,6 +1,6 @@
 {
   "name": "xom-sharepoint",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "HTTTP client to easily fetch SharePoint through its REST API.",
   "author": "Julio L. Muller",
   "license": "MIT",

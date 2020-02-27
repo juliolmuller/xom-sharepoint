@@ -1894,6 +1894,7 @@ var axios = require('axios');
  * "https://ishareteam2.na.xom.com/sites/cfscuritiba/Lists/MyList/"
  *
  * @class
+ * @version 0.3.0
  * @constructor
  * @param {string} siteUrl Base URL of the SharePoint site which the list
  *        belongs to. At the example, the site URL is
@@ -2082,17 +2083,17 @@ module.exports = function (siteUrl) {
     });
   };
   /**
-   * Performs a MERGE request to the API, in order to update the informed
+   * Performs a PUT request to the API, in order to update the informed
    * fields of an existing record in SharePoint list
    *
    * @param {number} id Identification number for the record to be modified
    * @param {object} data The object (using JSON notation) to be changed (fields
-   *         names case must match with the list's)
+   *        names case must match with the list's)
    * @return {Promise}
    */
 
 
-  _this.merge = function (id, data) {
+  _this.put = function (id, data) {
     return _axios.post("".concat(_this.baseUrl, "(").concat(id, ")"), data, {
       headers: _objectSpread({}, _axios.defaults.headers.common, {
         'X-Http-Method': 'MERGE',
@@ -2112,20 +2113,6 @@ module.exports = function (siteUrl) {
 
 
   _this.put = function (id, data) {
-    return _this.merge(id, data);
-  };
-  /**
-   * This is actualy an alternative to the 'merge' method, no difference, only
-   * a matter of name
-   *
-   * @param {number} id Identification number for the record to be modified
-   * @param {object} data The object (using JSON notation) to be changed (fields
-   *        names case must match with the list's)
-   * @return {Promise}
-   */
-
-
-  _this.patch = function (id, data) {
     return _this.merge(id, data);
   };
   /**
