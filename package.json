@@ -22,7 +22,7 @@
   "homepage": "https://github.com/juliolmuller/xom-sharepoint#readme",
   "main": "src/index.js",
   "scripts": {
-    "build": "parcel build src/dist.js --no-minify && parcel build src/dist.js -o xom-sharepoint.min.js",
+    "build": "parcel build src/dist.js --no-minify -o xom-sharepoint.js && parcel build src/dist.js -o xom-sharepoint.min.js",
     "watch": "parcel watch src/index.js",
     "test": "node test/index.js"
   },
