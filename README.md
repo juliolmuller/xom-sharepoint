@@ -22,5 +22,5 @@ $ yarn add axios xom-sharepoint
 Or, if you are not in a Node enviroment, you can use the bundled files in `dist/` folder or incorporate the CDN in your HTML file (with *axios* embeded):
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/xom-sharepoint@0.4.0/dist/xom-sharepoint.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xom-sharepoint@latest/dist/xom-sharepoint.min.js"></script>
 ```
