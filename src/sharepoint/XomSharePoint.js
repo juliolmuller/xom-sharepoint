@@ -6,6 +6,7 @@ const axios = require('axios')
  * "https://ishareteam2.na.xom.com/sites/cfscuritiba/Lists/MyList/"
  *
  * @class
+ * @version 0.3.0
  * @constructor
  * @param {string} siteUrl Base URL of the SharePoint site which the list
  *        belongs to. At the example, the site URL is
@@ -25,7 +26,7 @@ module.exports = function(siteUrl, listName = null) {
     'Accept': 'application/json;odata=verbose',
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'Content-Type',
-    'Content-Type': 'application/json;odata=verbose'
+    'Content-Type': 'application/json;odata=verbose',
   }
 
   /**
@@ -39,7 +40,7 @@ module.exports = function(siteUrl, listName = null) {
     },
     set(siteUrl) {
       _siteUrl = siteUrl
-    }
+    },
   })
 
   /**
@@ -53,7 +54,7 @@ module.exports = function(siteUrl, listName = null) {
     },
     set(listName) {
       _listName = listName
-    }
+    },
   })
 
   /**
@@ -64,7 +65,7 @@ module.exports = function(siteUrl, listName = null) {
   Object.defineProperty(_this, 'baseUrl', {
     get() {
       return `${_siteUrl}/_vti_bin/listdata.svc/${_listName}`
-    }
+    },
   })
 
   /**
@@ -75,7 +76,7 @@ module.exports = function(siteUrl, listName = null) {
   Object.defineProperty(_this, 'baseAttachmentUrl', {
     get() {
       return `${_siteUrl}/_api/web/lists/getbytitle(${_listName})`
-    }
+    },
   })
 
   /**
@@ -99,7 +100,10 @@ module.exports = function(siteUrl, listName = null) {
     const data2 = _axios.get(`${_siteUrl}/_api/SP.UserProfiles.PeopleManager/GetMyProperties`)
     return new Promise((resolve, reject) => {
       Promise.all([data1, data2])
-          .then(responses => resolve({ ...responses[0].data.d, ...responses[1].data.d }))
+          .then(responses => resolve({
+            ...responses[0].data.d,
+            ...responses[1].data.d,
+          }))
           .catch(error => reject(error))
     })
   }
@@ -170,22 +174,23 @@ module.exports = function(siteUrl, listName = null) {
           .catch(error => reject(error))
     })
   }
+
   /**
-   * Performs a MERGE request to the API, in order to update the informed
+   * Performs a PUT request to the API, in order to update the informed
    * fields of an existing record in SharePoint list
    *
    * @param {number} id Identification number for the record to be modified
    * @param {object} data The object (using JSON notation) to be changed (fields
-   *         names case must match with the list's)
+   *        names case must match with the list's)
    * @return {Promise}
    */
-  _this.merge = (id, data) => {
+  _this.put = (id, data) => {
     return _axios.post(`${_this.baseUrl}(${id})`, data, {
       headers: {
         ..._axios.defaults.headers.common,
         'X-Http-Method': 'MERGE',
-        'If-Match': '*'
-      }
+        'If-Match': '*',
+      },
     })
   }
 
@@ -203,19 +208,6 @@ module.exports = function(siteUrl, listName = null) {
   }
 
   /**
-   * This is actualy an alternative to the 'merge' method, no difference, only
-   * a matter of name
-   *
-   * @param {number} id Identification number for the record to be modified
-   * @param {object} data The object (using JSON notation) to be changed (fields
-   *        names case must match with the list's)
-   * @return {Promise}
-   */
-  _this.patch = (id, data) => {
-    return _this.merge(id, data)
-  }
-
-  /**
    * Performs a POST (with 'DELETE' header) request to the API, in order to
    * delete an existing record in SharePoint list
    *
@@ -227,8 +219,8 @@ module.exports = function(siteUrl, listName = null) {
       headers: {
         ..._axios.defaults.headers.common,
         'X-Http-Method': 'DELETE',
-        'If-Match': '*'
-      }
+        'If-Match': '*',
+      },
     })
   }
 }
