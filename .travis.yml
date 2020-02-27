@@ -1,0 +1,8 @@
+language: node_js
+node_js:
+  - 10
+before_install:
+  - npm i axios@0.19.*
+email:
+  on_failure: change
+  on_success: never
