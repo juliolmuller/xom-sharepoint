@@ -1,1 +1,1 @@
-window.XomSharePoint = require('./index')
+window.XomSharePoint = require('./sharepoint/XomSharePoint')

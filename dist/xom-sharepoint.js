@@ -2133,9 +2133,7 @@ module.exports = function (siteUrl) {
     });
   };
 };
-},{"axios":"dZBD"}],"Focm":[function(require,module,exports) {
-module.exports = require('./sharepoint/XomSharePoint');
-},{"./sharepoint/XomSharePoint":"o0Hk"}],"UeJd":[function(require,module,exports) {
-window.XomSharePoint = require('./index');
-},{"./index":"Focm"}]},{},["UeJd"], null)
+},{"axios":"dZBD"}],"UeJd":[function(require,module,exports) {
+window.XomSharePoint = require('./sharepoint/XomSharePoint');
+},{"./sharepoint/XomSharePoint":"o0Hk"}]},{},["UeJd"], null)
 //# sourceMappingURL=/xom-sharepoint.js.map
