@@ -10,14 +10,14 @@ var axios = require('axios');
 /**
  * Instantiate an object to consume SharePoint REST API. As parameters,
  * consider the folloing full URL example you are targeting:
- * "https://ishareteam2.na.xom.com/sites/cfscuritiba/Lists/MyList/"
+ * "https://myteam.sharepoint.com/sites/cfscuritiba/Lists/MyList/"
  *
  * @class
  * @version 0.3.0
  * @constructor
  * @param {string} siteUrl Base URL of the SharePoint site which the list
  *        belongs to. At the example, the site URL is
- *        "https://ishareteam2.na.xom.com/sites/cfscuritiba"
+ *        "https://myteam.sharepoint.com/sites/cfscuritiba"
  * @param {string} listName Name of the list you are targeting. At the
  *        example, the list name is "MyList"
  */
