@@ -6,7 +6,7 @@ const axios = require('axios')
  * "https://myteam.sharepoint.com/sites/cfscuritiba/Lists/MyList/"
  *
  * @class
- * @version 0.4.3
+ * @version 0.4.4
  * @constructor
  * @param {string} siteUrl Base URL of the SharePoint site which the list
  *        belongs to. At the example, the site URL is
@@ -115,14 +115,33 @@ module.exports = function(siteUrl, listName) {
         .replace(/\\/, '_')
   }
 
+  /**
+   * Add essential properties to the user object
+   *
+   * @param {object} user User object literal
+   */
   const addUserProperties = (user) => {
     user.Id = user.Id || user.Id0
     user.Account = user.LoginName || user.AccountName || user.Account
     user.AccountName = trimAccount(user.Account)
-    user.User.Id = user.AccountName.replace(/(.*)[_](.*)/, '$2')
+    user.UserId = user.AccountName.replace(/(.*)[_](.*)/, '$2')
     user.Name = user.Name || user.DisplayName
     user.PersonalUrl = `https://mysite.na.xom.com/personal//${user.AccountName}`
     user.PictureUrl = `http://lyncpictures/service/api/image/${user.AccountName}`
+  }
+
+  /**
+   * Convert a given string to Pascal case pattern
+   *
+   * @param {string} str Base string to be converted
+   * @return {string}
+   */
+  const toPascalCase = (str) => {
+    str = String(str)
+    str = str.replace(/([\ \,\.\!\?])([A-Za-zÀ-ÿ]?)/g, (_g0, _g1, g2) => {
+      return g2.toUpperCase()
+    })
+    return str.charAt(0).toUpperCase() + str.slice(1)
   }
 
   /**
@@ -156,7 +175,7 @@ module.exports = function(siteUrl, listName) {
           .then(responses => {
             const mergedAttr = {
               ...responses[0].data.d,
-              ...responses[1].data.d.results[0],
+              ...responses[1].data.d,
             }
             addUserProperties(mergedAttr)
             resolve(mergedAttr)
