@@ -1,7 +1,6 @@
 # XOM SharePoint
 
 [![npm version](https://img.shields.io/npm/v/xom-sharepoint.svg?style=flat-square)](https://www.npmjs.org/package/xom-sharepoint)
-[![build status](https://img.shields.io/travis/juliolmuller/xom-sharepoint/master.svg?style=flat-square)](https://travis-ci.org/juliolmuller/xom-sharepoint)
 [![install size](https://packagephobia.now.sh/badge?p=xom-sharepoint)](https://packagephobia.now.sh/result?p=xom-sharepoint)
 [![npm downloads](https://img.shields.io/npm/dm/xom-sharepoint.svg?style=flat-square)](http://npm-stat.com/charts.html?package=xom-sharepoint)
 
