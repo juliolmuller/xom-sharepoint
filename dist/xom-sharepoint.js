@@ -1894,25 +1894,48 @@ var axios = require('axios');
  * "https://myteam.sharepoint.com/sites/cfscuritiba/Lists/MyList/"
  *
  * @class
- * @version 0.3.0
+ * @version 0.4.3
  * @constructor
  * @param {string} siteUrl Base URL of the SharePoint site which the list
  *        belongs to. At the example, the site URL is
  *        "https://myteam.sharepoint.com/sites/cfscuritiba"
- * @param {string} listName Name of the list you are targeting. At the
+ * @param {string} [listName] Name of the list you are targeting. At the
  *        example, the list name is "MyList"
  */
 
 
-module.exports = function (siteUrl) {
-  var listName = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-
+module.exports = function (siteUrl, listName) {
+  /**
+   * Ensure pointer to propper 'this'
+   *
+   * @var {this}
+   */
   var _this = this;
+  /**
+   * Private instance of Axios
+   *
+   * @var {Axios}
+   */
+
 
   var _axios = axios.create();
+  /**
+   * Store the SharePoint site URL
+   *
+   * @var {string}
+   */
+
 
   var _siteUrl = siteUrl;
-  var _listName = listName;
+  /**
+   * Store the SharePoint list name
+   *
+   * @var {string}
+   */
+
+  var _listName = listName || null; // Configure HTTP client defaults
+
+
   _axios.defaults.withCredentials = true;
   _axios.defaults.headers.common = {
     'Accept': 'application/json;odata=verbose',
@@ -1971,6 +1994,26 @@ module.exports = function (siteUrl) {
     }
   });
   /**
+   * Extract the usefull part of account/login name
+   *
+   * @param {string} account Account/login name to be trimmed
+   * @return {string}
+   */
+
+  var trimAccount = function trimAccount(account) {
+    return String(account).replace(/(.*)[\|](.*)/, '$2').replace(/\\/, '_');
+  };
+
+  var addUserProperties = function addUserProperties(user) {
+    user.Id = user.Id || user.Id0;
+    user.Account = user.LoginName || user.AccountName || user.Account;
+    user.AccountName = trimAccount(user.Account);
+    user.User.Id = user.AccountName.replace(/(.*)[_](.*)/, '$2');
+    user.Name = user.Name || user.DisplayName;
+    user.PersonalUrl = "https://mysite.na.xom.com/personal//".concat(user.AccountName);
+    user.PictureUrl = "http://lyncpictures/service/api/image/".concat(user.AccountName);
+  };
+  /**
    * Queries the SharePoint API to grab user information. Inform nothing to get
    * current user information or pass an specific user ID
    *
@@ -1978,17 +2021,19 @@ module.exports = function (siteUrl) {
    * @return {Promise}
    */
 
-  _this.getUserInfo = function () {
-    var id = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
 
-    if (id !== null) {
+  _this.getUserInfo = function (id) {
+    if (id) {
       var _data = _axios.get("".concat(_siteUrl, "/_api/Web/GetUserById(").concat(id, ")"));
 
       var _data2 = _axios.get("".concat(_siteUrl, "/_vti_bin/listdata.svc/UserInformationList?$filter=(Id0 eq ").concat(id, ")"));
 
       return new Promise(function (resolve, reject) {
         Promise.all([_data, _data2]).then(function (responses) {
-          return resolve(_objectSpread({}, responses[0].data.d, {}, responses[1].data.d.results[0]));
+          var mergedAttr = _objectSpread({}, responses[0].data.d, {}, responses[1].data.d.results[0]);
+
+          addUserProperties(mergedAttr);
+          resolve(mergedAttr);
         }).catch(function (error) {
           return reject(error);
         });
@@ -2001,7 +2046,10 @@ module.exports = function (siteUrl) {
 
     return new Promise(function (resolve, reject) {
       Promise.all([data1, data2]).then(function (responses) {
-        return resolve(_objectSpread({}, responses[0].data.d, {}, responses[1].data.d));
+        var mergedAttr = _objectSpread({}, responses[0].data.d, {}, responses[1].data.d.results[0]);
+
+        addUserProperties(mergedAttr);
+        resolve(mergedAttr);
       }).catch(function (error) {
         return reject(error);
       });
@@ -2017,7 +2065,7 @@ module.exports = function (siteUrl) {
 
   _this.searchUser = function (name) {
     return new Promise(function (resolve, reject) {
-      _axios.get("".concat(_siteUrl, "/_vti_bin/listdata.svc/UserInformationList?$filter=substringof(").concat(name, ",Name)")).then(function (response) {
+      _axios.get("".concat(_siteUrl, "/_vti_bin/listdata.svc/UserInformationList?$filter=substringof('").concat(name, "',Name)")).then(function (response) {
         return resolve(response.data.d.results);
       }).catch(function (error) {
         return reject(error);

@@ -6,21 +6,45 @@ const axios = require('axios')
  * "https://myteam.sharepoint.com/sites/cfscuritiba/Lists/MyList/"
  *
  * @class
- * @version 0.3.0
+ * @version 0.4.3
  * @constructor
  * @param {string} siteUrl Base URL of the SharePoint site which the list
  *        belongs to. At the example, the site URL is
  *        "https://myteam.sharepoint.com/sites/cfscuritiba"
- * @param {string} listName Name of the list you are targeting. At the
+ * @param {string} [listName] Name of the list you are targeting. At the
  *        example, the list name is "MyList"
  */
-module.exports = function(siteUrl, listName = null) {
+module.exports = function(siteUrl, listName) {
 
+  /**
+   * Ensure pointer to propper 'this'
+   *
+   * @var {this}
+   */
   const _this = this
-  const _axios = axios.create()
-  let _siteUrl = siteUrl
-  let _listName = listName
 
+  /**
+   * Private instance of Axios
+   *
+   * @var {Axios}
+   */
+  const _axios = axios.create()
+
+  /**
+   * Store the SharePoint site URL
+   *
+   * @var {string}
+   */
+  let _siteUrl = siteUrl
+
+  /**
+   * Store the SharePoint list name
+   *
+   * @var {string}
+   */
+  let _listName = listName || null
+
+  // Configure HTTP client defaults
   _axios.defaults.withCredentials = true
   _axios.defaults.headers.common = {
     'Accept': 'application/json;odata=verbose',
@@ -80,19 +104,48 @@ module.exports = function(siteUrl, listName = null) {
   })
 
   /**
+   * Extract the usefull part of account/login name
+   *
+   * @param {string} account Account/login name to be trimmed
+   * @return {string}
+   */
+  const trimAccount = (account) => {
+    return String(account)
+        .replace(/(.*)[\|](.*)/, '$2')
+        .replace(/\\/, '_')
+  }
+
+  const addUserProperties = (user) => {
+    user.Id = user.Id || user.Id0
+    user.Account = user.LoginName || user.AccountName || user.Account
+    user.AccountName = trimAccount(user.Account)
+    user.User.Id = user.AccountName.replace(/(.*)[_](.*)/, '$2')
+    user.Name = user.Name || user.DisplayName
+    user.PersonalUrl = `https://mysite.na.xom.com/personal//${user.AccountName}`
+    user.PictureUrl = `http://lyncpictures/service/api/image/${user.AccountName}`
+  }
+
+  /**
    * Queries the SharePoint API to grab user information. Inform nothing to get
    * current user information or pass an specific user ID
    *
    * @param {number} id Id of the user you want the information for
    * @return {Promise}
    */
-  _this.getUserInfo = (id = null) => {
-    if (id !== null) {
+  _this.getUserInfo = (id) => {
+    if (id) {
       const data1 = _axios.get(`${_siteUrl}/_api/Web/GetUserById(${id})`)
       const data2 = _axios.get(`${_siteUrl}/_vti_bin/listdata.svc/UserInformationList?$filter=(Id0 eq ${id})`)
       return new Promise((resolve, reject) => {
         Promise.all([data1, data2])
-            .then(responses => resolve({ ...responses[0].data.d, ...responses[1].data.d.results[0] }))
+            .then(responses => {
+              const mergedAttr = {
+                ...responses[0].data.d,
+                ...responses[1].data.d.results[0],
+              }
+              addUserProperties(mergedAttr)
+              resolve(mergedAttr)
+            })
             .catch(error => reject(error))
       })
     }
@@ -100,10 +153,14 @@ module.exports = function(siteUrl, listName = null) {
     const data2 = _axios.get(`${_siteUrl}/_api/SP.UserProfiles.PeopleManager/GetMyProperties`)
     return new Promise((resolve, reject) => {
       Promise.all([data1, data2])
-          .then(responses => resolve({
-            ...responses[0].data.d,
-            ...responses[1].data.d,
-          }))
+          .then(responses => {
+            const mergedAttr = {
+              ...responses[0].data.d,
+              ...responses[1].data.d.results[0],
+            }
+            addUserProperties(mergedAttr)
+            resolve(mergedAttr)
+          })
           .catch(error => reject(error))
     })
   }
@@ -117,7 +174,7 @@ module.exports = function(siteUrl, listName = null) {
   _this.searchUser = (name) => {
     return new Promise((resolve, reject) => {
       _axios
-          .get(`${_siteUrl}/_vti_bin/listdata.svc/UserInformationList?$filter=substringof(${name},Name)`)
+          .get(`${_siteUrl}/_vti_bin/listdata.svc/UserInformationList?$filter=substringof('${name}',Name)`)
           .then(response => resolve(response.data.d.results))
           .catch(error => reject(error))
     })
