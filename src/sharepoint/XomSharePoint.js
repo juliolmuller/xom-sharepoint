@@ -6,7 +6,7 @@ const axios = require('axios')
  * "https://myteam.sharepoint.com/sites/cfscuritiba/Lists/MyList/"
  *
  * @class
- * @version 0.4.4
+ * @version 0.4.5
  * @constructor
  * @param {string} siteUrl Base URL of the SharePoint site which the list
  *        belongs to. At the example, the site URL is
@@ -131,30 +131,18 @@ module.exports = function(siteUrl, listName) {
   }
 
   /**
-   * Convert a given string to Pascal case pattern
-   *
-   * @param {string} str Base string to be converted
-   * @return {string}
-   */
-  const toPascalCase = (str) => {
-    str = String(str)
-    str = str.replace(/([\ \,\.\!\?])([A-Za-zÀ-ÿ]?)/g, (_g0, _g1, g2) => {
-      return g2.toUpperCase()
-    })
-    return str.charAt(0).toUpperCase() + str.slice(1)
-  }
-
-  /**
    * Queries the SharePoint API to grab user information. Inform nothing to get
    * current user information or pass an specific user ID
    *
    * @param {number} id Id of the user you want the information for
    * @return {Promise}
    */
-  _this.getUserInfo = (id) => {
+  _this.getUserInfo = async (id) => {
     if (id) {
+      const data0 = await _axios.get(`${_siteUrl}/_vti_bin/listdata.svc/UserInformationList?$top=1`)
+      const idField = data0.data.d.results[0].Id ? 'Id' : 'Id0'
       const data1 = _axios.get(`${_siteUrl}/_api/Web/GetUserById(${id})`)
-      const data2 = _axios.get(`${_siteUrl}/_vti_bin/listdata.svc/UserInformationList?$filter=(Id0 eq ${id})`)
+      const data2 = _axios.get(`${_siteUrl}/_vti_bin/listdata.svc/UserInformationList?$filter=(${idField} eq ${id})`)
       return new Promise((resolve, reject) => {
         Promise.all([data1, data2])
             .then(responses => {

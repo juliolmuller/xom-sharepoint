@@ -6,6 +6,10 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
 var axios = require('axios');
 /**
  * Instantiate an object to consume SharePoint REST API. As parameters,
@@ -13,7 +17,7 @@ var axios = require('axios');
  * "https://myteam.sharepoint.com/sites/cfscuritiba/Lists/MyList/"
  *
  * @class
- * @version 0.4.4
+ * @version 0.4.5
  * @constructor
  * @param {string} siteUrl Base URL of the SharePoint site which the list
  *        belongs to. At the example, the site URL is
@@ -139,21 +143,6 @@ module.exports = function (siteUrl, listName) {
     user.PictureUrl = "http://lyncpictures/service/api/image/".concat(user.AccountName);
   };
   /**
-   * Convert a given string to Pascal case pattern
-   *
-   * @param {string} str Base string to be converted
-   * @return {string}
-   */
-
-
-  var toPascalCase = function toPascalCase(str) {
-    str = String(str);
-    str = str.replace(/([\ \,\.\!\?])([A-Za-zÀ-ÿ]?)/g, function (_g0, _g1, g2) {
-      return g2.toUpperCase();
-    });
-    return str.charAt(0).toUpperCase() + str.slice(1);
-  };
-  /**
    * Queries the SharePoint API to grab user information. Inform nothing to get
    * current user information or pass an specific user ID
    *
@@ -162,39 +151,64 @@ module.exports = function (siteUrl, listName) {
    */
 
 
-  _this.getUserInfo = function (id) {
-    if (id) {
-      var _data = _axios.get("".concat(_siteUrl, "/_api/Web/GetUserById(").concat(id, ")"));
+  _this.getUserInfo = /*#__PURE__*/function () {
+    var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(id) {
+      var data0, idField, _data, _data2, data1, data2;
 
-      var _data2 = _axios.get("".concat(_siteUrl, "/_vti_bin/listdata.svc/UserInformationList?$filter=(Id0 eq ").concat(id, ")"));
+      return regeneratorRuntime.wrap(function _callee$(_context) {
+        while (1) {
+          switch (_context.prev = _context.next) {
+            case 0:
+              if (!id) {
+                _context.next = 8;
+                break;
+              }
 
-      return new Promise(function (resolve, reject) {
-        Promise.all([_data, _data2]).then(function (responses) {
-          var mergedAttr = _objectSpread({}, responses[0].data.d, {}, responses[1].data.d.results[0]);
+              _context.next = 3;
+              return _axios.get("".concat(_siteUrl, "/_vti_bin/listdata.svc/UserInformationList?$top=1"));
 
-          addUserProperties(mergedAttr);
-          resolve(mergedAttr);
-        })["catch"](function (error) {
-          return reject(error);
-        });
-      });
-    }
+            case 3:
+              data0 = _context.sent;
+              idField = data0.data.d.results[0].Id ? 'Id' : 'Id0';
+              _data = _axios.get("".concat(_siteUrl, "/_api/Web/GetUserById(").concat(id, ")"));
+              _data2 = _axios.get("".concat(_siteUrl, "/_vti_bin/listdata.svc/UserInformationList?$filter=(").concat(idField, " eq ").concat(id, ")"));
+              return _context.abrupt("return", new Promise(function (resolve, reject) {
+                Promise.all([_data, _data2]).then(function (responses) {
+                  var mergedAttr = _objectSpread({}, responses[0].data.d, {}, responses[1].data.d.results[0]);
 
-    var data1 = _axios.get("".concat(_siteUrl, "/_api/web/CurrentUser"));
+                  addUserProperties(mergedAttr);
+                  resolve(mergedAttr);
+                })["catch"](function (error) {
+                  return reject(error);
+                });
+              }));
 
-    var data2 = _axios.get("".concat(_siteUrl, "/_api/SP.UserProfiles.PeopleManager/GetMyProperties"));
+            case 8:
+              data1 = _axios.get("".concat(_siteUrl, "/_api/web/CurrentUser"));
+              data2 = _axios.get("".concat(_siteUrl, "/_api/SP.UserProfiles.PeopleManager/GetMyProperties"));
+              return _context.abrupt("return", new Promise(function (resolve, reject) {
+                Promise.all([data1, data2]).then(function (responses) {
+                  var mergedAttr = _objectSpread({}, responses[0].data.d, {}, responses[1].data.d);
 
-    return new Promise(function (resolve, reject) {
-      Promise.all([data1, data2]).then(function (responses) {
-        var mergedAttr = _objectSpread({}, responses[0].data.d, {}, responses[1].data.d);
+                  addUserProperties(mergedAttr);
+                  resolve(mergedAttr);
+                })["catch"](function (error) {
+                  return reject(error);
+                });
+              }));
 
-        addUserProperties(mergedAttr);
-        resolve(mergedAttr);
-      })["catch"](function (error) {
-        return reject(error);
-      });
-    });
-  };
+            case 11:
+            case "end":
+              return _context.stop();
+          }
+        }
+      }, _callee);
+    }));
+
+    return function (_x) {
+      return _ref.apply(this, arguments);
+    };
+  }();
   /**
    * Queries SharePoint API searching for user name
    *
