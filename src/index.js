@@ -17,7 +17,7 @@ var axios = require('axios');
  * "https://myteam.sharepoint.com/sites/cfscuritiba/Lists/MyList/"
  *
  * @class
- * @version 0.4.5
+ * @version 0.4.6
  * @constructor
  * @param {string} siteUrl Base URL of the SharePoint site which the list
  *        belongs to. At the example, the site URL is
@@ -169,7 +169,7 @@ module.exports = function (siteUrl, listName) {
 
             case 3:
               data0 = _context.sent;
-              idField = data0.data.d.results[0].Id ? 'Id' : 'Id0';
+              idField = data0.data.d[0].Id ? 'Id' : 'Id0';
               _data = _axios.get("".concat(_siteUrl, "/_api/Web/GetUserById(").concat(id, ")"));
               _data2 = _axios.get("".concat(_siteUrl, "/_vti_bin/listdata.svc/UserInformationList?$filter=(").concat(idField, " eq ").concat(id, ")"));
               return _context.abrupt("return", new Promise(function (resolve, reject) {

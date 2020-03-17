@@ -6,7 +6,7 @@ const axios = require('axios')
  * "https://myteam.sharepoint.com/sites/cfscuritiba/Lists/MyList/"
  *
  * @class
- * @version 0.4.5
+ * @version 0.4.6
  * @constructor
  * @param {string} siteUrl Base URL of the SharePoint site which the list
  *        belongs to. At the example, the site URL is
@@ -140,7 +140,7 @@ module.exports = function(siteUrl, listName) {
   _this.getUserInfo = async (id) => {
     if (id) {
       const data0 = await _axios.get(`${_siteUrl}/_vti_bin/listdata.svc/UserInformationList?$top=1`)
-      const idField = data0.data.d.results[0].Id ? 'Id' : 'Id0'
+      const idField = data0.data.d[0].Id ? 'Id' : 'Id0'
       const data1 = _axios.get(`${_siteUrl}/_api/Web/GetUserById(${id})`)
       const data2 = _axios.get(`${_siteUrl}/_vti_bin/listdata.svc/UserInformationList?$filter=(${idField} eq ${id})`)
       return new Promise((resolve, reject) => {
