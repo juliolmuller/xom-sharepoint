@@ -56,7 +56,7 @@ module.exports = function(siteUrl, listName) {
   /**
    * Define property to get & set 'siteUrl' value
    *
-   * @return {string}
+   * @property {string} siteUrl
    */
   Object.defineProperty(_this, 'siteUrl', {
     get() {
@@ -70,7 +70,7 @@ module.exports = function(siteUrl, listName) {
   /**
    * Define property to get & set 'listName' value
    *
-   * @return {string}
+   * @property {string} listName
    */
   Object.defineProperty(_this, 'listName', {
     get() {
@@ -84,7 +84,7 @@ module.exports = function(siteUrl, listName) {
   /**
    * Define property to get 'baseUrl' value
    *
-   * @return {string}
+   * @property {string} baseUrl
    */
   Object.defineProperty(_this, 'baseUrl', {
     get() {
@@ -95,7 +95,7 @@ module.exports = function(siteUrl, listName) {
   /**
    * Define property to get 'baseAttachmentUrl' value
    *
-   * @return {string}
+   * @property {string} baseAttachmentUrl
    */
   Object.defineProperty(_this, 'baseAttachmentUrl', {
     get() {
@@ -104,7 +104,7 @@ module.exports = function(siteUrl, listName) {
   })
 
   /**
-   * Extract the usefull part of account/login name
+   * Extract useful parts of account/login name
    *
    * @param {string} account Account/login name to be trimmed
    * @return {string}
@@ -118,7 +118,7 @@ module.exports = function(siteUrl, listName) {
   /**
    * Add essential properties to the user object
    *
-   * @param {object} user User object literal
+   * @param {Object} user User object literal
    */
   const addUserProperties = (user) => {
     user.Id = user.Id || user.Id0
@@ -128,6 +128,20 @@ module.exports = function(siteUrl, listName) {
     user.Name = user.Name || user.DisplayName
     user.PersonalUrl = `https://mysite.na.xom.com/personal//${user.AccountName}`
     user.PictureUrl = `http://lyncpictures/service/api/image/${user.AccountName}`
+  }
+
+  /**
+   * Convert a given string to Pascal case pattern
+   *
+   * @param {string} str Base string to be converted
+   * @return {string}
+   */
+  const toPascalCase = (str) => {
+    str = String(str)
+    str = str.replace(/([\ \,\.\!\?])([A-Za-zÀ-ÿ]?)/g, (_g0, _g1, g2) => {
+      return g2.toUpperCase()
+    })
+    return str.charAt(0).toUpperCase() + str.slice(1)
   }
 
   /**
@@ -191,7 +205,7 @@ module.exports = function(siteUrl, listName) {
    * Performs a GET request to the API, in order to obtain a records set from
    * the SharePoint list
    *
-   * @param {string} params Appends additional parameters to the request, like
+   * @param {string} [params] Appends additional parameters to the request, like
    *        filters or sorting
    * @return {Promise}
    */
@@ -209,7 +223,7 @@ module.exports = function(siteUrl, listName) {
    * based on its ID
    *
    * @param {number} id Identification number for the record to be retrieved
-   * @param {string} params Appends additional parameters to the request, like
+   * @param {string} [params] Appends additional parameters to the request, like
    *        filters or sorting
    * @return {Promise}
    */
@@ -226,7 +240,7 @@ module.exports = function(siteUrl, listName) {
    * Performs a POST request to the API, in order to insert a new record in
    * SharePoint list
    *
-   * @param {object} data The object (using JSON notation) to be saved (fields
+   * @param {Object} data The object (using JSON notation) to be saved (fields
    *        names case must match with the list's)
    * @return {Promise}
    */
@@ -244,7 +258,7 @@ module.exports = function(siteUrl, listName) {
    * fields of an existing record in SharePoint list
    *
    * @param {number} id Identification number for the record to be modified
-   * @param {object} data The object (using JSON notation) to be changed (fields
+   * @param {Object} data The object (using JSON notation) to be changed (fields
    *        names case must match with the list's)
    * @return {Promise}
    */
@@ -263,7 +277,7 @@ module.exports = function(siteUrl, listName) {
    * a matter of name
    *
    * @param {number} id Identification number for the record to be modified
-   * @param {object} data The object (using JSON notation) to be changed (fields
+   * @param {Object} data The object (using JSON notation) to be changed (fields
    *        names case must match with the list's)
    * @return {Promise}
    */
