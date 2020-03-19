@@ -1,24 +1,20 @@
-const axios = require('axios')
+const axios = require('axios').default
+const XomSharePointList = require('./XomSharePointList')
 
 /**
- * Instantiate an object to consume SharePoint REST API. As parameters,
- * consider the folloing full URL example you are targeting:
- * "https://myteam.sharepoint.com/sites/cfscuritiba/Lists/MyList/"
+ * Contain the necessary information to stablish a connection to a SharePoint
+ * team site through its REST API
  *
- * @class
- * @version 0.4.6
  * @constructor
- * @param {string} siteUrl Base URL of the SharePoint site which the list
- *        belongs to. At the example, the site URL is
- *        "https://myteam.sharepoint.com/sites/cfscuritiba"
- * @param {string} [listName] Name of the list you are targeting. At the
- *        example, the list name is "MyList"
+ * @param {string} siteUrl Base URL of the SharePoint site to connect to
  */
-module.exports = function(siteUrl, listName) {
+function XomSharePoint(siteUrl) {
 
   /**
    * Ensure pointer to propper 'this'
    *
+   * @private
+   * @final
    * @var {this}
    */
   const _this = this
@@ -26,27 +22,16 @@ module.exports = function(siteUrl, listName) {
   /**
    * Private instance of Axios
    *
+   * @private
+   * @final
    * @var {Axios}
    */
-  const _axios = axios.create()
+  const _http = axios.create()
 
-  /**
-   * Store the SharePoint site URL
-   *
-   * @var {string}
-   */
-  let _siteUrl = siteUrl
-
-  /**
-   * Store the SharePoint list name
-   *
-   * @var {string}
-   */
-  let _listName = listName || null
-
-  // Configure HTTP client defaults
-  _axios.defaults.withCredentials = true
-  _axios.defaults.headers.common = {
+  // Default HTTP client configurations
+  _http.defaults.withCredentials = true
+  _http.defaults.baseURL = siteUrl
+  _http.defaults.headers.common = {
     'Accept': 'application/json;odata=verbose',
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'Content-Type',
@@ -60,46 +45,10 @@ module.exports = function(siteUrl, listName) {
    */
   Object.defineProperty(_this, 'siteUrl', {
     get() {
-      return _siteUrl
+      return _http.defaults.baseURL
     },
     set(siteUrl) {
-      _siteUrl = siteUrl
-    },
-  })
-
-  /**
-   * Define property to get & set 'listName' value
-   *
-   * @property {string} listName
-   */
-  Object.defineProperty(_this, 'listName', {
-    get() {
-      return _listName
-    },
-    set(listName) {
-      _listName = listName
-    },
-  })
-
-  /**
-   * Define property to get 'baseUrl' value
-   *
-   * @property {string} baseUrl
-   */
-  Object.defineProperty(_this, 'baseUrl', {
-    get() {
-      return `${_siteUrl}/_vti_bin/listdata.svc/${_listName}`
-    },
-  })
-
-  /**
-   * Define property to get 'baseAttachmentUrl' value
-   *
-   * @property {string} baseAttachmentUrl
-   */
-  Object.defineProperty(_this, 'baseAttachmentUrl', {
-    get() {
-      return `${_siteUrl}/_api/web/lists/getbytitle(${_listName})`
+      _http.defaults.baseURL = siteUrl
     },
   })
 
@@ -131,49 +80,47 @@ module.exports = function(siteUrl, listName) {
   }
 
   /**
-   * Convert a given string to Pascal case pattern
-   *
-   * @param {string} str Base string to be converted
-   * @return {string}
-   */
-  const toPascalCase = (str) => {
-    str = String(str)
-    str = str.replace(/([\ \,\.\!\?])([A-Za-zÀ-ÿ]?)/g, (_g0, _g1, g2) => {
-      return g2.toUpperCase()
-    })
-    return str.charAt(0).toUpperCase() + str.slice(1)
-  }
-
-  /**
    * Queries the SharePoint API to grab user information. Inform nothing to get
    * current user information or pass an specific user ID
    *
-   * @param {number} id Id of the user you want the information for
+   * @param {number} [id] ID of the user you want the information for
    * @return {Promise}
    */
-  _this.getUserInfo = async (id) => {
-    if (id) {
-      const data0 = await _axios.get(`${_siteUrl}/_vti_bin/listdata.svc/UserInformationList?$top=1`)
-      const idField = data0.data.d[0].Id ? 'Id' : 'Id0'
-      const data1 = _axios.get(`${_siteUrl}/_api/Web/GetUserById(${id})`)
-      const data2 = _axios.get(`${_siteUrl}/_vti_bin/listdata.svc/UserInformationList?$filter=(${idField} eq ${id})`)
-      return new Promise((resolve, reject) => {
-        Promise.all([data1, data2])
-            .then(responses => {
-              const mergedAttr = {
-                ...responses[0].data.d,
-                ...responses[1].data.d.results[0],
-              }
-              addUserProperties(mergedAttr)
-              resolve(mergedAttr)
-            })
-            .catch(error => reject(error))
-      })
+  _this.getUserInfo = (id) => {
+    if (!id) {
+      return _this.getMyInfo()
     }
-    const data1 = _axios.get(`${_siteUrl}/_api/web/CurrentUser`)
-    const data2 = _axios.get(`${_siteUrl}/_api/SP.UserProfiles.PeopleManager/GetMyProperties`)
     return new Promise((resolve, reject) => {
-      Promise.all([data1, data2])
+      _http
+          .get(`${XomSharePoint.API_USER_INFO}?$top=1`)
+          .then(response => {
+            const idField = response.data.d[0].Id ? 'Id' : 'Id0'
+            const requests = [
+              _http.get(`${XomSharePoint.API_USER}(${id})`),
+              _http.get(`${XomSharePoint.API_USER_INFO}?$filter=(${idField} eq ${id})`),
+            ]
+            Promise.all(requests)
+                .then(responses => {
+                  const mergedAttr = {
+                    ...responses[0].data.d,
+                    ...responses[1].data.d.results[0],
+                  }
+                  addUserProperties(mergedAttr)
+                  resolve(mergedAttr)
+                })
+                .catch(error => reject(error))
+          })
+          .catch(error => reject(error))
+    })
+  }
+
+  _this.getMyInfo = () => {
+    const requests = [
+      _http.get(XomSharePoint.API_USER_SELF),
+      _http.get(XomSharePoint.API_USER_SELF_INFO),
+    ]
+    return new Promise((resolve, reject) => {
+      Promise.all(requests)
           .then(responses => {
             const mergedAttr = {
               ...responses[0].data.d,
@@ -194,111 +141,64 @@ module.exports = function(siteUrl, listName) {
    */
   _this.searchUser = (name) => {
     return new Promise((resolve, reject) => {
-      _axios
-          .get(`${_siteUrl}/_vti_bin/listdata.svc/UserInformationList?$filter=substringof('${name}',Name)`)
+      _http
+          .get(`${XomSharePoint.API_USER_INFO}?$filter=substringof('${name}',Name)`)
           .then(response => resolve(response.data.d.results))
           .catch(error => reject(error))
     })
   }
 
   /**
-   * Performs a GET request to the API, in order to obtain a records set from
-   * the SharePoint list
+   * Return a reference to connect to a SharePoint list
    *
-   * @param {string} [params] Appends additional parameters to the request, like
-   *        filters or sorting
-   * @return {Promise}
+   * @param {string} listName SharePoint list name
+   * @return {XomSharePointList}
    */
-  _this.get = (params) => {
-    return new Promise((resolve, reject) => {
-      _axios
-          .get(_this.baseUrl + (params || ''))
-          .then(response => resolve(response.data.d.results))
-          .catch(error => reject(error))
-    })
-  }
-
-  /**
-   * Performs a GET request to the API, in order to obtain a single record
-   * based on its ID
-   *
-   * @param {number} id Identification number for the record to be retrieved
-   * @param {string} [params] Appends additional parameters to the request, like
-   *        filters or sorting
-   * @return {Promise}
-   */
-  _this.getOne = (id, params) => {
-    return new Promise((resolve, reject) => {
-      _axios
-          .get(`${_this.baseUrl}(${id})${params || ''}`)
-          .then(response => resolve(response.data.d.results))
-          .catch(error => reject(error))
-    })
-  }
-
-  /**
-   * Performs a POST request to the API, in order to insert a new record in
-   * SharePoint list
-   *
-   * @param {Object} data The object (using JSON notation) to be saved (fields
-   *        names case must match with the list's)
-   * @return {Promise}
-   */
-  _this.post = (data) => {
-    return new Promise((resolve, reject) => {
-      _axios
-          .post(_this.baseUrl, data)
-          .then(response => resolve(response.data.d.results))
-          .catch(error => reject(error))
-    })
-  }
-
-  /**
-   * Performs a PUT request to the API, in order to update the informed
-   * fields of an existing record in SharePoint list
-   *
-   * @param {number} id Identification number for the record to be modified
-   * @param {Object} data The object (using JSON notation) to be changed (fields
-   *        names case must match with the list's)
-   * @return {Promise}
-   */
-  _this.put = (id, data) => {
-    return _axios.post(`${_this.baseUrl}(${id})`, data, {
-      headers: {
-        ..._axios.defaults.headers.common,
-        'X-Http-Method': 'MERGE',
-        'If-Match': '*',
-      },
-    })
-  }
-
-  /**
-   * This is actualy an alternative to the 'merge' method, no difference, only
-   * a matter of name
-   *
-   * @param {number} id Identification number for the record to be modified
-   * @param {Object} data The object (using JSON notation) to be changed (fields
-   *        names case must match with the list's)
-   * @return {Promise}
-   */
-  _this.put = (id, data) => {
-    return _this.merge(id, data)
-  }
-
-  /**
-   * Performs a POST (with 'DELETE' header) request to the API, in order to
-   * delete an existing record in SharePoint list
-   *
-   * @param {number} id Identification number for the record to be deleted
-   * @return {Promise}
-   */
-  _this.delete = (id) => {
-    return _axios.post(`${_this.baseUrl}(${id})`, {}, {
-      headers: {
-        ..._axios.defaults.headers.common,
-        'X-Http-Method': 'DELETE',
-        'If-Match': '*',
-      },
-    })
+  _this.getList = (listName) => {
+    return new XomSharePointList(listName, _http)
   }
 }
+
+/**
+ * Return the API URI to get user information
+ *
+ * @const {string}
+ */
+XomSharePoint.API_USER = '/_api/Web/GetUserById'
+
+/**
+ * Return the API URI to get additional user information
+ *
+ * @const {string}
+ */
+XomSharePoint.API_USER_INFO = '/_vti_bin/listdata.svc/UserInformationList'
+
+/**
+ * Return the API URI to get current user information
+ *
+ * @const {string}
+ */
+XomSharePoint.API_USER_SELF = '/_api/web/CurrentUser'
+
+/**
+ * Return the API URI to get additional current user information
+ *
+ * @const {string}
+ */
+XomSharePoint.API_USER_SELF_INFO = '/_api/SP.UserProfiles.PeopleManager/GetMyProperties'
+
+/**
+ * Return the API URI to fetch SharePoint lists
+ *
+ * @const {string}
+ */
+XomSharePoint.API_URI_LIST = '/_vti_bin/listdata.svc'
+
+/**
+ * Return the API URI to fetch SharePoint lists attachments
+ *
+ * @const {string}
+ */
+XomSharePoint.API_URI_LIST_ATTACH = '/_api/web/lists/getbytitle'
+
+module.exports = XomSharePoint
