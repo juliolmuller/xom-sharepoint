@@ -1,4 +1,5 @@
 const axios = require('axios').default
+const uri = require('./config/constants')
 const XomSharePointList = require('./XomSharePointList')
 
 /**
@@ -8,7 +9,7 @@ const XomSharePointList = require('./XomSharePointList')
  * @constructor
  * @param {string} siteUrl Base URL of the SharePoint site to connect to
  */
-function XomSharePoint(siteUrl) {
+module.exports = function XomSharePoint(siteUrl) {
 
   /**
    * Ensure pointer to propper 'this'
@@ -92,12 +93,12 @@ function XomSharePoint(siteUrl) {
     }
     return new Promise((resolve, reject) => {
       _http
-          .get(`${XomSharePoint.API_USER_INFO}?$top=1`)
+          .get(`${uri.API_USER_INFO}?$top=1`)
           .then(response => {
             const idField = response.data.d[0].Id ? 'Id' : 'Id0'
             const requests = [
-              _http.get(`${XomSharePoint.API_USER}(${id})`),
-              _http.get(`${XomSharePoint.API_USER_INFO}?$filter=(${idField} eq ${id})`),
+              _http.get(`${uri.API_USER}(${id})`),
+              _http.get(`${uri.API_USER_INFO}?$filter=(${idField} eq ${id})`),
             ]
             Promise.all(requests)
                 .then(responses => {
@@ -116,8 +117,8 @@ function XomSharePoint(siteUrl) {
 
   _this.getMyInfo = () => {
     const requests = [
-      _http.get(XomSharePoint.API_USER_SELF),
-      _http.get(XomSharePoint.API_USER_SELF_INFO),
+      _http.get(uri.API_USER_SELF),
+      _http.get(uri.API_USER_SELF_INFO),
     ]
     return new Promise((resolve, reject) => {
       Promise.all(requests)
@@ -142,7 +143,7 @@ function XomSharePoint(siteUrl) {
   _this.searchUser = (name) => {
     return new Promise((resolve, reject) => {
       _http
-          .get(`${XomSharePoint.API_USER_INFO}?$filter=substringof('${name}',Name)`)
+          .get(`${uri.API_USER_INFO}?$filter=substringof('${name}',Name)`)
           .then(response => resolve(response.data.d.results))
           .catch(error => reject(error))
     })
@@ -158,47 +159,3 @@ function XomSharePoint(siteUrl) {
     return new XomSharePointList(listName, _http)
   }
 }
-
-/**
- * Return the API URI to get user information
- *
- * @const {string}
- */
-XomSharePoint.API_USER = '/_api/Web/GetUserById'
-
-/**
- * Return the API URI to get additional user information
- *
- * @const {string}
- */
-XomSharePoint.API_USER_INFO = '/_vti_bin/listdata.svc/UserInformationList'
-
-/**
- * Return the API URI to get current user information
- *
- * @const {string}
- */
-XomSharePoint.API_USER_SELF = '/_api/web/CurrentUser'
-
-/**
- * Return the API URI to get additional current user information
- *
- * @const {string}
- */
-XomSharePoint.API_USER_SELF_INFO = '/_api/SP.UserProfiles.PeopleManager/GetMyProperties'
-
-/**
- * Return the API URI to fetch SharePoint lists
- *
- * @const {string}
- */
-XomSharePoint.API_URI_LIST = '/_vti_bin/listdata.svc'
-
-/**
- * Return the API URI to fetch SharePoint lists attachments
- *
- * @const {string}
- */
-XomSharePoint.API_URI_LIST_ATTACH = '/_api/web/lists/getbytitle'
-
-module.exports = XomSharePoint
