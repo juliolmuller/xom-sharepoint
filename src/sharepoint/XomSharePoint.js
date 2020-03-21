@@ -111,7 +111,7 @@ module.exports = function XomSharePoint(siteUrl) {
                 })
                 .catch(error => reject(error))
           })
-          .catch(error => reject(error))
+          .catch(reject)
     })
   }
 
@@ -130,7 +130,7 @@ module.exports = function XomSharePoint(siteUrl) {
             addUserProperties(mergedAttr)
             resolve(mergedAttr)
           })
-          .catch(error => reject(error))
+          .catch(reject)
     })
   }
 
@@ -145,7 +145,7 @@ module.exports = function XomSharePoint(siteUrl) {
       _http
           .get(`${endpoint.userInfo()}?$filter=substringof('${name}',Name)`)
           .then(response => resolve(response.data.d.results))
-          .catch(error => reject(error))
+          .catch(reject)
     })
   }
 

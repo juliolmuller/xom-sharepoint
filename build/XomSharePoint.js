@@ -115,9 +115,7 @@ module.exports = function XomSharePoint(siteUrl) {
         })["catch"](function (error) {
           return reject(error);
         });
-      })["catch"](function (error) {
-        return reject(error);
-      });
+      })["catch"](reject);
     });
   };
 
@@ -129,9 +127,7 @@ module.exports = function XomSharePoint(siteUrl) {
 
         addUserProperties(mergedAttr);
         resolve(mergedAttr);
-      })["catch"](function (error) {
-        return reject(error);
-      });
+      })["catch"](reject);
     });
   };
   /**
@@ -146,9 +142,7 @@ module.exports = function XomSharePoint(siteUrl) {
     return new Promise(function (resolve, reject) {
       _http.get("".concat(endpoint.userInfo(), "?$filter=substringof('").concat(name, "',Name)")).then(function (response) {
         return resolve(response.data.d.results);
-      })["catch"](function (error) {
-        return reject(error);
-      });
+      })["catch"](reject);
     });
   };
   /**

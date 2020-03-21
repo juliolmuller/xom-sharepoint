@@ -1,5 +1,6 @@
-const toPascalCase = require('./utils/toPascalCase')
 const endpoint = require('./config/endpoint')
+const genFileBuffer = require('./utils/genFileBuffer')
+const toPascalCase = require('./utils/toPascalCase')
 
 /**
  * Contain the necessary information to stablish a connection to a SharePoint
@@ -82,14 +83,14 @@ module.exports = function XomSharePointList(listName, axiosInstance) {
    *
    * @param {string} [params] Parameters to be appended to the requested URL.
    *                          See https://social.technet.microsoft.com/wiki/contents/articles/35796.sharepoint-2013-using-rest-api-for-selecting-filtering-sorting-and-pagination-in-sharepoint-list.aspx
-   * @return {Promise}
+   * @return {Promise<Object[]>}
    */
   _this.get = (params) => {
     return new Promise((resolve, reject) => {
       _http
           .get(_this.apiUri + (params || ''))
           .then(response => resolve(response.data.d.results || response.data.d))
-          .catch(error => reject(error))
+          .catch(reject)
     })
   }
 
@@ -97,14 +98,14 @@ module.exports = function XomSharePointList(listName, axiosInstance) {
    * Perform a GET request to API to obtain a single record based on its ID
    *
    * @param {number} id Identification number for the record to be retrieved
-   * @return {Promise}
+   * @return {Promise<Object>}
    */
   _this.getOne = (id) => {
     return new Promise((resolve, reject) => {
       _http
           .get(`${_this.apiUri}(${id})`)
           .then(response => resolve(response.data.d))
-          .catch(error => reject(error))
+          .catch(reject)
     })
   }
 
@@ -112,14 +113,14 @@ module.exports = function XomSharePointList(listName, axiosInstance) {
    * Performs a POST request to API to store a new record
    *
    * @param {Object} data The object (using JSON notation) to be saved
-   * @return {Promise}
+   * @return {Promise<Object>}
    */
   _this.post = (data) => {
     return new Promise((resolve, reject) => {
       _http
           .post(_this.apiUri, data)
           .then(response => resolve(response.data.d.results))
-          .catch(error => reject(error))
+          .catch(reject)
     })
   }
 
@@ -128,7 +129,7 @@ module.exports = function XomSharePointList(listName, axiosInstance) {
    *
    * @param {number} id Identification number for the record to be modified
    * @param {Object} data The object (using JSON notation) to be changed
-   * @return {Promise}
+   * @return {Promise<Object>}
    */
   _this.update = (id, data) => {
     return _http.post(_this.apiUri + `(${id})`, data, {
@@ -144,7 +145,7 @@ module.exports = function XomSharePointList(listName, axiosInstance) {
    * Perform a POST request (with DELETE header) to API delete an existing record
    *
    * @param {number} id Identification number for the record to be deleted
-   * @return {Promise}
+   * @return {Promise<Object>}
    */
   _this.delete = (id) => {
     return _http.post(_this.apiUri + `(${id})`, {}, {
@@ -153,6 +154,84 @@ module.exports = function XomSharePointList(listName, axiosInstance) {
         'X-Http-Method': 'DELETE',
         'If-Match': '*',
       },
+    })
+  }
+
+  /**
+   * Get the Request Digest for the context
+   *
+   * @return {Promise<String>}
+   */
+  _this.getRequestDigest = () => {
+    return new Promise((resolve, reject) => {
+      _http
+          .post(endpoint.contextInfo(), {})
+          .then(({ data }) => resolve(data.FormDigestValue || data.d.GetContextWebInformation.FormDigestValue))
+          .catch(reject)
+    })
+  }
+
+  /**
+   * Perform a GET request to API return a list of the files attached to a list item
+   *
+   * @param {number} itemId Identification number for the record to be changed
+   * @return {Promise<Object[]>}
+   */
+  _this.getAttachmentsFrom = (itemId) => {
+    return new Promise((resolve, reject) => {
+      _http
+          .get(endpoint.listItemsAttachment(_this.listName, itemId))
+          .then(response => resolve(response.data.d))
+          .catch(reject)
+    })
+  }
+
+  /**
+   * Upload a file attachment to a list item
+   *
+   * @param {number} itemId
+   * @param {string|HTMLElement|FileList|File} fileInput Some reference of the input type 'file':
+   *          String - if it is a query selector;
+   *          HTMLElement - if it is a direct reference to the input element;
+   *          FileList - if it is direct reference to the 'files' attribute of the element; and
+   *          File - if it is a direct reference to the file.
+   *        For the three first options, as it will result in a array of files (FileList), only
+   *        the first File of the collection will be selected. If you want to get the byte buffer
+   *        of other files, provide a File instance explicitaly
+   * @param {string} [fileName] Define a different name to be set to the uploaded file
+   * @return {Promise<Object>}
+   */
+  _this.attachFileTo = (itemId, fileInput, fileName) => {
+    return new Promise((resolve, reject) => {
+      const requests = [
+        genFileBuffer(fileInput),
+        _this.getRequestDigest(),
+      ]
+      Promise.all(requests)
+          .then(([fileBuffer, requestDigest]) => {
+            fileName = fileName || (() => {
+              switch (fileInput.constructor.name) {
+                case 'String':
+                  fileInput = document.querySelector(fileInput)
+                case 'HTMLInputElement':
+                  fileInput = fileInput.files[0]
+                case 'FileList':
+                  fileInput = fileInput[0]
+                case 'File':
+                  return fileInput.name
+              }
+            })()
+            _http({})
+                .post(`${endpoint.listItemsAttachment}/add(filename='${fileName}')`, fileBuffer, {
+                  headers: {
+                    ..._http.defaults.headers.common,
+                    'X-RequestDigest': requestDigest,
+                  },
+                })
+                .then(response => resolve(response.data.d))
+                .catch(reject)
+          })
+          .catch(reject)
     })
   }
 }

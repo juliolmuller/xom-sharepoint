@@ -1962,6 +1962,56 @@ module.exports = {
     return "/_api/web/lists/getbytitle('".concat(listTitle, "')/items(").concat(itemId, ")/AttachmentFiles");
   }
 };
+},{}],"jHLM":[function(require,module,exports) {
+/* eslint-disable operator-linebreak */
+
+/**
+ * Generate a byte buffer from a HTML file input
+ *
+ * @param {string|HTMLElement|FileList|File} input Some reference of the input type 'file':
+ *          String - if it is a query selector;
+ *          HTMLElement - if it is a direct reference to the input element;
+ *          FileList - if it is direct reference to the 'files' attribute of the element; and
+ *          File - if it is a direct reference to the file.
+ *        For the three first options, as it will result in a array of files (FileList), only
+ *        the first File of the collection will be selected. If you want to get the byte buffer
+ *        of other files, provide a File instance explicitaly
+ * @return {Promise<ArrayBuffer>}
+ */
+module.exports = function genFileBuffer(input) {
+  var reader = new FileReader();
+
+  var file = function () {
+    switch (input.constructor.name) {
+      case 'String':
+        input = document.querySelector(input);
+
+      case 'HTMLInputElement':
+        input = input.files[0];
+
+      case 'FileList':
+        input = input[0];
+
+      case 'File':
+        return input;
+
+      default:
+        throw new TypeError('Type must be an instance of HTMLInputElement, FileList, File or String (input selector)');
+    }
+  }();
+
+  return new Promise(function (resolve, reject) {
+    reader.onloadend = function (ev) {
+      return resolve(ev.target.result);
+    };
+
+    reader.onerror = function (ev) {
+      return reject(ev.target.error);
+    };
+
+    reader.readAsArrayBuffer(file);
+  });
+};
 },{}],"O8QA":[function(require,module,exports) {
 /**
  * Convert a given string to Pascal case pattern
@@ -1977,15 +2027,25 @@ module.exports = function toPascalCase(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 };
 },{}],"HXnx":[function(require,module,exports) {
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance"); }
+
+function _iterableToArrayLimit(arr, i) { if (!(Symbol.iterator in Object(arr) || Object.prototype.toString.call(arr) === "[object Arguments]")) { return; } var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-var toPascalCase = require('./utils/toPascalCase');
-
 var endpoint = require('./config/endpoint');
+
+var genFileBuffer = require('./utils/genFileBuffer');
+
+var toPascalCase = require('./utils/toPascalCase');
 /**
  * Contain the necessary information to stablish a connection to a SharePoint
  * list through its REST API
@@ -2068,23 +2128,21 @@ module.exports = function XomSharePointList(listName, axiosInstance) {
    *
    * @param {string} [params] Parameters to be appended to the requested URL.
    *                          See https://social.technet.microsoft.com/wiki/contents/articles/35796.sharepoint-2013-using-rest-api-for-selecting-filtering-sorting-and-pagination-in-sharepoint-list.aspx
-   * @return {Promise}
+   * @return {Promise<Object[]>}
    */
 
   _this.get = function (params) {
     return new Promise(function (resolve, reject) {
       _http.get(_this.apiUri + (params || '')).then(function (response) {
         return resolve(response.data.d.results || response.data.d);
-      }).catch(function (error) {
-        return reject(error);
-      });
+      }).catch(reject);
     });
   };
   /**
    * Perform a GET request to API to obtain a single record based on its ID
    *
    * @param {number} id Identification number for the record to be retrieved
-   * @return {Promise}
+   * @return {Promise<Object>}
    */
 
 
@@ -2092,16 +2150,14 @@ module.exports = function XomSharePointList(listName, axiosInstance) {
     return new Promise(function (resolve, reject) {
       _http.get("".concat(_this.apiUri, "(").concat(id, ")")).then(function (response) {
         return resolve(response.data.d);
-      }).catch(function (error) {
-        return reject(error);
-      });
+      }).catch(reject);
     });
   };
   /**
    * Performs a POST request to API to store a new record
    *
    * @param {Object} data The object (using JSON notation) to be saved
-   * @return {Promise}
+   * @return {Promise<Object>}
    */
 
 
@@ -2109,9 +2165,7 @@ module.exports = function XomSharePointList(listName, axiosInstance) {
     return new Promise(function (resolve, reject) {
       _http.post(_this.apiUri, data).then(function (response) {
         return resolve(response.data.d.results);
-      }).catch(function (error) {
-        return reject(error);
-      });
+      }).catch(reject);
     });
   };
   /**
@@ -2119,7 +2173,7 @@ module.exports = function XomSharePointList(listName, axiosInstance) {
    *
    * @param {number} id Identification number for the record to be modified
    * @param {Object} data The object (using JSON notation) to be changed
-   * @return {Promise}
+   * @return {Promise<Object>}
    */
 
 
@@ -2135,7 +2189,7 @@ module.exports = function XomSharePointList(listName, axiosInstance) {
    * Perform a POST request (with DELETE header) to API delete an existing record
    *
    * @param {number} id Identification number for the record to be deleted
-   * @return {Promise}
+   * @return {Promise<Object>}
    */
 
 
@@ -2147,8 +2201,89 @@ module.exports = function XomSharePointList(listName, axiosInstance) {
       })
     });
   };
+  /**
+   * Get the Request Digest for the context
+   *
+   * @return {Promise<String>}
+   */
+
+
+  _this.getRequestDigest = function () {
+    return new Promise(function (resolve, reject) {
+      _http.post(endpoint.contextInfo(), {}).then(function (_ref) {
+        var data = _ref.data;
+        return resolve(data.FormDigestValue || data.d.GetContextWebInformation.FormDigestValue);
+      }).catch(reject);
+    });
+  };
+  /**
+   * Perform a GET request to API return a list of the files attached to a list item
+   *
+   * @param {number} itemId Identification number for the record to be changed
+   * @return {Promise<Object[]>}
+   */
+
+
+  _this.getAttachmentsFrom = function (itemId) {
+    return new Promise(function (resolve, reject) {
+      _http.get(endpoint.listItemsAttachment(_this.listName, itemId)).then(function (response) {
+        return resolve(response.data.d);
+      }).catch(reject);
+    });
+  };
+  /**
+   * Upload a file attachment to a list item
+   *
+   * @param {number} itemId
+   * @param {string|HTMLElement|FileList|File} fileInput Some reference of the input type 'file':
+   *          String - if it is a query selector;
+   *          HTMLElement - if it is a direct reference to the input element;
+   *          FileList - if it is direct reference to the 'files' attribute of the element; and
+   *          File - if it is a direct reference to the file.
+   *        For the three first options, as it will result in a array of files (FileList), only
+   *        the first File of the collection will be selected. If you want to get the byte buffer
+   *        of other files, provide a File instance explicitaly
+   * @param {string} [fileName] Define a different name to be set to the uploaded file
+   * @return {Promise<Object>}
+   */
+
+
+  _this.attachFileTo = function (itemId, fileInput, fileName) {
+    return new Promise(function (resolve, reject) {
+      var requests = [genFileBuffer(fileInput), _this.getRequestDigest()];
+      Promise.all(requests).then(function (_ref2) {
+        var _ref3 = _slicedToArray(_ref2, 2),
+            fileBuffer = _ref3[0],
+            requestDigest = _ref3[1];
+
+        fileName = fileName || function () {
+          switch (fileInput.constructor.name) {
+            case 'String':
+              fileInput = document.querySelector(fileInput);
+
+            case 'HTMLInputElement':
+              fileInput = fileInput.files[0];
+
+            case 'FileList':
+              fileInput = fileInput[0];
+
+            case 'File':
+              return fileInput.name;
+          }
+        }();
+
+        _http({}).post("".concat(endpoint.listItemsAttachment, "/add(filename='").concat(fileName, "')"), fileBuffer, {
+          headers: _objectSpread({}, _http.defaults.headers.common, {
+            'X-RequestDigest': requestDigest
+          })
+        }).then(function (response) {
+          return resolve(response.data.d);
+        }).catch(reject);
+      }).catch(reject);
+    });
+  };
 };
-},{"./utils/toPascalCase":"O8QA","./config/endpoint":"CFNo"}],"o0Hk":[function(require,module,exports) {
+},{"./config/endpoint":"CFNo","./utils/genFileBuffer":"jHLM","./utils/toPascalCase":"O8QA"}],"o0Hk":[function(require,module,exports) {
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
@@ -2264,9 +2399,7 @@ module.exports = function XomSharePoint(siteUrl) {
         }).catch(function (error) {
           return reject(error);
         });
-      }).catch(function (error) {
-        return reject(error);
-      });
+      }).catch(reject);
     });
   };
 
@@ -2278,9 +2411,7 @@ module.exports = function XomSharePoint(siteUrl) {
 
         addUserProperties(mergedAttr);
         resolve(mergedAttr);
-      }).catch(function (error) {
-        return reject(error);
-      });
+      }).catch(reject);
     });
   };
   /**
@@ -2295,9 +2426,7 @@ module.exports = function XomSharePoint(siteUrl) {
     return new Promise(function (resolve, reject) {
       _http.get("".concat(endpoint.userInfo(), "?$filter=substringof('").concat(name, "',Name)")).then(function (response) {
         return resolve(response.data.d.results);
-      }).catch(function (error) {
-        return reject(error);
-      });
+      }).catch(reject);
     });
   };
   /**
