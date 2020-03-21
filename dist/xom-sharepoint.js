@@ -1880,49 +1880,87 @@ module.exports.default = axios;
 
 },{"./utils":"S1cf","./helpers/bind":"EDTP","./core/Axios":"OvAf","./core/mergeConfig":"OHvn","./defaults":"BXyq","./cancel/Cancel":"mIKj","./cancel/CancelToken":"tsWd","./cancel/isCancel":"V30M","./helpers/spread":"X8jb"}],"dZBD":[function(require,module,exports) {
 module.exports = require('./lib/axios');
-},{"./lib/axios":"nUiQ"}],"NSVH":[function(require,module,exports) {
+},{"./lib/axios":"nUiQ"}],"CFNo":[function(require,module,exports) {
+/**
+ * Group of functions to get SharePoint API URI endpoints
+ */
 module.exports = {
   /**
-   * Return the API URI to get user information
+   * Return URI for site context information
    *
-   * @const {string}
+   * @return {string}
    */
-  API_USER: '/_api/Web/GetUserById',
+  contextInfo: function contextInfo() {
+    return '/_api/ContextInfo';
+  },
 
   /**
-   * Return the API URI to get additional user information
+   * Return URI to get a user information
    *
-   * @const {string}
+   * @param {number} userId
+   * @return {string}
    */
-  API_USER_INFO: '/_vti_bin/listdata.svc/UserInformationList',
+  user: function user(userId) {
+    return "/_api/Web/GetUserById(".concat(userId, ")");
+  },
 
   /**
-   * Return the API URI to get current user information
+   * Return URI to get additional user information
    *
-   * @const {string}
+   * @return {string}
    */
-  API_USER_SELF: '/_api/web/CurrentUser',
+  userInfo: function userInfo() {
+    return '/_vti_bin/listdata.svc/UserInformationList';
+  },
 
   /**
-   * Return the API URI to get additional current user information
+   * Return URI to get current user information
    *
-   * @const {string}
+   * @return {string}
    */
-  API_USER_SELF_INFO: '/_api/SP.UserProfiles.PeopleManager/GetMyProperties',
+  currentUser: function currentUser() {
+    return '/_api/web/CurrentUser';
+  },
 
   /**
-   * Return the API URI to fetch SharePoint lists
+   * Return URI to get additional current user information
    *
-   * @const {string}
+   * @return {string}
    */
-  API_URI_LIST: '/_vti_bin/listdata.svc',
+  currentUserInfo: function currentUserInfo() {
+    return '/_api/SP.UserProfiles.PeopleManager/GetMyProperties';
+  },
 
   /**
-   * Return the API URI to fetch SharePoint lists attachments
+   * Return URI to touch a list
    *
-   * @const {string}
+   * @param {string} listTitle
+   * @return {string}
    */
-  API_URI_LIST_ATTACH: '/_api/web/lists/getbytitle'
+  list: function list(listTitle) {
+    return "/_api/web/lists/GetByTitle('".concat(listTitle, "')");
+  },
+
+  /**
+   * Return URI to handle list items
+   *
+   * @param {string} listTitle
+   * @return {string}
+   */
+  listItems: function listItems(listTitle) {
+    return "/_vti_bin/listdata.svc/".concat(listTitle);
+  },
+
+  /**
+   * Return URI to handle list items attachments
+   *
+   * @param {string} listTitle
+   * @param {number} itemId
+   * @return {string}
+   */
+  listItemsAttachment: function listItemsAttachment(listTitle, itemId) {
+    return "/_api/web/lists/getbytitle('".concat(listTitle, "')/items(").concat(itemId, ")/AttachmentFiles");
+  }
 };
 },{}],"O8QA":[function(require,module,exports) {
 /**
@@ -1947,7 +1985,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 var toPascalCase = require('./utils/toPascalCase');
 
-var uri = require('./config/constants');
+var endpoint = require('./config/endpoint');
 /**
  * Contain the necessary information to stablish a connection to a SharePoint
  * list through its REST API
@@ -2022,18 +2060,7 @@ module.exports = function XomSharePointList(listName, axiosInstance) {
 
   Object.defineProperty(_this, 'apiUri', {
     get: function get() {
-      return "".concat(uri.API_URI_LIST, "/").concat(_this.listName);
-    }
-  });
-  /**
-   * Define property to get 'apiUriAttachment' value
-   *
-   * @property {string} apiUriAttachment
-   */
-
-  Object.defineProperty(_this, 'apiUriAttachment', {
-    get: function get() {
-      return "".concat(uri.API_URI_LIST_ATTACH, "(").concat(_this.listName, ")");
+      return endpoint.listItems(_this.listName);
     }
   });
   /**
@@ -2063,7 +2090,7 @@ module.exports = function XomSharePointList(listName, axiosInstance) {
 
   _this.getOne = function (id) {
     return new Promise(function (resolve, reject) {
-      _http.get(_this.apiUri + "(".concat(id, ")")).then(function (response) {
+      _http.get("".concat(_this.apiUri, "(").concat(id, ")")).then(function (response) {
         return resolve(response.data.d);
       }).catch(function (error) {
         return reject(error);
@@ -2121,7 +2148,7 @@ module.exports = function XomSharePointList(listName, axiosInstance) {
     });
   };
 };
-},{"./utils/toPascalCase":"O8QA","./config/constants":"NSVH"}],"o0Hk":[function(require,module,exports) {
+},{"./utils/toPascalCase":"O8QA","./config/endpoint":"CFNo"}],"o0Hk":[function(require,module,exports) {
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
@@ -2130,7 +2157,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 var axios = require('axios').default;
 
-var uri = require('./config/constants');
+var endpoint = require('./config/endpoint');
 
 var XomSharePointList = require('./XomSharePointList');
 /**
@@ -2226,9 +2253,9 @@ module.exports = function XomSharePoint(siteUrl) {
     }
 
     return new Promise(function (resolve, reject) {
-      _http.get("".concat(uri.API_USER_INFO, "?$top=1")).then(function (response) {
+      _http.get("".concat(endpoint.userInfo(), "?$top=1")).then(function (response) {
         var idField = response.data.d[0].Id ? 'Id' : 'Id0';
-        var requests = [_http.get("".concat(uri.API_USER, "(").concat(id, ")")), _http.get("".concat(uri.API_USER_INFO, "?$filter=(").concat(idField, " eq ").concat(id, ")"))];
+        var requests = [_http.get(endpoint.user(id)), _http.get("".concat(endpoint.userInfo(), "?$filter=(").concat(idField, " eq ").concat(id, ")"))];
         Promise.all(requests).then(function (responses) {
           var mergedAttr = _objectSpread({}, responses[0].data.d, {}, responses[1].data.d.results[0]);
 
@@ -2244,7 +2271,7 @@ module.exports = function XomSharePoint(siteUrl) {
   };
 
   _this.getMyInfo = function () {
-    var requests = [_http.get(uri.API_USER_SELF), _http.get(uri.API_USER_SELF_INFO)];
+    var requests = [_http.get(endpoint.currentUser()), _http.get(endpoint.currentUserInfo())];
     return new Promise(function (resolve, reject) {
       Promise.all(requests).then(function (responses) {
         var mergedAttr = _objectSpread({}, responses[0].data.d, {}, responses[1].data.d);
@@ -2266,7 +2293,7 @@ module.exports = function XomSharePoint(siteUrl) {
 
   _this.searchUser = function (name) {
     return new Promise(function (resolve, reject) {
-      _http.get("".concat(uri.API_USER_INFO, "?$filter=substringof('").concat(name, "',Name)")).then(function (response) {
+      _http.get("".concat(endpoint.userInfo(), "?$filter=substringof('").concat(name, "',Name)")).then(function (response) {
         return resolve(response.data.d.results);
       }).catch(function (error) {
         return reject(error);
@@ -2285,14 +2312,14 @@ module.exports = function XomSharePoint(siteUrl) {
     return new XomSharePointList(listName, _http);
   };
 };
-},{"axios":"dZBD","./config/constants":"NSVH","./XomSharePointList":"HXnx"}],"XVne":[function(require,module,exports) {
+},{"axios":"dZBD","./config/endpoint":"CFNo","./XomSharePointList":"HXnx"}],"XVne":[function(require,module,exports) {
 var XomSharePoint = require('./XomSharePoint');
 /**
  * Instantiate a XomSharePoint object to connect to a SharePoint site and,
  * therefore, exchange data with its contents (lists, libraries, permissions)
  * through SharePoint native REST API
  *
- * @version 0.5.0
+ * @version 0.6.0
  * @param {string} siteUrl Base URL of the SharePoint site to connect to
  * @return {XomSharePoint}
  */

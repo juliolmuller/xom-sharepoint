@@ -8,7 +8,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 var axios = require('axios')["default"];
 
-var uri = require('./config/constants');
+var endpoint = require('./config/endpoint');
 
 var XomSharePointList = require('./XomSharePointList');
 /**
@@ -104,9 +104,9 @@ module.exports = function XomSharePoint(siteUrl) {
     }
 
     return new Promise(function (resolve, reject) {
-      _http.get("".concat(uri.API_USER_INFO, "?$top=1")).then(function (response) {
+      _http.get("".concat(endpoint.userInfo(), "?$top=1")).then(function (response) {
         var idField = response.data.d[0].Id ? 'Id' : 'Id0';
-        var requests = [_http.get("".concat(uri.API_USER, "(").concat(id, ")")), _http.get("".concat(uri.API_USER_INFO, "?$filter=(").concat(idField, " eq ").concat(id, ")"))];
+        var requests = [_http.get(endpoint.user(id)), _http.get("".concat(endpoint.userInfo(), "?$filter=(").concat(idField, " eq ").concat(id, ")"))];
         Promise.all(requests).then(function (responses) {
           var mergedAttr = _objectSpread({}, responses[0].data.d, {}, responses[1].data.d.results[0]);
 
@@ -122,7 +122,7 @@ module.exports = function XomSharePoint(siteUrl) {
   };
 
   _this.getMyInfo = function () {
-    var requests = [_http.get(uri.API_USER_SELF), _http.get(uri.API_USER_SELF_INFO)];
+    var requests = [_http.get(endpoint.currentUser()), _http.get(endpoint.currentUserInfo())];
     return new Promise(function (resolve, reject) {
       Promise.all(requests).then(function (responses) {
         var mergedAttr = _objectSpread({}, responses[0].data.d, {}, responses[1].data.d);
@@ -144,7 +144,7 @@ module.exports = function XomSharePoint(siteUrl) {
 
   _this.searchUser = function (name) {
     return new Promise(function (resolve, reject) {
-      _http.get("".concat(uri.API_USER_INFO, "?$filter=substringof('").concat(name, "',Name)")).then(function (response) {
+      _http.get("".concat(endpoint.userInfo(), "?$filter=substringof('").concat(name, "',Name)")).then(function (response) {
         return resolve(response.data.d.results);
       })["catch"](function (error) {
         return reject(error);

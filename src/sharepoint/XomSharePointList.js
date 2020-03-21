@@ -1,5 +1,5 @@
 const toPascalCase = require('./utils/toPascalCase')
-const uri = require('./config/constants')
+const endpoint = require('./config/endpoint')
 
 /**
  * Contain the necessary information to stablish a connection to a SharePoint
@@ -73,18 +73,7 @@ module.exports = function XomSharePointList(listName, axiosInstance) {
    */
   Object.defineProperty(_this, 'apiUri', {
     get() {
-      return `${uri.API_URI_LIST}/${_this.listName}`
-    },
-  })
-
-  /**
-   * Define property to get 'apiUriAttachment' value
-   *
-   * @property {string} apiUriAttachment
-   */
-  Object.defineProperty(_this, 'apiUriAttachment', {
-    get() {
-      return `${uri.API_URI_LIST_ATTACH}(${_this.listName})`
+      return endpoint.listItems(_this.listName)
     },
   })
 
@@ -113,7 +102,7 @@ module.exports = function XomSharePointList(listName, axiosInstance) {
   _this.getOne = (id) => {
     return new Promise((resolve, reject) => {
       _http
-          .get(_this.apiUri + `(${id})`)
+          .get(`${_this.apiUri}(${id})`)
           .then(response => resolve(response.data.d))
           .catch(error => reject(error))
     })

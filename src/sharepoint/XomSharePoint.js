@@ -1,5 +1,5 @@
 const axios = require('axios').default
-const uri = require('./config/constants')
+const endpoint = require('./config/endpoint')
 const XomSharePointList = require('./XomSharePointList')
 
 /**
@@ -93,12 +93,12 @@ module.exports = function XomSharePoint(siteUrl) {
     }
     return new Promise((resolve, reject) => {
       _http
-          .get(`${uri.API_USER_INFO}?$top=1`)
+          .get(`${(endpoint.userInfo())}?$top=1`)
           .then(response => {
             const idField = response.data.d[0].Id ? 'Id' : 'Id0'
             const requests = [
-              _http.get(`${uri.API_USER}(${id})`),
-              _http.get(`${uri.API_USER_INFO}?$filter=(${idField} eq ${id})`),
+              _http.get(endpoint.user(id)),
+              _http.get(`${endpoint.userInfo()}?$filter=(${idField} eq ${id})`),
             ]
             Promise.all(requests)
                 .then(responses => {
@@ -117,8 +117,8 @@ module.exports = function XomSharePoint(siteUrl) {
 
   _this.getMyInfo = () => {
     const requests = [
-      _http.get(uri.API_USER_SELF),
-      _http.get(uri.API_USER_SELF_INFO),
+      _http.get(endpoint.currentUser()),
+      _http.get(endpoint.currentUserInfo()),
     ]
     return new Promise((resolve, reject) => {
       Promise.all(requests)
@@ -143,7 +143,7 @@ module.exports = function XomSharePoint(siteUrl) {
   _this.searchUser = (name) => {
     return new Promise((resolve, reject) => {
       _http
-          .get(`${uri.API_USER_INFO}?$filter=substringof('${name}',Name)`)
+          .get(`${endpoint.userInfo()}?$filter=substringof('${name}',Name)`)
           .then(response => resolve(response.data.d.results))
           .catch(error => reject(error))
     })

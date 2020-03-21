@@ -1,0 +1,68 @@
+
+/**
+ * Group of functions to get SharePoint API URI endpoints
+ */
+module.exports = {
+
+  /**
+   * Return URI for site context information
+   *
+   * @return {string}
+   */
+  contextInfo: () => '/_api/ContextInfo',
+
+  /**
+   * Return URI to get a user information
+   *
+   * @param {number} userId
+   * @return {string}
+   */
+  user: (userId) => `/_api/Web/GetUserById(${userId})`,
+
+  /**
+   * Return URI to get additional user information
+   *
+   * @return {string}
+   */
+  userInfo: () => '/_vti_bin/listdata.svc/UserInformationList',
+
+  /**
+   * Return URI to get current user information
+   *
+   * @return {string}
+   */
+  currentUser: () => '/_api/web/CurrentUser',
+
+  /**
+   * Return URI to get additional current user information
+   *
+   * @return {string}
+   */
+  currentUserInfo: () => '/_api/SP.UserProfiles.PeopleManager/GetMyProperties',
+
+  /**
+   * Return URI to touch a list
+   *
+   * @param {string} listTitle
+   * @return {string}
+   */
+  list: (listTitle) => `/_api/web/lists/GetByTitle('${listTitle}')`,
+
+  /**
+   * Return URI to handle list items
+   *
+   * @param {string} listTitle
+   * @return {string}
+   */
+  listItems: (listTitle) => `/_vti_bin/listdata.svc/${listTitle}`,
+
+  /**
+   * Return URI to handle list items attachments
+   *
+   * @param {string} listTitle
+   * @param {number} itemId
+   * @return {string}
+   */
+  listItemsAttachment: (listTitle, itemId) => `/_api/web/lists/getbytitle('${listTitle}')/items(${itemId})/AttachmentFiles`,
+
+}

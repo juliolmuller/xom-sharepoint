@@ -5,7 +5,7 @@ const XomSharePoint = require('./XomSharePoint')
  * therefore, exchange data with its contents (lists, libraries, permissions)
  * through SharePoint native REST API
  *
- * @version 0.5.0
+ * @version 0.6.0
  * @param {string} siteUrl Base URL of the SharePoint site to connect to
  * @return {XomSharePoint}
  */

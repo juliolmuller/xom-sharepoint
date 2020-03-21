@@ -8,7 +8,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 var toPascalCase = require('./utils/toPascalCase');
 
-var uri = require('./config/constants');
+var endpoint = require('./config/endpoint');
 /**
  * Contain the necessary information to stablish a connection to a SharePoint
  * list through its REST API
@@ -83,18 +83,7 @@ module.exports = function XomSharePointList(listName, axiosInstance) {
 
   Object.defineProperty(_this, 'apiUri', {
     get: function get() {
-      return "".concat(uri.API_URI_LIST, "/").concat(_this.listName);
-    }
-  });
-  /**
-   * Define property to get 'apiUriAttachment' value
-   *
-   * @property {string} apiUriAttachment
-   */
-
-  Object.defineProperty(_this, 'apiUriAttachment', {
-    get: function get() {
-      return "".concat(uri.API_URI_LIST_ATTACH, "(").concat(_this.listName, ")");
+      return endpoint.listItems(_this.listName);
     }
   });
   /**
@@ -124,7 +113,7 @@ module.exports = function XomSharePointList(listName, axiosInstance) {
 
   _this.getOne = function (id) {
     return new Promise(function (resolve, reject) {
-      _http.get(_this.apiUri + "(".concat(id, ")")).then(function (response) {
+      _http.get("".concat(_this.apiUri, "(").concat(id, ")")).then(function (response) {
         return resolve(response.data.d);
       })["catch"](function (error) {
         return reject(error);
