@@ -202,7 +202,7 @@ module.exports = function XomSharePointList(listName, axiosInstance) {
   _this.getAttachmentsFrom = function (itemId) {
     return new Promise(function (resolve, reject) {
       _http.get(endpoint.listItemsAttachment(_this.listName, itemId)).then(function (response) {
-        return resolve(response.data.d);
+        return resolve(response.data.d.results);
       })["catch"](reject);
     });
   };

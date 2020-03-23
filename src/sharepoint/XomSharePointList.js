@@ -181,7 +181,7 @@ module.exports = function XomSharePointList(listName, axiosInstance) {
     return new Promise((resolve, reject) => {
       _http
           .get(endpoint.listItemsAttachment(_this.listName, itemId))
-          .then(response => resolve(response.data.d))
+          .then(response => resolve(response.data.d.results))
           .catch(reject)
     })
   }
