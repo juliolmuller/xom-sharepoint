@@ -24,7 +24,7 @@ module.exports = function genFileBuffer(input) {
         input = document.querySelector(input);
 
       case 'HTMLInputElement':
-        input = input.files[0];
+        input = input.files;
 
       case 'FileList':
         input = input[0];

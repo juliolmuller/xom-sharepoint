@@ -214,15 +214,15 @@ module.exports = function XomSharePointList(listName, axiosInstance) {
                 case 'String':
                   fileInput = document.querySelector(fileInput)
                 case 'HTMLInputElement':
-                  fileInput = fileInput.files[0]
+                  fileInput = fileInput.files
                 case 'FileList':
                   fileInput = fileInput[0]
                 case 'File':
                   return fileInput.name
               }
             })()
-            _http({})
-                .post(`${endpoint.listItemsAttachment}/add(filename='${fileName}')`, fileBuffer, {
+            _http
+                .post(`${endpoint.listItemsAttachment(this.listName, itemId)}/add(filename='${fileName}')`, fileBuffer, {
                   headers: {
                     ..._http.defaults.headers.common,
                     'X-RequestDigest': requestDigest,

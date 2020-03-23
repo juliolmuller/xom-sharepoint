@@ -31,6 +31,8 @@ var toPascalCase = require('./utils/toPascalCase');
 
 
 module.exports = function XomSharePointList(listName, axiosInstance) {
+  var _this2 = this;
+
   /**
    * Ensure pointer to propper 'this'
    *
@@ -235,7 +237,7 @@ module.exports = function XomSharePointList(listName, axiosInstance) {
               fileInput = document.querySelector(fileInput);
 
             case 'HTMLInputElement':
-              fileInput = fileInput.files[0];
+              fileInput = fileInput.files;
 
             case 'FileList':
               fileInput = fileInput[0];
@@ -245,7 +247,7 @@ module.exports = function XomSharePointList(listName, axiosInstance) {
           }
         }();
 
-        _http({}).post("".concat(endpoint.listItemsAttachment, "/add(filename='").concat(fileName, "')"), fileBuffer, {
+        _http.post("".concat(endpoint.listItemsAttachment(_this2.listName, itemId), "/add(filename='").concat(fileName, "')"), fileBuffer, {
           headers: _objectSpread({}, _http.defaults.headers.common, {
             'X-RequestDigest': requestDigest
           })
