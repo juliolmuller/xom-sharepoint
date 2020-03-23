@@ -79,5 +79,15 @@ module.exports = {
    */
   listItemsAttachment: function listItemsAttachment(listTitle, itemId) {
     return "/_api/web/lists/getbytitle('".concat(listTitle, "')/items(").concat(itemId, ")/AttachmentFiles");
+  },
+
+  /**
+   * Return URI to access resources by relative URL
+   *
+   * @param {string} relativeUrl
+   * @return {string}
+   */
+  serverResource: function serverResource(relativeUrl) {
+    return "/_api/web/getfilebyserverrelativeurl('".concat(relativeUrl, "')");
   }
 };

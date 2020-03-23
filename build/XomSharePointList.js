@@ -199,7 +199,7 @@ module.exports = function XomSharePointList(listName, axiosInstance) {
    */
 
 
-  _this.getAttachmentsFrom = function (itemId) {
+  _this.getAttachments = function (itemId) {
     return new Promise(function (resolve, reject) {
       _http.get(endpoint.listItemsAttachment(_this.listName, itemId)).then(function (response) {
         return resolve(response.data.d.results);
@@ -223,7 +223,7 @@ module.exports = function XomSharePointList(listName, axiosInstance) {
    */
 
 
-  _this.attachFileTo = function (itemId, fileInput, fileName) {
+  _this.postAttachment = function (itemId, fileInput, fileName) {
     return new Promise(function (resolve, reject) {
       var requests = [genFileBuffer(fileInput), _this.getRequestDigest()];
       Promise.all(requests).then(function (_ref2) {
@@ -254,6 +254,61 @@ module.exports = function XomSharePointList(listName, axiosInstance) {
         }).then(function (response) {
           return resolve(response.data.d);
         })["catch"](reject);
+      })["catch"](reject);
+    });
+  };
+  /**
+   * Perform a POST request to rename a given list item attachment
+   *
+   * @param {number} itemId Identification number for the record to be changed
+   * @param {string} oldFileName Existing file name
+   * @param {string} newFileName Name to be set to selected file
+   * @return {Promise}
+   */
+
+
+  _this.renameAttachment = function (itemId, oldFileName, newFileName) {
+    return new Promise(function (resolve, reject) {
+      var requests = [_this.getAttachments(itemId), _this.getRequestDigest()];
+      Promise.all(requests).then(function (_ref4) {
+        var _ref5 = _slicedToArray(_ref4, 2),
+            attachments = _ref5[0],
+            requestDigest = _ref5[1];
+
+        var targetFile = attachments.filter(function (att) {
+          return att.FileName === oldFileName;
+        })[0];
+        var newUrl = targetFile.ServerRelativeUrl.replace(oldFileName, newFileName);
+
+        _http.post("".concat(endpoint.serverResource(targetFile.ServerRelativeUrl), "/moveto(newurl='").concat(newUrl, "', flags=1)"), {}, {
+          headers: _objectSpread({}, _http.defaults.headers.common, {
+            'X-RequestDigest': requestDigest,
+            'X-Http-Method': 'PUT',
+            'If-Match': '*'
+          })
+        }).then(resolve)["catch"](reject);
+      })["catch"](reject);
+    });
+  };
+  /**
+   * Perform a POST request to delete a given list item attachment
+   *
+   * @param {number} itemId Identification number for the record to be changed
+   * @param {string} fileName Existing file name
+   * @return {Promise}
+   */
+
+
+  _this.deleteAttachment = function (itemId, fileName) {
+    return new Promise(function (resolve, reject) {
+      _this.getRequestDigest().then(function (requestDigest) {
+        _http.post("".concat(endpoint.listItemsAttachment(_this2.listName, itemId), "/getByFileName('").concat(fileName, "')"), {}, {
+          headers: _objectSpread({}, _http.defaults.headers.common, {
+            'X-RequestDigest': requestDigest,
+            'X-Http-Method': 'DELETE',
+            'If-Match': '*'
+          })
+        }).then(resolve)["catch"](reject);
       })["catch"](reject);
     });
   };

@@ -65,4 +65,11 @@ module.exports = {
    */
   listItemsAttachment: (listTitle, itemId) => `/_api/web/lists/getbytitle('${listTitle}')/items(${itemId})/AttachmentFiles`,
 
+  /**
+   * Return URI to access resources by relative URL
+   *
+   * @param {string} relativeUrl
+   * @return {string}
+   */
+  serverResource: (relativeUrl) => `/_api/web/getfilebyserverrelativeurl('${relativeUrl}')`,
 }
