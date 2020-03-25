@@ -164,6 +164,20 @@ module.exports = function XomSharePoint(baseSiteUrl) {
   }
 
   /**
+   * Return an array with all the resources stored in the site (lists)
+   *
+   * @return {Promise}
+   */
+  _this.getResources = () => {
+    return new Promise((resolve, reject) => {
+      _http
+          .get(endpoint.resourcesIndex())
+          .then(response => resolve(response.data.d.results || response.data.d))
+          .catch(reject)
+    })
+  }
+
+  /**
    * Return a reference to connect to a SharePoint list
    *
    * @param {string} listName SharePoint list name

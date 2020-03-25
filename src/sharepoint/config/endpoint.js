@@ -48,6 +48,13 @@ module.exports = {
   currentUserInfo: () => '/_api/SP.UserProfiles.PeopleManager/GetMyProperties',
 
   /**
+   * Return URI tfor site resources/lists index
+   *
+   * @return {string}
+   */
+  resourcesIndex: () => '/_api/lists',
+
+  /**
    * Return URI to touch a list
    *
    * @param {string} listTitle
