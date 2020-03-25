@@ -5,6 +5,13 @@
 module.exports = {
 
   /**
+   * Return URI for site metadata
+   *
+   * @return {string}
+   */
+  siteInfo: () => '/_api/web',
+
+  /**
    * Return URI for site context information
    *
    * @return {string}

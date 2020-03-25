@@ -7,9 +7,9 @@ const XomSharePointList = require('./XomSharePointList')
  * team site through its REST API
  *
  * @constructor
- * @param {string} siteUrl Base URL of the SharePoint site to connect to
+ * @param {string} baseSiteUrl Base URL of the SharePoint site to connect to
  */
-module.exports = function XomSharePoint(siteUrl) {
+module.exports = function XomSharePoint(baseSiteUrl) {
 
   /**
    * Ensure pointer to propper 'this'
@@ -31,7 +31,7 @@ module.exports = function XomSharePoint(siteUrl) {
 
   // Default HTTP client configurations
   _http.defaults.withCredentials = true
-  _http.defaults.baseURL = siteUrl
+  _http.defaults.baseURL = baseSiteUrl
   _http.defaults.headers.common = {
     'Accept': 'application/json;odata=verbose',
     'Access-Control-Allow-Origin': '*',
@@ -40,16 +40,16 @@ module.exports = function XomSharePoint(siteUrl) {
   }
 
   /**
-   * Define property to get & set 'siteUrl' value
+   * Define property to get & set 'baseUrl' value
    *
-   * @property {string} siteUrl
+   * @property {string} baseUrl
    */
-  Object.defineProperty(_this, 'siteUrl', {
+  Object.defineProperty(_this, 'baseUrl', {
     get() {
       return _http.defaults.baseURL
     },
-    set(siteUrl) {
-      _http.defaults.baseURL = siteUrl
+    set(baseUrl) {
+      _http.defaults.baseURL = baseUrl
     },
   })
 
@@ -78,6 +78,20 @@ module.exports = function XomSharePoint(siteUrl) {
     user.Name = user.Name || user.DisplayName
     user.PersonalUrl = `https://mysite.na.xom.com/personal//${user.AccountName}`
     user.PictureUrl = `http://lyncpictures/service/api/image/${user.AccountName}`
+  }
+
+  /**
+   * Get the SharePoint site metadata
+   *
+   * @return {Promise}
+   */
+  _this.getInfo = () => {
+    return new Promise((resolve, reject) => {
+      _http
+          .get(endpoint.siteInfo())
+          .then(response => resolve(response.data.d))
+          .catch(reject)
+    })
   }
 
   /**
