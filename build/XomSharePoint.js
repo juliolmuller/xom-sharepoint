@@ -11,16 +11,18 @@ var axios = require('axios')["default"];
 var endpoint = require('./config/endpoint');
 
 var XomSharePointList = require('./XomSharePointList');
+
+var XomSharePointSurvey = require('./XomSharePointSurvey');
 /**
  * Contain the necessary information to stablish a connection to a SharePoint
  * team site through its REST API
  *
  * @constructor
- * @param {string} siteUrl Base URL of the SharePoint site to connect to
+ * @param {string} baseSiteUrl Base URL of the SharePoint site to connect to
  */
 
 
-module.exports = function XomSharePoint(siteUrl) {
+module.exports = function XomSharePoint(baseSiteUrl) {
   /**
    * Ensure pointer to propper 'this'
    *
@@ -42,7 +44,7 @@ module.exports = function XomSharePoint(siteUrl) {
 
 
   _http.defaults.withCredentials = true;
-  _http.defaults.baseURL = siteUrl;
+  _http.defaults.baseURL = baseSiteUrl;
   _http.defaults.headers.common = {
     'Accept': 'application/json;odata=verbose',
     'Access-Control-Allow-Origin': '*',
@@ -50,17 +52,17 @@ module.exports = function XomSharePoint(siteUrl) {
     'Content-Type': 'application/json;odata=verbose'
   };
   /**
-   * Define property to get & set 'siteUrl' value
+   * Define property to get & set 'baseUrl' value
    *
-   * @property {string} siteUrl
+   * @property {string} baseUrl
    */
 
-  Object.defineProperty(_this, 'siteUrl', {
+  Object.defineProperty(_this, 'baseUrl', {
     get: function get() {
       return _http.defaults.baseURL;
     },
-    set: function set(siteUrl) {
-      _http.defaults.baseURL = siteUrl;
+    set: function set(baseUrl) {
+      _http.defaults.baseURL = baseUrl;
     }
   });
   /**
@@ -88,6 +90,20 @@ module.exports = function XomSharePoint(siteUrl) {
     user.Name = user.Name || user.DisplayName;
     user.PersonalUrl = "https://mysite.na.xom.com/personal//".concat(user.AccountName);
     user.PictureUrl = "http://lyncpictures/service/api/image/".concat(user.AccountName);
+  };
+  /**
+   * Get the SharePoint site metadata
+   *
+   * @return {Promise}
+   */
+
+
+  _this.getInfo = function () {
+    return new Promise(function (resolve, reject) {
+      _http.get(endpoint.siteInfo()).then(function (response) {
+        return resolve(response.data.d);
+      })["catch"](reject);
+    });
   };
   /**
    * Queries the SharePoint API to grab user information. Inform nothing to get
@@ -146,14 +162,39 @@ module.exports = function XomSharePoint(siteUrl) {
     });
   };
   /**
+   * Return an array with all the resources stored in the site (lists)
+   *
+   * @return {Promise}
+   */
+
+
+  _this.getResources = function () {
+    return new Promise(function (resolve, reject) {
+      _http.get(endpoint.resourcesIndex()).then(function (response) {
+        return resolve(response.data.d.results || response.data.d);
+      })["catch"](reject);
+    });
+  };
+  /**
    * Return a reference to connect to a SharePoint list
    *
-   * @param {string} listName SharePoint list name
+   * @param {string} listTitle SharePoint list title
    * @return {XomSharePointList}
    */
 
 
-  _this.getList = function (listName) {
-    return new XomSharePointList(listName, _http);
+  _this.getList = function (listTitle) {
+    return new XomSharePointList(listTitle, _http);
+  };
+  /**
+   * Return a reference to connect to a SharePoint survey
+   *
+   * @param {string} surveyTitle SharePoint survey title
+   * @return {XomSharePointList}
+   */
+
+
+  _this.getSurvey = function (surveyTitle) {
+    return new XomSharePointSurvey(surveyTitle, _http);
   };
 };

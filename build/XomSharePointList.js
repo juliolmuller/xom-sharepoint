@@ -1,10 +1,14 @@
 "use strict";
 
-function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest(); }
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
 
-function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance"); }
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
 
-function _iterableToArrayLimit(arr, i) { if (!(Symbol.iterator in Object(arr) || Object.prototype.toString.call(arr) === "[object Arguments]")) { return; } var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(n); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function _iterableToArrayLimit(arr, i) { if (typeof Symbol === "undefined" || !(Symbol.iterator in Object(arr))) return; var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
 
 function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
@@ -24,13 +28,13 @@ var toPascalCase = require('./utils/toPascalCase');
  * list through its REST API
  *
  * @constructor
- * @param {string} listName Base URL of the SharePoint site to connect to
+ * @param {string} listTitle List title/name to connect to
  * @param {Axios} axiosInstance The Axios instance to beused to perform HTTP
  * '                            requests
  */
 
 
-module.exports = function XomSharePointList(listName, axiosInstance) {
+module.exports = function XomSharePointList(listTitle, axiosInstance) {
   var _this2 = this;
 
   /**
@@ -42,14 +46,14 @@ module.exports = function XomSharePointList(listName, axiosInstance) {
    */
   var _this = this;
   /**
-   * Store the SharePoint list name
+   * Store the SharePoint list title
    *
    * @private
    * @var {string}
    */
 
 
-  var _listName = listName;
+  var _title = listTitle;
   /**
    * Private instance of Axios
    *
@@ -67,35 +71,35 @@ module.exports = function XomSharePointList(listName, axiosInstance) {
 
   Object.defineProperty(_this, 'siteUrl', {
     get: function get() {
-      return _http.defaults.apiUri;
+      return _http.defaults.baseURL;
     },
-    set: function set(siteUrl) {
-      _http.defaults.apiUri = siteUrl;
+    set: function set(baseUrl) {
+      _http.defaults.baseURL = baseUrl;
     }
   });
   /**
-   * Define property to get & set 'listName' value
+   * Define property to get & set 'title' value
    *
-   * @property {string} listName
+   * @property {string} title
    */
 
-  Object.defineProperty(_this, 'listName', {
+  Object.defineProperty(_this, 'title', {
     get: function get() {
-      return toPascalCase(_listName);
+      return _title;
     },
-    set: function set(listName) {
-      _listName = listName;
+    set: function set(listTitle) {
+      _title = listTitle;
     }
   });
   /**
-   * Define property to get 'apiUri' value
+   * Define property to get 'name' value
    *
-   * @property {string} apiUri
+   * @property {string} name
    */
 
-  Object.defineProperty(_this, 'apiUri', {
+  Object.defineProperty(_this, 'name', {
     get: function get() {
-      return endpoint.listItems(_this.listName);
+      return toPascalCase(_title);
     }
   });
   /**
@@ -106,9 +110,9 @@ module.exports = function XomSharePointList(listName, axiosInstance) {
    * @return {Promise<Object[]>}
    */
 
-  _this.get = function (params) {
+  _this.getAll = function (params) {
     return new Promise(function (resolve, reject) {
-      _http.get(_this.apiUri + (params || '')).then(function (response) {
+      _http.get(endpoint.listItems(_this.name) + (params || '')).then(function (response) {
         return resolve(response.data.d.results || response.data.d);
       })["catch"](reject);
     });
@@ -121,9 +125,9 @@ module.exports = function XomSharePointList(listName, axiosInstance) {
    */
 
 
-  _this.getOne = function (id) {
+  _this.getItem = function (id) {
     return new Promise(function (resolve, reject) {
-      _http.get("".concat(_this.apiUri, "(").concat(id, ")")).then(function (response) {
+      _http.get("".concat(endpoint.listItems(_this.name), "(").concat(id, ")")).then(function (response) {
         return resolve(response.data.d);
       })["catch"](reject);
     });
@@ -136,9 +140,9 @@ module.exports = function XomSharePointList(listName, axiosInstance) {
    */
 
 
-  _this.post = function (data) {
+  _this.createItem = function (data) {
     return new Promise(function (resolve, reject) {
-      _http.post(_this.apiUri, data).then(function (response) {
+      _http.post(endpoint.listItems(_this.name), data).then(function (response) {
         return resolve(response.data.d.results);
       })["catch"](reject);
     });
@@ -152,12 +156,16 @@ module.exports = function XomSharePointList(listName, axiosInstance) {
    */
 
 
-  _this.update = function (id, data) {
-    return _http.post(_this.apiUri + "(".concat(id, ")"), data, {
-      headers: _objectSpread({}, _http.defaults.headers.common, {
-        'X-Http-Method': 'MERGE',
-        'If-Match': '*'
-      })
+  _this.updateItem = function (id, data) {
+    return new Promise(function (resolve, reject) {
+      _http.post(endpoint.listItems(_this.name) + "(".concat(id, ")"), data, {
+        headers: _objectSpread({}, _http.defaults.headers.common, {
+          'X-Http-Method': 'MERGE',
+          'If-Match': '*'
+        })
+      }).then(function () {
+        _this.getItem(id).then(resolve)["catch"](reject);
+      })["catch"](reject);
     });
   };
   /**
@@ -168,12 +176,18 @@ module.exports = function XomSharePointList(listName, axiosInstance) {
    */
 
 
-  _this["delete"] = function (id) {
-    return _http.post(_this.apiUri + "(".concat(id, ")"), {}, {
-      headers: _objectSpread({}, _http.defaults.headers.common, {
-        'X-Http-Method': 'DELETE',
-        'If-Match': '*'
-      })
+  _this.deleteItem = function (id) {
+    return new Promise(function (resolve, reject) {
+      _this.getItem(id).then(function (item) {
+        _http.post(endpoint.listItems(_this.name) + "(".concat(id, ")"), {}, {
+          headers: _objectSpread({}, _http.defaults.headers.common, {
+            'X-Http-Method': 'DELETE',
+            'If-Match': '*'
+          })
+        }).then(function () {
+          return resolve(item);
+        })["catch"](reject);
+      })["catch"](reject);
     });
   };
   /**
@@ -201,7 +215,7 @@ module.exports = function XomSharePointList(listName, axiosInstance) {
 
   _this.getAttachments = function (itemId) {
     return new Promise(function (resolve, reject) {
-      _http.get(endpoint.listItemsAttachment(_this.listName, itemId)).then(function (response) {
+      _http.get(endpoint.listItemsAttachment(_this.title, itemId)).then(function (response) {
         return resolve(response.data.d.results);
       })["catch"](reject);
     });
@@ -223,7 +237,7 @@ module.exports = function XomSharePointList(listName, axiosInstance) {
    */
 
 
-  _this.postAttachment = function (itemId, fileInput, fileName) {
+  _this.uploadAttachment = function (itemId, fileInput, fileName) {
     return new Promise(function (resolve, reject) {
       var requests = [genFileBuffer(fileInput), _this.getRequestDigest()];
       Promise.all(requests).then(function (_ref2) {

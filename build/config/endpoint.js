@@ -5,6 +5,15 @@
  */
 module.exports = {
   /**
+   * Return URI for site metadata
+   *
+   * @return {string}
+   */
+  siteInfo: function siteInfo() {
+    return '/_api/web';
+  },
+
+  /**
    * Return URI for site context information
    *
    * @return {string}
@@ -51,23 +60,42 @@ module.exports = {
   },
 
   /**
+   * Return URI tfor site resources/lists index
+   *
+   * @return {string}
+   */
+  resourcesIndex: function resourcesIndex() {
+    return '/_api/lists';
+  },
+
+  /**
    * Return URI to touch a list
    *
    * @param {string} listTitle
    * @return {string}
    */
   list: function list(listTitle) {
-    return "/_api/web/lists/GetByTitle('".concat(listTitle, "')");
+    return "/_api/web/lists/getByTitle('".concat(listTitle, "')");
+  },
+
+  /**
+   * Return URI to list fields and their metadata
+   *
+   * @param {string} listTitle
+   * @return {string}
+   */
+  listFields: function listFields(listTitle) {
+    return "/_api/web/lists/getByTitle('".concat(listTitle, "')/fields");
   },
 
   /**
    * Return URI to handle list items
    *
-   * @param {string} listTitle
+   * @param {string} listUri
    * @return {string}
    */
-  listItems: function listItems(listTitle) {
-    return "/_vti_bin/listdata.svc/".concat(listTitle);
+  listItems: function listItems(listUri) {
+    return "/_vti_bin/listdata.svc/".concat(listUri);
   },
 
   /**
@@ -78,7 +106,7 @@ module.exports = {
    * @return {string}
    */
   listItemsAttachment: function listItemsAttachment(listTitle, itemId) {
-    return "/_api/web/lists/getbytitle('".concat(listTitle, "')/items(").concat(itemId, ")/AttachmentFiles");
+    return "/_api/web/lists/getByTitle('".concat(listTitle, "')/items(").concat(itemId, ")/AttachmentFiles");
   },
 
   /**
@@ -88,6 +116,6 @@ module.exports = {
    * @return {string}
    */
   serverResource: function serverResource(relativeUrl) {
-    return "/_api/web/getfilebyserverrelativeurl('".concat(relativeUrl, "')");
+    return "/_api/web/getFileByServerRelativeUrl('".concat(relativeUrl, "')");
   }
 };
