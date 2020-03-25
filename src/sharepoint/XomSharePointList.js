@@ -121,12 +121,22 @@ module.exports = function XomSharePointList(listName, axiosInstance) {
    * @return {Promise<Object>}
    */
   _this.updateItem = (id, data) => {
-    return _http.post(endpoint.listItems(_this.name) + `(${id})`, data, {
-      headers: {
-        ..._http.defaults.headers.common,
-        'X-Http-Method': 'MERGE',
-        'If-Match': '*',
-      },
+    return new Promise((resolve, reject) => {
+      _http
+          .post(endpoint.listItems(_this.name) + `(${id})`, data, {
+            headers: {
+              ..._http.defaults.headers.common,
+              'X-Http-Method': 'MERGE',
+              'If-Match': '*',
+            },
+          })
+          .then(() => {
+            _this
+                .getItem(id)
+                .then(resolve)
+                .catch(reject)
+          })
+          .catch(reject)
     })
   }
 
@@ -137,12 +147,22 @@ module.exports = function XomSharePointList(listName, axiosInstance) {
    * @return {Promise<Object>}
    */
   _this.deleteItem = (id) => {
-    return _http.post(endpoint.listItems(_this.name) + `(${id})`, {}, {
-      headers: {
-        ..._http.defaults.headers.common,
-        'X-Http-Method': 'DELETE',
-        'If-Match': '*',
-      },
+    return new Promise((resolve, reject) => {
+      _this
+          .getItem(id)
+          .then((item) => {
+            _http
+                .post(endpoint.listItems(_this.name) + `(${id})`, {}, {
+                  headers: {
+                    ..._http.defaults.headers.common,
+                    'X-Http-Method': 'DELETE',
+                    'If-Match': '*',
+                  },
+                })
+                .then(() => resolve(item))
+                .catch(reject)
+          })
+          .catch(reject)
     })
   }
 
