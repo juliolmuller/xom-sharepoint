@@ -7,7 +7,7 @@ const toPascalCase = require('./utils/toPascalCase')
  * list through its REST API
  *
  * @constructor
- * @param {string} listName Base URL of the SharePoint site to connect to
+ * @param {string} listName List title/name to connect to
  * @param {Axios} axiosInstance The Axios instance to beused to perform HTTP
  * '                            requests
  */
@@ -28,7 +28,7 @@ module.exports = function XomSharePointList(listName, axiosInstance) {
    * @private
    * @var {string}
    */
-  let _listName = listName
+  let _name = listName
 
   /**
    * Private instance of Axios
@@ -46,35 +46,24 @@ module.exports = function XomSharePointList(listName, axiosInstance) {
    */
   Object.defineProperty(_this, 'siteUrl', {
     get() {
-      return _http.defaults.apiUri
+      return _http.defaults.baseURL
     },
-    set(siteUrl) {
-      _http.defaults.apiUri = siteUrl
-    },
-  })
-
-  /**
-   * Define property to get & set 'listName' value
-   *
-   * @property {string} listName
-   */
-  Object.defineProperty(_this, 'listName', {
-    get() {
-      return toPascalCase(_listName)
-    },
-    set(listName) {
-      _listName = listName
+    set(baseUrl) {
+      _http.defaults.baseURL = baseUrl
     },
   })
 
   /**
-   * Define property to get 'apiUri' value
+   * Define property to get & set 'name' value
    *
-   * @property {string} apiUri
+   * @property {string} name
    */
-  Object.defineProperty(_this, 'apiUri', {
+  Object.defineProperty(_this, 'name', {
     get() {
-      return endpoint.listItems(_this.listName)
+      return toPascalCase(_name)
+    },
+    set(name) {
+      _name = name
     },
   })
 
@@ -85,10 +74,10 @@ module.exports = function XomSharePointList(listName, axiosInstance) {
    *                          See https://social.technet.microsoft.com/wiki/contents/articles/35796.sharepoint-2013-using-rest-api-for-selecting-filtering-sorting-and-pagination-in-sharepoint-list.aspx
    * @return {Promise<Object[]>}
    */
-  _this.get = (params) => {
+  _this.getAll = (params) => {
     return new Promise((resolve, reject) => {
       _http
-          .get(_this.apiUri + (params || ''))
+          .get(endpoint.listItems(_this.name) + (params || ''))
           .then(response => resolve(response.data.d.results || response.data.d))
           .catch(reject)
     })
@@ -100,10 +89,10 @@ module.exports = function XomSharePointList(listName, axiosInstance) {
    * @param {number} id Identification number for the record to be retrieved
    * @return {Promise<Object>}
    */
-  _this.getOne = (id) => {
+  _this.getItem = (id) => {
     return new Promise((resolve, reject) => {
       _http
-          .get(`${_this.apiUri}(${id})`)
+          .get(`${endpoint.listItems(_this.name)}(${id})`)
           .then(response => resolve(response.data.d))
           .catch(reject)
     })
@@ -115,10 +104,10 @@ module.exports = function XomSharePointList(listName, axiosInstance) {
    * @param {Object} data The object (using JSON notation) to be saved
    * @return {Promise<Object>}
    */
-  _this.post = (data) => {
+  _this.createItem = (data) => {
     return new Promise((resolve, reject) => {
       _http
-          .post(_this.apiUri, data)
+          .post(endpoint.listItems(_this.name), data)
           .then(response => resolve(response.data.d.results))
           .catch(reject)
     })
@@ -131,8 +120,8 @@ module.exports = function XomSharePointList(listName, axiosInstance) {
    * @param {Object} data The object (using JSON notation) to be changed
    * @return {Promise<Object>}
    */
-  _this.update = (id, data) => {
-    return _http.post(_this.apiUri + `(${id})`, data, {
+  _this.updateItem = (id, data) => {
+    return _http.post(endpoint.listItems(_this.name) + `(${id})`, data, {
       headers: {
         ..._http.defaults.headers.common,
         'X-Http-Method': 'MERGE',
@@ -147,8 +136,8 @@ module.exports = function XomSharePointList(listName, axiosInstance) {
    * @param {number} id Identification number for the record to be deleted
    * @return {Promise<Object>}
    */
-  _this.delete = (id) => {
-    return _http.post(_this.apiUri + `(${id})`, {}, {
+  _this.deleteItem = (id) => {
+    return _http.post(endpoint.listItems(_this.name) + `(${id})`, {}, {
       headers: {
         ..._http.defaults.headers.common,
         'X-Http-Method': 'DELETE',
@@ -180,7 +169,7 @@ module.exports = function XomSharePointList(listName, axiosInstance) {
   _this.getAttachments = (itemId) => {
     return new Promise((resolve, reject) => {
       _http
-          .get(endpoint.listItemsAttachment(_this.listName, itemId))
+          .get(endpoint.listItemsAttachment(_this.name, itemId))
           .then(response => resolve(response.data.d.results))
           .catch(reject)
     })
@@ -201,7 +190,7 @@ module.exports = function XomSharePointList(listName, axiosInstance) {
    * @param {string} [fileName] Define a different name to be set to the uploaded file
    * @return {Promise<Object>}
    */
-  _this.postAttachment = (itemId, fileInput, fileName) => {
+  _this.uploadAttachment = (itemId, fileInput, fileName) => {
     return new Promise((resolve, reject) => {
       const requests = [
         genFileBuffer(fileInput),
