@@ -60,15 +60,15 @@ module.exports = {
    * @param {string} listTitle
    * @return {string}
    */
-  list: (listTitle) => `/_api/web/lists/GetByTitle('${listTitle}')`,
+  list: (listTitle) => `/_api/web/lists/getByTitle('${listTitle}')`,
 
   /**
    * Return URI to handle list items
    *
-   * @param {string} listTitle
+   * @param {string} listUri
    * @return {string}
    */
-  listItems: (listTitle) => `/_vti_bin/listdata.svc/${listTitle}`,
+  listItems: (listUri) => `/_vti_bin/listdata.svc/${listUri}`,
 
   /**
    * Return URI to handle list items attachments
@@ -77,7 +77,7 @@ module.exports = {
    * @param {number} itemId
    * @return {string}
    */
-  listItemsAttachment: (listTitle, itemId) => `/_api/web/lists/getbytitle('${listTitle}')/items(${itemId})/AttachmentFiles`,
+  listItemsAttachment: (listTitle, itemId) => `/_api/web/lists/getByTitle('${listTitle}')/items(${itemId})/AttachmentFiles`,
 
   /**
    * Return URI to access resources by relative URL
@@ -85,5 +85,5 @@ module.exports = {
    * @param {string} relativeUrl
    * @return {string}
    */
-  serverResource: (relativeUrl) => `/_api/web/getfilebyserverrelativeurl('${relativeUrl}')`,
+  serverResource: (relativeUrl) => `/_api/web/getFileByServerRelativeUrl('${relativeUrl}')`,
 }

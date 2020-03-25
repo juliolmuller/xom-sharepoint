@@ -7,11 +7,11 @@ const toPascalCase = require('./utils/toPascalCase')
  * list through its REST API
  *
  * @constructor
- * @param {string} listName List title/name to connect to
+ * @param {string} listTitle List title/name to connect to
  * @param {Axios} axiosInstance The Axios instance to beused to perform HTTP
  * '                            requests
  */
-module.exports = function XomSharePointList(listName, axiosInstance) {
+module.exports = function XomSharePointList(listTitle, axiosInstance) {
 
   /**
    * Ensure pointer to propper 'this'
@@ -23,12 +23,12 @@ module.exports = function XomSharePointList(listName, axiosInstance) {
   const _this = this
 
   /**
-   * Store the SharePoint list name
+   * Store the SharePoint list title
    *
    * @private
    * @var {string}
    */
-  let _name = listName
+  let _title = listTitle
 
   /**
    * Private instance of Axios
@@ -54,16 +54,27 @@ module.exports = function XomSharePointList(listName, axiosInstance) {
   })
 
   /**
-   * Define property to get & set 'name' value
+   * Define property to get & set 'title' value
+   *
+   * @property {string} title
+   */
+  Object.defineProperty(_this, 'title', {
+    get() {
+      return _title
+    },
+    set(listTitle) {
+      _title = listTitle
+    },
+  })
+
+  /**
+   * Define property to get 'name' value
    *
    * @property {string} name
    */
   Object.defineProperty(_this, 'name', {
     get() {
-      return toPascalCase(_name)
-    },
-    set(name) {
-      _name = name
+      return toPascalCase(_title)
     },
   })
 
@@ -189,7 +200,7 @@ module.exports = function XomSharePointList(listName, axiosInstance) {
   _this.getAttachments = (itemId) => {
     return new Promise((resolve, reject) => {
       _http
-          .get(endpoint.listItemsAttachment(_this.name, itemId))
+          .get(endpoint.listItemsAttachment(_this.title, itemId))
           .then(response => resolve(response.data.d.results))
           .catch(reject)
     })
