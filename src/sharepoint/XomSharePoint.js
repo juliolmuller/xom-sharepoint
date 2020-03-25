@@ -1,6 +1,7 @@
 const axios = require('axios').default
 const endpoint = require('./config/endpoint')
 const XomSharePointList = require('./XomSharePointList')
+const XomSharePointSurvey = require('./XomSharePointSurvey')
 
 /**
  * Contain the necessary information to stablish a connection to a SharePoint
@@ -180,10 +181,20 @@ module.exports = function XomSharePoint(baseSiteUrl) {
   /**
    * Return a reference to connect to a SharePoint list
    *
-   * @param {string} listName SharePoint list name
+   * @param {string} listTitle SharePoint list title
    * @return {XomSharePointList}
    */
-  _this.getList = (listName) => {
-    return new XomSharePointList(listName, _http)
+  _this.getList = (listTitle) => {
+    return new XomSharePointList(listTitle, _http)
+  }
+
+  /**
+   * Return a reference to connect to a SharePoint survey
+   *
+   * @param {string} surveyTitle SharePoint survey title
+   * @return {XomSharePointList}
+   */
+  _this.getSurvey = (surveyTitle) => {
+    return new XomSharePointSurvey(surveyTitle, _http)
   }
 }

@@ -63,6 +63,14 @@ module.exports = {
   list: (listTitle) => `/_api/web/lists/getByTitle('${listTitle}')`,
 
   /**
+   * Return URI to list fields and their metadata
+   *
+   * @param {string} listTitle
+   * @return {string}
+   */
+  listFields: (listTitle) => `/_api/web/lists/getByTitle('${listTitle}')/fields`,
+
+  /**
    * Return URI to handle list items
    *
    * @param {string} listUri
