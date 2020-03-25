@@ -7,7 +7,7 @@
  */
 module.exports = function toPascalCase(str) {
   str = String(str)
-  str = str.replace(/([\ \,\.\!\?])([A-Za-zÀ-ÿ]?)/g, (_g0, _g1, g2) => {
+  str = str.replace(/([\ \,\.\!\?\-])([A-Za-zÀ-ÿ]?)/g, (_g0, _g1, g2) => {
     return g2.toUpperCase()
   })
   return str.charAt(0).toUpperCase() + str.slice(1)
