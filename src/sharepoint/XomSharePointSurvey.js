@@ -133,7 +133,7 @@ module.exports = function XomSharePointSurvey(surveyTitle, axiosInstance) {
     return new Promise((resolve, reject) => {
       _http
           .post(endpoint.listItems(_this.name), data)
-          .then(response => resolve(response.data.d.results))
+          .then(response => resolve(response.data.d))
           .catch(reject)
     })
   }
