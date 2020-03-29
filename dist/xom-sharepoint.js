@@ -117,7 +117,127 @@ parcelRequire = (function (modules, cache, entry, globalName) {
   }
 
   return newRequire;
-})({"EDTP":[function(require,module,exports) {
+})({"CFNo":[function(require,module,exports) {
+/**
+ * Group of functions to get SharePoint API URI endpoints
+ */
+module.exports = {
+  /**
+   * Return URI for site metadata
+   *
+   * @return {string}
+   */
+  siteInfo: function siteInfo() {
+    return '/_api/web';
+  },
+
+  /**
+   * Return URI for site context information
+   *
+   * @return {string}
+   */
+  contextInfo: function contextInfo() {
+    return '/_api/ContextInfo';
+  },
+
+  /**
+   * Return URI to get a user information
+   *
+   * @param {number} userId
+   * @return {string}
+   */
+  user: function user(userId) {
+    return "/_api/Web/GetUserById(".concat(userId, ")");
+  },
+
+  /**
+   * Return URI to get additional user information
+   *
+   * @return {string}
+   */
+  userInfo: function userInfo() {
+    return '/_vti_bin/listdata.svc/UserInformationList';
+  },
+
+  /**
+   * Return URI to get current user information
+   *
+   * @return {string}
+   */
+  currentUser: function currentUser() {
+    return '/_api/web/CurrentUser';
+  },
+
+  /**
+   * Return URI to get additional current user information
+   *
+   * @return {string}
+   */
+  currentUserInfo: function currentUserInfo() {
+    return '/_api/SP.UserProfiles.PeopleManager/GetMyProperties';
+  },
+
+  /**
+   * Return URI tfor site resources/lists index
+   *
+   * @return {string}
+   */
+  resourcesIndex: function resourcesIndex() {
+    return '/_api/lists';
+  },
+
+  /**
+   * Return URI to touch a list
+   *
+   * @param {string} listTitle
+   * @return {string}
+   */
+  list: function list(listTitle) {
+    return "/_api/web/lists/getByTitle('".concat(listTitle, "')");
+  },
+
+  /**
+   * Return URI to list fields and their metadata
+   *
+   * @param {string} listTitle
+   * @return {string}
+   */
+  listFields: function listFields(listTitle) {
+    return "/_api/web/lists/getByTitle('".concat(listTitle, "')/fields");
+  },
+
+  /**
+   * Return URI to handle list items
+   *
+   * @param {string} listUri
+   * @return {string}
+   */
+  listItems: function listItems(listUri) {
+    return "/_vti_bin/listdata.svc/".concat(listUri);
+  },
+
+  /**
+   * Return URI to handle list items attachments
+   *
+   * @param {string} listTitle
+   * @param {number} itemId
+   * @return {string}
+   */
+  listItemsAttachment: function listItemsAttachment(listTitle, itemId) {
+    return "/_api/web/lists/getByTitle('".concat(listTitle, "')/items(").concat(itemId, ")/AttachmentFiles");
+  },
+
+  /**
+   * Return URI to access resources by relative URL
+   *
+   * @param {string} relativeUrl
+   * @return {string}
+   */
+  serverResource: function serverResource(relativeUrl) {
+    return "/_api/web/getFileByServerRelativeUrl('".concat(relativeUrl, "')");
+  }
+};
+},{}],"EDTP":[function(require,module,exports) {
 'use strict';
 
 module.exports = function bind(fn, thisArg) {
@@ -1880,127 +2000,246 @@ module.exports.default = axios;
 
 },{"./utils":"S1cf","./helpers/bind":"EDTP","./core/Axios":"OvAf","./core/mergeConfig":"OHvn","./defaults":"BXyq","./cancel/Cancel":"mIKj","./cancel/CancelToken":"tsWd","./cancel/isCancel":"V30M","./helpers/spread":"X8jb"}],"dZBD":[function(require,module,exports) {
 module.exports = require('./lib/axios');
-},{"./lib/axios":"nUiQ"}],"CFNo":[function(require,module,exports) {
+},{"./lib/axios":"nUiQ"}],"pYDG":[function(require,module,exports) {
 /**
- * Group of functions to get SharePoint API URI endpoints
+ * Redefine axios' POST request
+ *
+ * @param {Axios} axiosInstance
  */
-module.exports = {
-  /**
-   * Return URI for site metadata
-   *
-   * @return {string}
-   */
-  siteInfo: function siteInfo() {
-    return '/_api/web';
-  },
+module.exports = function redefinePostRequest(axiosInstance) {
+  var _post = axiosInstance.post;
 
-  /**
-   * Return URI for site context information
-   *
-   * @return {string}
-   */
-  contextInfo: function contextInfo() {
-    return '/_api/ContextInfo';
-  },
+  axiosInstance.post = function (url, data, config) {
+    config = config || {};
+    config.headers = config.headers || this.defaults.headers.common;
 
-  /**
-   * Return URI to get a user information
-   *
-   * @param {number} userId
-   * @return {string}
-   */
-  user: function user(userId) {
-    return "/_api/Web/GetUserById(".concat(userId, ")");
-  },
+    if (config.digest) {
+      config.headers['X-RequestDigest'] = config.digest;
+    }
 
-  /**
-   * Return URI to get additional user information
-   *
-   * @return {string}
-   */
-  userInfo: function userInfo() {
-    return '/_vti_bin/listdata.svc/UserInformationList';
-  },
-
-  /**
-   * Return URI to get current user information
-   *
-   * @return {string}
-   */
-  currentUser: function currentUser() {
-    return '/_api/web/CurrentUser';
-  },
-
-  /**
-   * Return URI to get additional current user information
-   *
-   * @return {string}
-   */
-  currentUserInfo: function currentUserInfo() {
-    return '/_api/SP.UserProfiles.PeopleManager/GetMyProperties';
-  },
-
-  /**
-   * Return URI tfor site resources/lists index
-   *
-   * @return {string}
-   */
-  resourcesIndex: function resourcesIndex() {
-    return '/_api/lists';
-  },
-
-  /**
-   * Return URI to touch a list
-   *
-   * @param {string} listTitle
-   * @return {string}
-   */
-  list: function list(listTitle) {
-    return "/_api/web/lists/getByTitle('".concat(listTitle, "')");
-  },
-
-  /**
-   * Return URI to list fields and their metadata
-   *
-   * @param {string} listTitle
-   * @return {string}
-   */
-  listFields: function listFields(listTitle) {
-    return "/_api/web/lists/getByTitle('".concat(listTitle, "')/fields");
-  },
-
-  /**
-   * Return URI to handle list items
-   *
-   * @param {string} listUri
-   * @return {string}
-   */
-  listItems: function listItems(listUri) {
-    return "/_vti_bin/listdata.svc/".concat(listUri);
-  },
-
-  /**
-   * Return URI to handle list items attachments
-   *
-   * @param {string} listTitle
-   * @param {number} itemId
-   * @return {string}
-   */
-  listItemsAttachment: function listItemsAttachment(listTitle, itemId) {
-    return "/_api/web/lists/getByTitle('".concat(listTitle, "')/items(").concat(itemId, ")/AttachmentFiles");
-  },
-
-  /**
-   * Return URI to access resources by relative URL
-   *
-   * @param {string} relativeUrl
-   * @return {string}
-   */
-  serverResource: function serverResource(relativeUrl) {
-    return "/_api/web/getFileByServerRelativeUrl('".concat(relativeUrl, "')");
-  }
+    return _post(url, data, config);
+  };
 };
-},{}],"jHLM":[function(require,module,exports) {
+},{}],"pukz":[function(require,module,exports) {
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+/**
+ * Redefine axios' DELETE request
+ *
+ * @param {Axios} axiosInstance
+ */
+module.exports = function redefineDeleteRequest(axiosInstance) {
+  axiosInstance.delete = function (url, config) {
+    var _this = this;
+
+    config = config || {};
+    config.headers = config.headers || _objectSpread({}, this.defaults.headers.common, {
+      'X-Http-Method': 'DELETE',
+      'If-Match': '*'
+    });
+
+    if (config.digest) {
+      return this.post(url, {}, config);
+    }
+
+    return new Promise(function (resolve) {
+      _this.get(url).then(function (_ref) {
+        var data = _ref.data;
+
+        _this.post(url, {}, config).then(function (response) {
+          response.data = data;
+          resolve(response);
+        });
+      });
+    });
+  };
+};
+},{}],"STcK":[function(require,module,exports) {
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+/**
+ * Redefine axios' PUT request
+ *
+ * @param {Axios} axiosInstance
+ */
+module.exports = function redefinePutRequest(axiosInstance) {
+  axiosInstance.put = function (url, data, config) {
+    var _this = this;
+
+    config = config || {};
+    config.headers = config.headers || _objectSpread({}, this.defaults.headers.common, {
+      'X-Http-Method': config.digest ? 'PUT ' : 'MERGE',
+      'If-Match': '*'
+    });
+
+    if (config.digest) {
+      return this.post(url, data, config);
+    }
+
+    return new Promise(function (resolve) {
+      _this.post(url, data, config).then(function (response) {
+        _this.get(url).then(function (_ref) {
+          var data = _ref.data;
+          response.data = data;
+          resolve(response);
+        });
+      });
+    });
+  };
+};
+},{}],"DPVX":[function(require,module,exports) {
+/**
+ * Define axios' common headers
+ *
+ * @param {Axios} axiosInstance
+ */
+module.exports = function setDefaultHeaders(axiosHeaders) {
+  axiosHeaders.defaults.withCredentials = true;
+  axiosHeaders.defaults.headers.common = {
+    'Accept': 'application/json;odata=verbose',
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Content-Type': 'application/json;odata=verbose'
+  };
+};
+},{}],"UZAO":[function(require,module,exports) {
+/**
+ * Regular expression pattern for dates coming from SharePoint
+ *
+ * @const {RegExp}
+ */
+var SP_DATE_PATTERN = /^\/Date\((\d+)\)\/$/;
+/**
+ * Amount of milliseconds per minute
+ *
+ * @const {number}
+ */
+
+var MILLISECONDS_PER_MINUTE = 60000;
+/**
+ * Convert a SharePoint date notation to a JS Date object
+ *
+ * @param {string} spDate
+ * @return {Date}
+ */
+
+function convertToDate(spDate) {
+  spDate = String(spDate).replace(/\D/g, '');
+  spDate = new Date(Number(spDate));
+  spDate = spDate.getTime() + spDate.getTimezoneOffset() * MILLISECONDS_PER_MINUTE;
+  return new Date(spDate);
+}
+/**
+ * Iterate object properties to convert dates
+ *
+ * @param {object} obj
+ */
+
+
+function sweepObject(obj) {
+  Object.keys(obj).forEach(function (key) {
+    if (SP_DATE_PATTERN.test(obj[key])) {
+      obj[key] = convertToDate(obj[key]);
+    }
+  });
+}
+/**
+ * Seep the response object(s) and convert dates
+ *
+ * @param {*} data
+ */
+
+
+module.exports = function convertResponseDates(data) {
+  if (data) {
+    try {
+      if (data.constructor === Array) {
+        data.forEach(sweepObject);
+      } else {
+        sweepObject(data);
+      }
+    } catch (e) {
+      /* Ignore */
+    }
+  }
+
+  return data;
+};
+},{}],"fWFn":[function(require,module,exports) {
+/**
+ * Extract data set from subitems of response object
+ *
+ * @param {*} data
+ * @return {*}
+ */
+module.exports = function extractResponseData(data) {
+  if (data && data.d) {
+    return data.d.results || data.d;
+  }
+
+  return data;
+};
+},{}],"EQhF":[function(require,module,exports) {
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(n); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && Symbol.iterator in Object(iter)) return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+var axios = require('axios').default;
+
+var redefinePostRequest = require('./requests/redefinePostRequest');
+
+var redefineDeleteRequest = require('./requests/redefineDeleteRequest');
+
+var redefinePutRequest = require('./requests/redefinePutRequest');
+
+var setDefaultHeaders = require('./requests/setDefaultHeaders');
+
+var convertResponseDates = require('./transform/convertResponseDates');
+
+var extractResponseData = require('./transform/extractResponseData');
+/**
+ * Create a custom instance of axios
+ *
+ * @param {string} [siteUrl] If no URL is provided, current site's will be used
+ * @return {Axios}
+ */
+
+
+module.exports = function xomHttpFactory(siteUrl) {
+  var http = axios.create(); // Define request defaults
+
+  http.defaults.baseURL = siteUrl || function () {
+    var delimiters = new RegExp(['/lists/', '/folders/', '/_layouts/', '_api', '/_vti_bin/'].join('|'));
+    return window.location.href.toLowerCase().split(delimiters)[0];
+  }(); // Define default headers
+
+
+  setDefaultHeaders(http); // Redefine methods to perform requests
+
+  redefinePostRequest(http);
+  redefineDeleteRequest(http);
+  redefinePutRequest(http); // Define response transformation
+
+  http.defaults.transformResponse = [].concat(_toConsumableArray(http.defaults.transformResponse), [extractResponseData, convertResponseDates]);
+  return http;
+};
+},{"axios":"dZBD","./requests/redefinePostRequest":"pYDG","./requests/redefineDeleteRequest":"pukz","./requests/redefinePutRequest":"STcK","./requests/setDefaultHeaders":"DPVX","./transform/convertResponseDates":"UZAO","./transform/extractResponseData":"fWFn"}],"jHLM":[function(require,module,exports) {
 /* eslint-disable operator-linebreak */
 
 /**
@@ -2024,11 +2263,17 @@ module.exports = function genFileBuffer(input) {
       case 'String':
         input = document.querySelector(input);
 
+      /* fall through */
+
       case 'HTMLInputElement':
         input = input.files;
 
+      /* fall through */
+
       case 'FileList':
         input = input[0];
+
+      /* fall through */
 
       case 'File':
         return input;
@@ -2064,7 +2309,7 @@ module.exports = function toPascalCase(str) {
   });
   return str.charAt(0).toUpperCase() + str.slice(1);
 };
-},{}],"HXnx":[function(require,module,exports) {
+},{}],"p0uT":[function(require,module,exports) {
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
 
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -2077,17 +2322,13 @@ function _iterableToArrayLimit(arr, i) { if (typeof Symbol === "undefined" || !(
 
 function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
-function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+var endpoint = require('../config/endpoint');
 
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+var httpFactory = require('../http/xomHttpFactory');
 
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+var genFileBuffer = require('../utils/genFileBuffer');
 
-var endpoint = require('./config/endpoint');
-
-var genFileBuffer = require('./utils/genFileBuffer');
-
-var toPascalCase = require('./utils/toPascalCase');
+var toPascalCase = require('../utils/toPascalCase');
 /**
  * Contain the necessary information to stablish a connection to a SharePoint
  * list through its REST API
@@ -2100,24 +2341,14 @@ var toPascalCase = require('./utils/toPascalCase');
 
 
 module.exports = function XomSharePointList(listTitle, axiosInstance) {
-  var _this2 = this;
-
-  /**
-   * Ensure pointer to propper 'this'
-   *
-   * @private
-   * @final
-   * @var {this}
-   */
   var _this = this;
+
   /**
    * Store the SharePoint list title
    *
    * @private
    * @var {string}
    */
-
-
   var _title = listTitle;
   /**
    * Private instance of Axios
@@ -2127,28 +2358,15 @@ module.exports = function XomSharePointList(listTitle, axiosInstance) {
    * @var {Axios}
    */
 
-  var _http = axiosInstance;
-  /**
-   * Define property to get & set 'siteUrl' value
-   *
-   * @property {string} siteUrl
-   */
-
-  Object.defineProperty(_this, 'siteUrl', {
-    get: function get() {
-      return _http.defaults.baseURL;
-    },
-    set: function set(baseUrl) {
-      _http.defaults.baseURL = baseUrl;
-    }
-  });
+  var _http = axiosInstance || httpFactory();
   /**
    * Define property to get & set 'title' value
    *
    * @property {string} title
    */
 
-  Object.defineProperty(_this, 'title', {
+
+  Object.defineProperty(this, 'title', {
     get: function get() {
       return _title;
     },
@@ -2162,7 +2380,7 @@ module.exports = function XomSharePointList(listTitle, axiosInstance) {
    * @property {string} name
    */
 
-  Object.defineProperty(_this, 'name', {
+  Object.defineProperty(this, 'name', {
     get: function get() {
       return toPascalCase(_title);
     }
@@ -2172,118 +2390,80 @@ module.exports = function XomSharePointList(listTitle, axiosInstance) {
    *
    * @param {string} [params] Parameters to be appended to the requested URL.
    *                          See https://social.technet.microsoft.com/wiki/contents/articles/35796.sharepoint-2013-using-rest-api-for-selecting-filtering-sorting-and-pagination-in-sharepoint-list.aspx
-   * @return {Promise<Object[]>}
+   * @return {Promise}
    */
 
-  _this.getAll = function (params) {
-    return new Promise(function (resolve, reject) {
-      _http.get(endpoint.listItems(_this.name) + (params || '')).then(function (response) {
-        return resolve(response.data.d.results || response.data.d);
-      }).catch(reject);
-    });
+  this.getAll = function (params) {
+    return _http.get(endpoint.listItems(_this.name) + (params || ''));
   };
   /**
    * Perform a GET request to API to obtain a single record based on its ID
    *
    * @param {number} id Identification number for the record to be retrieved
-   * @return {Promise<Object>}
+   * @return {Promise}
    */
 
 
-  _this.getItem = function (id) {
-    return new Promise(function (resolve, reject) {
-      _http.get("".concat(endpoint.listItems(_this.name), "(").concat(id, ")")).then(function (response) {
-        return resolve(response.data.d);
-      }).catch(reject);
-    });
+  this.getItem = function (id) {
+    return _http.get("".concat(endpoint.listItems(_this.name), "(").concat(id, ")"));
   };
   /**
    * Performs a POST request to API to store a new record
    *
    * @param {Object} data The object (using JSON notation) to be saved
-   * @return {Promise<Object>}
+   * @return {Promise}
    */
 
 
-  _this.createItem = function (data) {
-    return new Promise(function (resolve, reject) {
-      _http.post(endpoint.listItems(_this.name), data).then(function (response) {
-        return resolve(response.data.d.results);
-      }).catch(reject);
-    });
+  this.createItem = function (data) {
+    return _http.post(endpoint.listItems(_this.name), data);
   };
   /**
    * Perform a POST request (with MERGE header) to API to update an existing record based on its ID
    *
    * @param {number} id Identification number for the record to be modified
    * @param {Object} data The object (using JSON notation) to be changed
-   * @return {Promise<Object>}
+   * @return {Promise}
    */
 
 
-  _this.updateItem = function (id, data) {
-    return new Promise(function (resolve, reject) {
-      _http.post(endpoint.listItems(_this.name) + "(".concat(id, ")"), data, {
-        headers: _objectSpread({}, _http.defaults.headers.common, {
-          'X-Http-Method': 'MERGE',
-          'If-Match': '*'
-        })
-      }).then(function () {
-        _this.getItem(id).then(resolve).catch(reject);
-      }).catch(reject);
-    });
+  this.updateItem = function (id, data) {
+    return _http.put("".concat(endpoint.listItems(_this.name), "(").concat(id, ")"), data);
   };
   /**
    * Perform a POST request (with DELETE header) to API delete an existing record
    *
    * @param {number} id Identification number for the record to be deleted
-   * @return {Promise<Object>}
+   * @return {Promise}
    */
 
 
-  _this.deleteItem = function (id) {
-    return new Promise(function (resolve, reject) {
-      _this.getItem(id).then(function (item) {
-        _http.post(endpoint.listItems(_this.name) + "(".concat(id, ")"), {}, {
-          headers: _objectSpread({}, _http.defaults.headers.common, {
-            'X-Http-Method': 'DELETE',
-            'If-Match': '*'
-          })
-        }).then(function () {
-          return resolve(item);
-        }).catch(reject);
-      }).catch(reject);
-    });
+  this.deleteItem = function (id) {
+    return _http.delete("".concat(endpoint.listItems(_this.name), "(").concat(id, ")"));
   };
   /**
    * Get the Request Digest for the context
    *
-   * @return {Promise<String>}
+   * @return {Promise}
    */
 
 
-  _this.getRequestDigest = function () {
-    return new Promise(function (resolve, reject) {
-      _http.post(endpoint.contextInfo(), {}).then(function (_ref) {
-        var data = _ref.data;
-        return resolve(data.FormDigestValue || data.d.GetContextWebInformation.FormDigestValue);
-      }).catch(reject);
+  this.getRequestDigest = function () {
+    return _http.post(endpoint.contextInfo(), {}).then(function (_ref) {
+      var data = _ref.data;
+      return data.FormDigestValue || data.GetContextWebInformation.FormDigestValue;
     });
   };
   /**
    * Perform a GET request to API return a list of the files attached to a list item
    *
    * @param {number} itemId Identification number for the record to be changed
-   * @return {Promise<Object[]>}
+   * @return {Promise}
    */
 
 
-  _this.getAttachments = function (itemId) {
-    return new Promise(function (resolve, reject) {
-      _http.get(endpoint.listItemsAttachment(_this.title, itemId)).then(function (response) {
-        return resolve(response.data.d.results);
-      }).catch(reject);
-    });
+  this.getAttachments = function (itemId) {
+    return _http.get(endpoint.listItemsAttachment(_this.title, itemId));
   };
   /**
    * Upload a file attachment to a list item
@@ -2298,42 +2478,48 @@ module.exports = function XomSharePointList(listTitle, axiosInstance) {
    *        the first File of the collection will be selected. If you want to get the byte buffer
    *        of other files, provide a File instance explicitaly
    * @param {string} [fileName] Define a different name to be set to the uploaded file
-   * @return {Promise<Object>}
+   * @return {Promise}
    */
 
 
-  _this.uploadAttachment = function (itemId, fileInput, fileName) {
-    return new Promise(function (resolve, reject) {
-      var requests = [genFileBuffer(fileInput), _this.getRequestDigest()];
-      Promise.all(requests).then(function (_ref2) {
-        var _ref3 = _slicedToArray(_ref2, 2),
-            fileBuffer = _ref3[0],
-            requestDigest = _ref3[1];
+  this.uploadAttachment = function (itemId, fileInput, fileName) {
+    return Promise.all([genFileBuffer(fileInput), _this.getRequestDigest()]).then(function (_ref2) {
+      var _ref3 = _slicedToArray(_ref2, 2),
+          fileBuffer = _ref3[0],
+          requestDigest = _ref3[1];
 
-        fileName = fileName || function () {
-          switch (fileInput.constructor.name) {
-            case 'String':
-              fileInput = document.querySelector(fileInput);
+      fileName = fileName || function () {
+        switch (fileInput.constructor.name) {
+          case 'String':
+            fileInput = document.querySelector(fileInput);
 
-            case 'HTMLInputElement':
-              fileInput = fileInput.files;
+          /* fall through */
 
-            case 'FileList':
-              fileInput = fileInput[0];
+          case 'HTMLInputElement':
+            fileInput = fileInput.files;
 
-            case 'File':
-              return fileInput.name;
-          }
-        }();
+          /* fall through */
 
-        _http.post("".concat(endpoint.listItemsAttachment(_this2.listName, itemId), "/add(filename='").concat(fileName, "')"), fileBuffer, {
-          headers: _objectSpread({}, _http.defaults.headers.common, {
-            'X-RequestDigest': requestDigest
-          })
-        }).then(function (response) {
-          return resolve(response.data.d);
-        }).catch(reject);
-      }).catch(reject);
+          case 'FileList':
+            var _fileInput = fileInput;
+
+            var _fileInput2 = _slicedToArray(_fileInput, 1);
+
+            fileInput = _fileInput2[0];
+
+          /* fall through */
+
+          case 'File':
+            return fileInput.name;
+
+          default:
+            return null;
+        }
+      }();
+
+      return _http.post("".concat(endpoint.listItemsAttachment(_this.title, itemId), "/add(filename='").concat(fileName, "')"), fileBuffer, {
+        digest: requestDigest
+      });
     });
   };
   /**
@@ -2346,27 +2532,19 @@ module.exports = function XomSharePointList(listTitle, axiosInstance) {
    */
 
 
-  _this.renameAttachment = function (itemId, oldFileName, newFileName) {
-    return new Promise(function (resolve, reject) {
-      var requests = [_this.getAttachments(itemId), _this.getRequestDigest()];
-      Promise.all(requests).then(function (_ref4) {
-        var _ref5 = _slicedToArray(_ref4, 2),
-            attachments = _ref5[0],
-            requestDigest = _ref5[1];
+  this.renameAttachment = function (itemId, oldFileName, newFileName) {
+    return Promise.all([_this.getAttachments(itemId), _this.getRequestDigest()]).then(function (_ref4) {
+      var _ref5 = _slicedToArray(_ref4, 2),
+          attachments = _ref5[0],
+          requestDigest = _ref5[1];
 
-        var targetFile = attachments.filter(function (att) {
-          return att.FileName === oldFileName;
-        })[0];
-        var newUrl = targetFile.ServerRelativeUrl.replace(oldFileName, newFileName);
-
-        _http.post("".concat(endpoint.serverResource(targetFile.ServerRelativeUrl), "/moveto(newurl='").concat(newUrl, "', flags=1)"), {}, {
-          headers: _objectSpread({}, _http.defaults.headers.common, {
-            'X-RequestDigest': requestDigest,
-            'X-Http-Method': 'PUT',
-            'If-Match': '*'
-          })
-        }).then(resolve).catch(reject);
-      }).catch(reject);
+      var targetFile = attachments.data.filter(function (att) {
+        return att.FileName === oldFileName;
+      })[0];
+      var newUrl = targetFile.ServerRelativeUrl.replace(oldFileName, newFileName);
+      return _http.put("".concat(endpoint.serverResource(targetFile.ServerRelativeUrl), "/moveto(newurl='").concat(newUrl, "', flags=1)"), {}, {
+        digest: requestDigest
+      });
     });
   };
   /**
@@ -2378,30 +2556,20 @@ module.exports = function XomSharePointList(listTitle, axiosInstance) {
    */
 
 
-  _this.deleteAttachment = function (itemId, fileName) {
-    return new Promise(function (resolve, reject) {
-      _this.getRequestDigest().then(function (requestDigest) {
-        _http.post("".concat(endpoint.listItemsAttachment(_this2.listName, itemId), "/getByFileName('").concat(fileName, "')"), {}, {
-          headers: _objectSpread({}, _http.defaults.headers.common, {
-            'X-RequestDigest': requestDigest,
-            'X-Http-Method': 'DELETE',
-            'If-Match': '*'
-          })
-        }).then(resolve).catch(reject);
-      }).catch(reject);
+  this.deleteAttachment = function (itemId, fileName) {
+    return _this.getRequestDigest().then(function (requestDigest) {
+      return _http.delete("".concat(endpoint.listItemsAttachment(_this.title, itemId), "/getByFileName('").concat(fileName, "')"), {
+        digest: requestDigest
+      });
     });
   };
 };
-},{"./config/endpoint":"CFNo","./utils/genFileBuffer":"jHLM","./utils/toPascalCase":"O8QA"}],"cXZv":[function(require,module,exports) {
-function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+},{"../config/endpoint":"CFNo","../http/xomHttpFactory":"EQhF","../utils/genFileBuffer":"jHLM","../utils/toPascalCase":"O8QA"}],"tCvt":[function(require,module,exports) {
+var endpoint = require('../config/endpoint');
 
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+var httpFactory = require('../http/xomHttpFactory');
 
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
-var endpoint = require('./config/endpoint');
-
-var toPascalCase = require('./utils/toPascalCase');
+var toPascalCase = require('../utils/toPascalCase');
 /**
  * Contain the necessary information to stablish a connection to a SharePoint
  * list through its REST API
@@ -2414,22 +2582,14 @@ var toPascalCase = require('./utils/toPascalCase');
 
 
 module.exports = function XomSharePointSurvey(surveyTitle, axiosInstance) {
-  /**
-   * Ensure pointer to propper 'this'
-   *
-   * @private
-   * @final
-   * @var {this}
-   */
   var _this = this;
+
   /**
    * Store the SharePoint list name
    *
    * @private
    * @var {string}
    */
-
-
   var _title = surveyTitle;
   /**
    * Private instance of Axios
@@ -2439,28 +2599,15 @@ module.exports = function XomSharePointSurvey(surveyTitle, axiosInstance) {
    * @var {Axios}
    */
 
-  var _http = axiosInstance;
-  /**
-   * Define property to get & set 'siteUrl' value
-   *
-   * @property {string} siteUrl
-   */
-
-  Object.defineProperty(_this, 'siteUrl', {
-    get: function get() {
-      return _http.defaults.baseURL;
-    },
-    set: function set(baseUrl) {
-      _http.defaults.baseURL = baseUrl;
-    }
-  });
+  var _http = axiosInstance || httpFactory();
   /**
    * Define property to get & set 'title' value
    *
    * @property {string} title
    */
 
-  Object.defineProperty(_this, 'title', {
+
+  Object.defineProperty(this, 'title', {
     get: function get() {
       return _title;
     },
@@ -2474,26 +2621,30 @@ module.exports = function XomSharePointSurvey(surveyTitle, axiosInstance) {
    * @property {string} name
    */
 
-  Object.defineProperty(_this, 'name', {
+  Object.defineProperty(this, 'name', {
     get: function get() {
       return toPascalCase(_title);
     }
   });
+  /**
+   * Get fields that corresponds to the questions and their choices
+   *
+   * @return {Promise}
+   */
 
-  _this.getQuestions = function () {
-    return new Promise(function (resolve, reject) {
-      _http.get("".concat(endpoint.listFields(_this.title), "?$filter=(CanBeDeleted eq true)")).then(function (response) {
-        var questions = [];
-        response.data.d.results.forEach(function (field) {
-          questions.push({
-            Field: toPascalCase(field.Title) + 'Value',
-            Question: field.Title,
-            Type: field.TypeDisplayName,
-            Choices: field.Choices && field.Choices.results
-          });
-          resolve(questions);
+  this.getQuestions = function () {
+    return _http.get("".concat(endpoint.listFields(_this.title), "?$filter=(CanBeDeleted eq true)")).then(function (response) {
+      var questions = [];
+      response.data.forEach(function (field) {
+        questions.push({
+          Field: "".concat(toPascalCase(field.Title), "Value"),
+          Question: field.Title,
+          Type: field.TypeDisplayName,
+          Choices: field.Choices && field.Choices.results
         });
-      }).catch(reject);
+      });
+      response.data = questions;
+      return response;
     });
   };
   /**
@@ -2501,109 +2652,87 @@ module.exports = function XomSharePointSurvey(surveyTitle, axiosInstance) {
    *
    * @param {string} [params] Parameters to be appended to the requested URL.
    *                          See https://social.technet.microsoft.com/wiki/contents/articles/35796.sharepoint-2013-using-rest-api-for-selecting-filtering-sorting-and-pagination-in-sharepoint-list.aspx
-   * @return {Promise<Object[]>}
+   * @return {Promise}
    */
 
 
-  _this.getResponses = function (params) {
-    return new Promise(function (resolve, reject) {
-      _http.get(endpoint.listItems(_this.name) + (params || '')).then(function (response) {
-        return resolve(response.data.d.results || response.data.d);
-      }).catch(reject);
-    });
+  this.getResponses = function (params) {
+    return _http.get(endpoint.listItems(_this.name) + (params || ''));
   };
   /**
    * Perform a GET request to API to obtain all records from the list
    *
    * @param {number} userId User ID to filter responses
-   * @return {Promise<Object[]>}
+   * @return {Promise}
    */
 
 
-  _this.getResponsesByUser = function (userId) {
+  this.getResponsesByUser = function (userId) {
     return _this.getResponses("?$filter=(CreatedById eq ".concat(userId, ")"));
   };
   /**
    * Performs a POST request to API to store a new record
    *
    * @param {Object} data The object (using JSON notation) to be saved
-   * @return {Promise<Object>}
+   * @return {Promise}
    */
 
 
-  _this.createResponse = function (data) {
-    return new Promise(function (resolve, reject) {
-      _http.post(endpoint.listItems(_this.name), data).then(function (response) {
-        return resolve(response.data.d.results);
-      }).catch(reject);
-    });
+  this.createResponse = function (data) {
+    return _http.post(endpoint.listItems(_this.name), data);
   };
   /**
    * Perform a POST request (with MERGE header) to API to update an existing record based on its ID
    *
    * @param {number} id Identification number for the record to be modified
    * @param {Object} data The object (using JSON notation) to be changed
-   * @return {Promise<Object>}
+   * @return {Promise}
    */
 
 
-  _this.updateResponse = function (id, data) {
-    return _http.post(endpoint.listItems(_this.name) + "(".concat(id, ")"), data, {
-      headers: _objectSpread({}, _http.defaults.headers.common, {
-        'X-Http-Method': 'MERGE',
-        'If-Match': '*'
-      })
-    });
+  this.updateResponse = function (id, data) {
+    return _http.put("".concat(endpoint.listItems(_this.name), "(").concat(id, ")"), data);
   };
   /**
    * Perform a POST request (with DELETE header) to API delete an existing record
    *
    * @param {number} id Identification number for the record to be deleted
-   * @return {Promise<Object>}
+   * @return {Promise}
    */
 
 
-  _this.deleteResponse = function (id) {
-    return _http.post(endpoint.listItems(_this.name) + "(".concat(id, ")"), {}, {
-      headers: _objectSpread({}, _http.defaults.headers.common, {
-        'X-Http-Method': 'DELETE',
-        'If-Match': '*'
-      })
-    });
+  this.deleteResponse = function (id) {
+    return _http.delete("".concat(endpoint.listItems(_this.name), "(").concat(id, ")"));
   };
 };
-},{"./config/endpoint":"CFNo","./utils/toPascalCase":"O8QA"}],"o0Hk":[function(require,module,exports) {
+},{"../config/endpoint":"CFNo","../http/xomHttpFactory":"EQhF","../utils/toPascalCase":"O8QA"}],"Jggw":[function(require,module,exports) {
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-var axios = require('axios').default;
+var endpoint = require('../config/endpoint');
 
-var endpoint = require('./config/endpoint');
+var httpFactory = require('../http/xomHttpFactory');
 
 var XomSharePointList = require('./XomSharePointList');
 
 var XomSharePointSurvey = require('./XomSharePointSurvey');
 /**
  * Contain the necessary information to stablish a connection to a SharePoint
- * team site through its REST API
+ * site through its REST API
  *
  * @constructor
- * @param {string} baseSiteUrl Base URL of the SharePoint site to connect to
+ * @param {string} [baseSiteUrl] Base URL for the SharePoint site to connect to.
+ *                               If none URL is provided, the instance will assume
+ *                               the current site/subsite
  */
 
 
 module.exports = function XomSharePoint(baseSiteUrl) {
-  /**
-   * Ensure pointer to propper 'this'
-   *
-   * @private
-   * @final
-   * @var {this}
-   */
   var _this = this;
+
   /**
    * Private instance of Axios
    *
@@ -2611,26 +2740,15 @@ module.exports = function XomSharePoint(baseSiteUrl) {
    * @final
    * @var {Axios}
    */
-
-
-  var _http = axios.create(); // Default HTTP client configurations
-
-
-  _http.defaults.withCredentials = true;
-  _http.defaults.baseURL = baseSiteUrl;
-  _http.defaults.headers.common = {
-    'Accept': 'application/json;odata=verbose',
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type',
-    'Content-Type': 'application/json;odata=verbose'
-  };
+  var _http = httpFactory(baseSiteUrl);
   /**
    * Define property to get & set 'baseUrl' value
    *
    * @property {string} baseUrl
    */
 
-  Object.defineProperty(_this, 'baseUrl', {
+
+  Object.defineProperty(this, 'baseUrl', {
     get: function get() {
       return _http.defaults.baseURL;
     },
@@ -2646,7 +2764,7 @@ module.exports = function XomSharePoint(baseSiteUrl) {
    */
 
   var trimAccount = function trimAccount(account) {
-    return String(account).replace(/(.*)[\|](.*)/, '$2').replace(/\\/, '_');
+    return String(account).replace(/(.*)[|](.*)/, '$2').replace(/\\/, '_');
   };
   /**
    * Add essential properties to the user object
@@ -2663,6 +2781,7 @@ module.exports = function XomSharePoint(baseSiteUrl) {
     user.Name = user.Name || user.DisplayName;
     user.PersonalUrl = "https://mysite.na.xom.com/personal//".concat(user.AccountName);
     user.PictureUrl = "http://lyncpictures/service/api/image/".concat(user.AccountName);
+    return user;
   };
   /**
    * Get the SharePoint site metadata
@@ -2671,15 +2790,11 @@ module.exports = function XomSharePoint(baseSiteUrl) {
    */
 
 
-  _this.getInfo = function () {
-    return new Promise(function (resolve, reject) {
-      _http.get(endpoint.siteInfo()).then(function (response) {
-        return resolve(response.data.d);
-      }).catch(reject);
-    });
+  this.getInfo = function () {
+    return _http.get(endpoint.siteInfo());
   };
   /**
-   * Queries the SharePoint API to grab user information. Inform nothing to get
+   * Queries the SharePoint API to get user information. Inform nothing to get
    * current user information or pass an specific user ID
    *
    * @param {number} [id] ID of the user you want the information for
@@ -2687,36 +2802,33 @@ module.exports = function XomSharePoint(baseSiteUrl) {
    */
 
 
-  _this.getUserInfo = function (id) {
+  this.getUserInfo = function (id) {
     if (!id) {
       return _this.getMyInfo();
     }
 
-    return new Promise(function (resolve, reject) {
-      _http.get("".concat(endpoint.userInfo(), "?$top=1")).then(function (response) {
-        var idField = response.data.d[0].Id ? 'Id' : 'Id0';
-        var requests = [_http.get(endpoint.user(id)), _http.get("".concat(endpoint.userInfo(), "?$filter=(").concat(idField, " eq ").concat(id, ")"))];
-        Promise.all(requests).then(function (responses) {
-          var mergedAttr = _objectSpread({}, responses[0].data.d, {}, responses[1].data.d.results[0]);
-
-          addUserProperties(mergedAttr);
-          resolve(mergedAttr);
-        }).catch(function (error) {
-          return reject(error);
-        });
-      }).catch(reject);
+    return _http.get("".concat(endpoint.userInfo(), "?$top=1")).then(function (response) {
+      var idField = response.data[0].Id ? 'Id' : 'Id0';
+      return Promise.all([_http.get(endpoint.user(id)), _http.get("".concat(endpoint.userInfo(), "?$filter=(").concat(idField, " eq ").concat(id, ")"))]);
+    }).then(function (responses) {
+      return _objectSpread({}, responses[0], {}, responses[1], {}, {
+        data: addUserProperties(_objectSpread({}, responses[0].data, {}, responses[1].data))
+      });
     });
   };
+  /**
+   * Queries the SharePoint API to get current user information
+   *
+   * @deprecated
+   * @return {Promise}
+   */
 
-  _this.getMyInfo = function () {
-    var requests = [_http.get(endpoint.currentUser()), _http.get(endpoint.currentUserInfo())];
-    return new Promise(function (resolve, reject) {
-      Promise.all(requests).then(function (responses) {
-        var mergedAttr = _objectSpread({}, responses[0].data.d, {}, responses[1].data.d);
 
-        addUserProperties(mergedAttr);
-        resolve(mergedAttr);
-      }).catch(reject);
+  this.getMyInfo = function () {
+    return Promise.all([_http.get(endpoint.currentUser()), _http.get(endpoint.currentUserInfo())]).then(function (responses) {
+      return _objectSpread({}, responses[0], {}, responses[1], {}, {
+        data: addUserProperties(_objectSpread({}, responses[0].data, {}, responses[1].data))
+      });
     });
   };
   /**
@@ -2727,12 +2839,8 @@ module.exports = function XomSharePoint(baseSiteUrl) {
    */
 
 
-  _this.searchUser = function (name) {
-    return new Promise(function (resolve, reject) {
-      _http.get("".concat(endpoint.userInfo(), "?$filter=substringof('").concat(name, "',Name)")).then(function (response) {
-        return resolve(response.data.d.results);
-      }).catch(reject);
-    });
+  this.searchUser = function (name) {
+    return _http.get("".concat(endpoint.userInfo(), "?$filter=substringof('").concat(name, "',Name)"));
   };
   /**
    * Return an array with all the resources stored in the site (lists)
@@ -2741,12 +2849,8 @@ module.exports = function XomSharePoint(baseSiteUrl) {
    */
 
 
-  _this.getResources = function () {
-    return new Promise(function (resolve, reject) {
-      _http.get(endpoint.resourcesIndex()).then(function (response) {
-        return resolve(response.data.d.results || response.data.d);
-      }).catch(reject);
-    });
+  this.getResources = function () {
+    return _http.get(endpoint.resourcesIndex());
   };
   /**
    * Return a reference to connect to a SharePoint list
@@ -2756,7 +2860,7 @@ module.exports = function XomSharePoint(baseSiteUrl) {
    */
 
 
-  _this.getList = function (listTitle) {
+  this.getList = function (listTitle) {
     return new XomSharePointList(listTitle, _http);
   };
   /**
@@ -2767,27 +2871,33 @@ module.exports = function XomSharePoint(baseSiteUrl) {
    */
 
 
-  _this.getSurvey = function (surveyTitle) {
+  this.getSurvey = function (surveyTitle) {
     return new XomSharePointSurvey(surveyTitle, _http);
   };
 };
-},{"axios":"dZBD","./config/endpoint":"CFNo","./XomSharePointList":"HXnx","./XomSharePointSurvey":"cXZv"}],"XVne":[function(require,module,exports) {
-var XomSharePoint = require('./XomSharePoint');
+},{"../config/endpoint":"CFNo","../http/xomHttpFactory":"EQhF","./XomSharePointList":"p0uT","./XomSharePointSurvey":"tCvt"}],"XVne":[function(require,module,exports) {
+var XomSharePoint = require('./objects/XomSharePoint');
 /**
  * Instantiate a XomSharePoint object to connect to a SharePoint site and,
  * therefore, exchange data with its contents (lists, libraries, permissions)
  * through SharePoint native REST API
  *
- * @version 0.6.0
- * @param {string} siteUrl Base URL of the SharePoint site to connect to
+ * @param {string} [baseSiteUrl] Base URL of the SharePoint site to connect to
  * @return {XomSharePoint}
  */
 
 
-module.exports = function xomFactory(siteUrl) {
-  return new XomSharePoint(siteUrl);
+module.exports = function xomFactory(baseSiteUrl) {
+  return new XomSharePoint(baseSiteUrl);
 };
-},{"./XomSharePoint":"o0Hk"}],"UeJd":[function(require,module,exports) {
+},{"./objects/XomSharePoint":"Jggw"}],"UeJd":[function(require,module,exports) {
+/*
+ * Entry point for browser version
+ */
 window.xomSharePoint = require('./sharepoint/index');
-},{"./sharepoint/index":"XVne"}]},{},["UeJd"], null)
+window.xomHttpFactory = require('./sharepoint/http/xomHttpFactory');
+window.XomSharePoint = require('./sharepoint/objects/XomSharePoint');
+window.XomSharePointList = require('./sharepoint/objects/XomSharePointList');
+window.XomSharePointSurvey = require('./sharepoint/objects/XomSharePointSurvey');
+},{"./sharepoint/index":"XVne","./sharepoint/http/xomHttpFactory":"EQhF","./sharepoint/objects/XomSharePoint":"Jggw","./sharepoint/objects/XomSharePointList":"p0uT","./sharepoint/objects/XomSharePointSurvey":"tCvt"}]},{},["UeJd"], null)
 //# sourceMappingURL=/xom-sharepoint.js.map

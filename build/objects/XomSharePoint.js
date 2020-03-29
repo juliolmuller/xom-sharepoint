@@ -6,31 +6,27 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-var axios = require('axios')["default"];
+var endpoint = require('../config/endpoint');
 
-var endpoint = require('./config/endpoint');
+var httpFactory = require('../http/xomHttpFactory');
 
 var XomSharePointList = require('./XomSharePointList');
 
 var XomSharePointSurvey = require('./XomSharePointSurvey');
 /**
  * Contain the necessary information to stablish a connection to a SharePoint
- * team site through its REST API
+ * site through its REST API
  *
  * @constructor
- * @param {string} baseSiteUrl Base URL of the SharePoint site to connect to
+ * @param {string} [baseSiteUrl] Base URL for the SharePoint site to connect to.
+ *                               If none URL is provided, the instance will assume
+ *                               the current site/subsite
  */
 
 
 module.exports = function XomSharePoint(baseSiteUrl) {
-  /**
-   * Ensure pointer to propper 'this'
-   *
-   * @private
-   * @final
-   * @var {this}
-   */
   var _this = this;
+
   /**
    * Private instance of Axios
    *
@@ -38,26 +34,15 @@ module.exports = function XomSharePoint(baseSiteUrl) {
    * @final
    * @var {Axios}
    */
-
-
-  var _http = axios.create(); // Default HTTP client configurations
-
-
-  _http.defaults.withCredentials = true;
-  _http.defaults.baseURL = baseSiteUrl;
-  _http.defaults.headers.common = {
-    'Accept': 'application/json;odata=verbose',
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type',
-    'Content-Type': 'application/json;odata=verbose'
-  };
+  var _http = httpFactory(baseSiteUrl);
   /**
    * Define property to get & set 'baseUrl' value
    *
    * @property {string} baseUrl
    */
 
-  Object.defineProperty(_this, 'baseUrl', {
+
+  Object.defineProperty(this, 'baseUrl', {
     get: function get() {
       return _http.defaults.baseURL;
     },
@@ -73,7 +58,7 @@ module.exports = function XomSharePoint(baseSiteUrl) {
    */
 
   var trimAccount = function trimAccount(account) {
-    return String(account).replace(/(.*)[\|](.*)/, '$2').replace(/\\/, '_');
+    return String(account).replace(/(.*)[|](.*)/, '$2').replace(/\\/, '_');
   };
   /**
    * Add essential properties to the user object
@@ -90,6 +75,7 @@ module.exports = function XomSharePoint(baseSiteUrl) {
     user.Name = user.Name || user.DisplayName;
     user.PersonalUrl = "https://mysite.na.xom.com/personal//".concat(user.AccountName);
     user.PictureUrl = "http://lyncpictures/service/api/image/".concat(user.AccountName);
+    return user;
   };
   /**
    * Get the SharePoint site metadata
@@ -98,15 +84,11 @@ module.exports = function XomSharePoint(baseSiteUrl) {
    */
 
 
-  _this.getInfo = function () {
-    return new Promise(function (resolve, reject) {
-      _http.get(endpoint.siteInfo()).then(function (response) {
-        return resolve(response.data.d);
-      })["catch"](reject);
-    });
+  this.getInfo = function () {
+    return _http.get(endpoint.siteInfo());
   };
   /**
-   * Queries the SharePoint API to grab user information. Inform nothing to get
+   * Queries the SharePoint API to get user information. Inform nothing to get
    * current user information or pass an specific user ID
    *
    * @param {number} [id] ID of the user you want the information for
@@ -114,36 +96,33 @@ module.exports = function XomSharePoint(baseSiteUrl) {
    */
 
 
-  _this.getUserInfo = function (id) {
+  this.getUserInfo = function (id) {
     if (!id) {
       return _this.getMyInfo();
     }
 
-    return new Promise(function (resolve, reject) {
-      _http.get("".concat(endpoint.userInfo(), "?$top=1")).then(function (response) {
-        var idField = response.data.d[0].Id ? 'Id' : 'Id0';
-        var requests = [_http.get(endpoint.user(id)), _http.get("".concat(endpoint.userInfo(), "?$filter=(").concat(idField, " eq ").concat(id, ")"))];
-        Promise.all(requests).then(function (responses) {
-          var mergedAttr = _objectSpread({}, responses[0].data.d, {}, responses[1].data.d.results[0]);
-
-          addUserProperties(mergedAttr);
-          resolve(mergedAttr);
-        })["catch"](function (error) {
-          return reject(error);
-        });
-      })["catch"](reject);
+    return _http.get("".concat(endpoint.userInfo(), "?$top=1")).then(function (response) {
+      var idField = response.data[0].Id ? 'Id' : 'Id0';
+      return Promise.all([_http.get(endpoint.user(id)), _http.get("".concat(endpoint.userInfo(), "?$filter=(").concat(idField, " eq ").concat(id, ")"))]);
+    }).then(function (responses) {
+      return _objectSpread({}, responses[0], {}, responses[1], {}, {
+        data: addUserProperties(_objectSpread({}, responses[0].data, {}, responses[1].data))
+      });
     });
   };
+  /**
+   * Queries the SharePoint API to get current user information
+   *
+   * @deprecated
+   * @return {Promise}
+   */
 
-  _this.getMyInfo = function () {
-    var requests = [_http.get(endpoint.currentUser()), _http.get(endpoint.currentUserInfo())];
-    return new Promise(function (resolve, reject) {
-      Promise.all(requests).then(function (responses) {
-        var mergedAttr = _objectSpread({}, responses[0].data.d, {}, responses[1].data.d);
 
-        addUserProperties(mergedAttr);
-        resolve(mergedAttr);
-      })["catch"](reject);
+  this.getMyInfo = function () {
+    return Promise.all([_http.get(endpoint.currentUser()), _http.get(endpoint.currentUserInfo())]).then(function (responses) {
+      return _objectSpread({}, responses[0], {}, responses[1], {}, {
+        data: addUserProperties(_objectSpread({}, responses[0].data, {}, responses[1].data))
+      });
     });
   };
   /**
@@ -154,12 +133,8 @@ module.exports = function XomSharePoint(baseSiteUrl) {
    */
 
 
-  _this.searchUser = function (name) {
-    return new Promise(function (resolve, reject) {
-      _http.get("".concat(endpoint.userInfo(), "?$filter=substringof('").concat(name, "',Name)")).then(function (response) {
-        return resolve(response.data.d.results);
-      })["catch"](reject);
-    });
+  this.searchUser = function (name) {
+    return _http.get("".concat(endpoint.userInfo(), "?$filter=substringof('").concat(name, "',Name)"));
   };
   /**
    * Return an array with all the resources stored in the site (lists)
@@ -168,12 +143,8 @@ module.exports = function XomSharePoint(baseSiteUrl) {
    */
 
 
-  _this.getResources = function () {
-    return new Promise(function (resolve, reject) {
-      _http.get(endpoint.resourcesIndex()).then(function (response) {
-        return resolve(response.data.d.results || response.data.d);
-      })["catch"](reject);
-    });
+  this.getResources = function () {
+    return _http.get(endpoint.resourcesIndex());
   };
   /**
    * Return a reference to connect to a SharePoint list
@@ -183,7 +154,7 @@ module.exports = function XomSharePoint(baseSiteUrl) {
    */
 
 
-  _this.getList = function (listTitle) {
+  this.getList = function (listTitle) {
     return new XomSharePointList(listTitle, _http);
   };
   /**
@@ -194,7 +165,7 @@ module.exports = function XomSharePoint(baseSiteUrl) {
    */
 
 
-  _this.getSurvey = function (surveyTitle) {
+  this.getSurvey = function (surveyTitle) {
     return new XomSharePointSurvey(surveyTitle, _http);
   };
 };

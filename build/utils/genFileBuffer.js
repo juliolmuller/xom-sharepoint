@@ -23,11 +23,17 @@ module.exports = function genFileBuffer(input) {
       case 'String':
         input = document.querySelector(input);
 
+      /* fall through */
+
       case 'HTMLInputElement':
         input = input.files;
 
+      /* fall through */
+
       case 'FileList':
         input = input[0];
+
+      /* fall through */
 
       case 'File':
         return input;
