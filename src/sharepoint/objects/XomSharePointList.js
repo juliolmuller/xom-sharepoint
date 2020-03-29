@@ -116,7 +116,7 @@ module.exports = function XomSharePointList(listTitle, axiosInstance) {
   this.getRequestDigest = () => {
     return _http
       .post(endpoint.contextInfo(), {})
-      .then(({ data }) => data.FormDigestValue || data.d.GetContextWebInformation.FormDigestValue)
+      .then(({ data }) => data.FormDigestValue || data.GetContextWebInformation.FormDigestValue)
   }
 
   /**
@@ -167,7 +167,7 @@ module.exports = function XomSharePointList(listTitle, axiosInstance) {
               return null
           }
         })()
-        return _http.post(`${endpoint.listItemsAttachment(this.listName, itemId)}/add(filename='${fileName}')`, fileBuffer, {
+        return _http.post(`${endpoint.listItemsAttachment(this.title, itemId)}/add(filename='${fileName}')`, fileBuffer, {
           digest: requestDigest,
         })
       })
@@ -187,7 +187,7 @@ module.exports = function XomSharePointList(listTitle, axiosInstance) {
       this.getRequestDigest(),
     ])
       .then(([attachments, requestDigest]) => {
-        const targetFile = attachments.filter((att) => att.FileName === oldFileName)[0]
+        const targetFile = attachments.data.filter((att) => att.FileName === oldFileName)[0]
         const newUrl = targetFile.ServerRelativeUrl.replace(oldFileName, newFileName)
         return _http.put(`${endpoint.serverResource(targetFile.ServerRelativeUrl)}/moveto(newurl='${newUrl}', flags=1)`, {}, {
           digest: requestDigest,
@@ -205,7 +205,7 @@ module.exports = function XomSharePointList(listTitle, axiosInstance) {
   this.deleteAttachment = (itemId, fileName) => {
     return this.getRequestDigest()
       .then((requestDigest) => {
-        return _http.delete(`${endpoint.listItemsAttachment(this.listName, itemId)}/getByFileName('${fileName}')`, {
+        return _http.delete(`${endpoint.listItemsAttachment(this.title, itemId)}/getByFileName('${fileName}')`, {
           digest: requestDigest,
         })
       })

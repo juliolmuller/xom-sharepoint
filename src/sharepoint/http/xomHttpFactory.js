@@ -1,4 +1,5 @@
-const axios = require('axios')
+const axios = require('axios').default
+const redefinePostRequest = require('./requests/redefinePostRequest')
 const redefineDeleteRequest = require('./requests/redefineDeleteRequest')
 const redefinePutRequest = require('./requests/redefinePutRequest')
 const setDefaultHeaders = require('./requests/setDefaultHeaders')
@@ -28,6 +29,7 @@ module.exports = function xomHttpFactory(siteUrl) {
   setDefaultHeaders(http)
 
   // Redefine methods to perform requests
+  redefinePostRequest(http)
   redefineDeleteRequest(http)
   redefinePutRequest(http)
 

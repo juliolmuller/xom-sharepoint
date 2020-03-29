@@ -9,14 +9,12 @@ module.exports = function redefinePutRequest(axiosInstance) {
     config = config || {}
     config.headers = config.headers || {
       ...this.defaults.headers.common,
-      'X-Http-Method': 'MERGE',
+      'X-Http-Method': config.digest ? 'PUT ' : 'MERGE',
       'If-Match': '*',
     }
 
     if (config.digest) {
-      config.headers['X-RequestDigest'] = config.digest
-      config.headers['X-Http-Method'] = 'PUT'
-      delete config.digest
+      return this.post(url, data, config)
     }
 
     return new Promise((resolve) => {

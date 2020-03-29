@@ -1,4 +1,4 @@
-const XomSharePoint = require('./resorces/XomSharePoint')
+const XomSharePoint = require('./objects/XomSharePoint')
 
 /**
  * Instantiate a XomSharePoint object to connect to a SharePoint site and,

@@ -4,7 +4,7 @@
  *
  * @param {Axios} axiosInstance
  */
-export default function setDefaultHeaders(axiosHeaders) {
+module.exports = function setDefaultHeaders(axiosHeaders) {
   axiosHeaders.defaults.withCredentials = true
   axiosHeaders.defaults.headers.common = {
     'Accept': 'application/json;odata=verbose',

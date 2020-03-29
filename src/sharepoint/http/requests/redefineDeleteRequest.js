@@ -14,8 +14,7 @@ module.exports = function redefineDeleteRequest(axiosInstance) {
     }
 
     if (config.digest) {
-      config.headers['X-RequestDigest'] = config.digest
-      delete config.digest
+      return this.post(url, {}, config)
     }
 
     return new Promise((resolve) => {

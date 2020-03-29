@@ -45,7 +45,7 @@ module.exports = function XomSharePoint(baseSiteUrl) {
    */
   const trimAccount = (account) => {
     return String(account)
-      .replace(/(.*)[\|](.*)/, '$2')
+      .replace(/(.*)[|](.*)/, '$2')
       .replace(/\\/, '_')
   }
 
