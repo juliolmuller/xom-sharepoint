@@ -19,10 +19,13 @@ module.exports = function genFileBuffer(input) {
     switch (input.constructor.name) {
       case 'String':
         input = document.querySelector(input)
+        /* fall through */
       case 'HTMLInputElement':
         input = input.files
+        /* fall through */
       case 'FileList':
         input = input[0]
+        /* fall through */
       case 'File':
         return input
       default:
