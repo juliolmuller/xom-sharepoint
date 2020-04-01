@@ -42,6 +42,8 @@
     "parcel-bundler": "1.*"
   },
   "dependencies": {
-    "@lacussoft/num-only": "1.*"
+    "@lacussoft/num-only": "1.*",
+    "core-js": "3.*",
+    "regenerator-runtime": "0.13.*"
   }
 }
