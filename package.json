@@ -1,6 +1,6 @@
 {
   "name": "xom-sharepoint",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "description": "HTTTP client based on Axios to easily fetch SharePoint through its REST API.",
   "author": "Julio L. Muller",
   "license": "MIT",
@@ -41,5 +41,7 @@
     "eslint-plugin-import": "2.*",
     "parcel-bundler": "1.*"
   },
-  "dependencies": {}
+  "dependencies": {
+    "@lacussoft/num-only": "1.*"
+  }
 }
