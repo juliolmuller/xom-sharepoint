@@ -12,7 +12,7 @@ const XomSharePointSurvey = require('./XomSharePointSurvey')
  *                               If none URL is provided, the instance will assume
  *                               the current site/subsite
  */
-module.exports = function XomSharePoint(baseSiteUrl) {
+module.exports = function XomSharePointSite(baseSiteUrl) {
 
   /**
    * Private instance of Axios

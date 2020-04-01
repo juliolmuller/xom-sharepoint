@@ -1,4 +1,4 @@
-const XomSharePoint = require('./objects/XomSharePoint')
+const XomSharePointSite = require('./objects/XomSharePointSite')
 
 /**
  * Instantiate a XomSharePoint object to connect to a SharePoint site and,
@@ -9,5 +9,5 @@ const XomSharePoint = require('./objects/XomSharePoint')
  * @return {XomSharePoint}
  */
 module.exports = function xomFactory(baseSiteUrl) {
-  return new XomSharePoint(baseSiteUrl)
+  return new XomSharePointSite(baseSiteUrl)
 }

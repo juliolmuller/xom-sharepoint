@@ -3,6 +3,6 @@
  */
 window.xomSharePoint = require('./sharepoint/index')
 window.xomHttpFactory = require('./sharepoint/http/xomHttpFactory')
-window.XomSharePoint = require('./sharepoint/objects/XomSharePoint')
+window.XomSharePointSite = require('./sharepoint/objects/XomSharePointSite')
 window.XomSharePointList = require('./sharepoint/objects/XomSharePointList')
 window.XomSharePointSurvey = require('./sharepoint/objects/XomSharePointSurvey')
