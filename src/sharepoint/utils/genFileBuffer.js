@@ -24,7 +24,7 @@ module.exports = function genFileBuffer(input) {
         input = input.files
         /* fall through */
       case 'FileList':
-        input = input[0]
+        [input] = input
         /* fall through */
       case 'File':
         return input
@@ -34,8 +34,8 @@ module.exports = function genFileBuffer(input) {
   })()
 
   return new Promise((resolve, reject) => {
-    reader.onloadend = ev => resolve(ev.target.result)
-    reader.onerror = ev => reject(ev.target.error)
+    reader.onloadend = (ev) => resolve(ev.target.result)
+    reader.onerror = (ev) => reject(ev.target.error)
     reader.readAsArrayBuffer(file)
   })
 }
