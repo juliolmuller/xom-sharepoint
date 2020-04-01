@@ -7,19 +7,26 @@ const toPascalCase = require('../utils/toPascalCase')
  * list through its REST API
  *
  * @constructor
- * @param {string} surveyTitle Survey title to connect to
- * @param {Axios} axiosInstance The Axios instance to beused to perform HTTP
- * '                            requests
+ * @param {String} surveyTitle Survey title to connect to
+ * @param {Axios} [httpInstance] Customized Axios instance to perform HTTP requests
  */
-module.exports = function XomSharePointSurvey(surveyTitle, axiosInstance) {
+module.exports = function XomSharePointSurvey(surveyTitle, httpInstance) {
 
   /**
    * Store the SharePoint list name
    *
    * @private
-   * @var {string}
+   * @var {String}
    */
   let _title = surveyTitle
+
+  /**
+   * Store the full response of the previous request
+   *
+   * @private
+   * @var {Object}
+   */
+  let _lastHttpResponse = null
 
   /**
    * Private instance of Axios
@@ -28,12 +35,12 @@ module.exports = function XomSharePointSurvey(surveyTitle, axiosInstance) {
    * @final
    * @var {Axios}
    */
-  const _http = axiosInstance || httpFactory()
+  const _http = httpInstance || httpFactory()
 
   /**
    * Define property to get & set 'title' value
    *
-   * @property {string} title
+   * @property {String} title
    */
   Object.defineProperty(this, 'title', {
     get() {
@@ -47,7 +54,7 @@ module.exports = function XomSharePointSurvey(surveyTitle, axiosInstance) {
   /**
    * Define property to get 'name' value
    *
-   * @property {string} name
+   * @property {String} name
    */
   Object.defineProperty(this, 'name', {
     get() {
@@ -56,77 +63,105 @@ module.exports = function XomSharePointSurvey(surveyTitle, axiosInstance) {
   })
 
   /**
+   * Define property to get & set 'lastHttpResponse' value
+   *
+   * @property {Object} lastHttpResponse
+   */
+  Object.defineProperty(this, 'lastHttpResponse', {
+    get() {
+      return _lastHttpResponse
+    },
+  })
+
+  /**
    * Get fields that corresponds to the questions and their choices
    *
    * @return {Promise}
    */
-  this.getQuestions = () => {
-    return _http
-      .get(`${endpoint.listFields(this.title)}?$filter=(CanBeDeleted eq true)`)
-      .then((response) => {
-        const questions = []
-        response.data.forEach((field) => {
-          questions.push({
-            Field: `${toPascalCase(field.Title)}Value`,
-            Question: field.Title,
-            Type: field.TypeDisplayName,
-            Choices: field.Choices && field.Choices.results,
-          })
-        })
-        response.data = questions
-        return response
-      })
+  this.getQuestions = async () => {
+    const url = `${endpoint.listFields(this.title)}?$filter=(CanBeDeleted eq true)`
+    _lastHttpResponse = await _http.get(url)
+    return _lastHttpResponse.data.map((field) => {
+      return {
+        Field: `${toPascalCase(field.Title)}Value`,
+        Question: field.Title,
+        Type: field.TypeDisplayName,
+        Choices: field.Choices && field.Choices.results,
+      }
+    })
   }
 
   /**
-   * Perform a GET request to API to obtain all records from the list
+   * Return a list of the responses stored in the survey list. If no additional
+   * parameter is provided, all records are returned. For your reference, check out
+   * https://social.technet.microsoft.com/wiki/contents/articles/35796.sharepoint-2013-using-rest-api-for-selecting-filtering-sorting-and-pagination-in-sharepoint-list.aspx
+   * on how to build parameters
    *
-   * @param {string} [params] Parameters to be appended to the requested URL.
-   *                          See https://social.technet.microsoft.com/wiki/contents/articles/35796.sharepoint-2013-using-rest-api-for-selecting-filtering-sorting-and-pagination-in-sharepoint-list.aspx
+   * @param {String} [params]
    * @return {Promise}
    */
-  this.getResponses = (params) => {
-    return _http.get(endpoint.listItems(this.name) + (params || ''))
+  this.get = async (params) => {
+    const url = endpoint.listItems(this.name) + (params || '')
+    _lastHttpResponse = await _http.get(url)
+    return _lastHttpResponse.data
   }
 
   /**
-   * Perform a GET request to API to obtain all records from the list
+   * Retrun a single response by its ID
    *
-   * @param {number} userId User ID to filter responses
+   * @param {Number} id
    * @return {Promise}
    */
-  this.getResponsesByUser = (userId) => {
-    return this.getResponses(`?$filter=(CreatedById eq ${userId})`)
+  this.find = async (id) => {
+    const url = `${endpoint.listItems(this.name)}(${id})`
+    _lastHttpResponse = await _http.get(url)
+    return _lastHttpResponse.data
   }
 
   /**
-   * Performs a POST request to API to store a new record
+   * Return the responses created by a given user
    *
-   * @param {Object} data The object (using JSON notation) to be saved
+   * @param {Number} userId
    * @return {Promise}
    */
-  this.createResponse = (data) => {
-    return _http.post(endpoint.listItems(this.name), data)
+  this.findByUser = (userId) => {
+    return this.get(`?$filter=(CreatedById eq ${userId})`)
   }
 
   /**
-   * Perform a POST request (with MERGE header) to API to update an existing record based on its ID
+   * Save a new response in the SharePoint survey list
    *
-   * @param {number} id Identification number for the record to be modified
-   * @param {Object} data The object (using JSON notation) to be changed
+   * @param {Object} data Use literal objects to send data
    * @return {Promise}
    */
-  this.updateResponse = (id, data) => {
-    return _http.put(`${endpoint.listItems(this.name)}(${id})`, data)
+  this.create = async (data) => {
+    const url = endpoint.listItems(this.name)
+    _lastHttpResponse = await _http.post(url, data)
+    return _lastHttpResponse.data
   }
 
   /**
-   * Perform a POST request (with DELETE header) to API delete an existing record
+   * Update the response of an existing record
    *
-   * @param {number} id Identification number for the record to be deleted
+   * @param {Number} id
+   * @param {Object} data Use literal objects to send data
    * @return {Promise}
    */
-  this.deleteResponse = (id) => {
-    return _http.delete(`${endpoint.listItems(this.name)}(${id})`)
+  this.update = async (id, data) => {
+    const url = `${endpoint.listItems(this.name)}(${id})`
+    _lastHttpResponse = await _http.put(url, data)
+    return _lastHttpResponse.data
+  }
+
+  /**
+   * Delete an existing response
+   *
+   * @param {Number} id
+   * @return {Promise}
+   */
+  this.delete = async (id) => {
+    const url = `${endpoint.listItems(this.name)}(${id})`
+    _lastHttpResponse = await _http.delete(url)
+    return _lastHttpResponse.data
   }
 }

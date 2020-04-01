@@ -1,6 +1,7 @@
 const endpoint = require('../config/endpoint')
-const httpFactory = require('../http/xomHttpFactory')
 const genFileBuffer = require('../utils/genFileBuffer')
+const genFileName = require('../utils/genFileName')
+const httpFactory = require('../http/xomHttpFactory')
 const toPascalCase = require('../utils/toPascalCase')
 
 /**
@@ -8,19 +9,26 @@ const toPascalCase = require('../utils/toPascalCase')
  * list through its REST API
  *
  * @constructor
- * @param {string} listTitle List title/name to connect to
- * @param {Axios} axiosInstance The Axios instance to beused to perform HTTP
- * '                            requests
+ * @param {String} listTitle List title to connect to
+ * @param {Axios} [httpInstance] Customized Axios instance to perform HTTP requests
  */
-module.exports = function XomSharePointList(listTitle, axiosInstance) {
+module.exports = function XomSharePointList(listTitle, httpInstance) {
 
   /**
    * Store the SharePoint list title
    *
    * @private
-   * @var {string}
+   * @var {String}
    */
   let _title = listTitle
+
+  /**
+   * Store the full response of the previous request
+   *
+   * @private
+   * @var {Object}
+   */
+  let _lastHttpResponse = null
 
   /**
    * Private instance of Axios
@@ -29,26 +37,36 @@ module.exports = function XomSharePointList(listTitle, axiosInstance) {
    * @final
    * @var {Axios}
    */
-  const _http = axiosInstance || httpFactory()
+  const _http = httpInstance || httpFactory()
+
+  /**
+   * Store the full response of the previous request
+   *
+   * @private
+   * @var {String}
+   */
+  const _requestDigest = _http
+    .post(endpoint.contextInfo(), {})
+    .then(({ data }) => data.FormDigestValue || data.GetContextWebInformation.FormDigestValue)
 
   /**
    * Define property to get & set 'title' value
    *
-   * @property {string} title
+   * @property {String} title
    */
   Object.defineProperty(this, 'title', {
     get() {
       return _title
     },
-    set(listTitle) {
-      _title = listTitle
+    set(title) {
+      _title = title
     },
   })
 
   /**
    * Define property to get 'name' value
    *
-   * @property {string} name
+   * @property {String} name
    */
   Object.defineProperty(this, 'name', {
     get() {
@@ -57,83 +75,97 @@ module.exports = function XomSharePointList(listTitle, axiosInstance) {
   })
 
   /**
-   * Perform a GET request to API to obtain all records from the list
+   * Define property to get & set 'lastHttpResponse' value
    *
-   * @param {string} [params] Parameters to be appended to the requested URL.
-   *                          See https://social.technet.microsoft.com/wiki/contents/articles/35796.sharepoint-2013-using-rest-api-for-selecting-filtering-sorting-and-pagination-in-sharepoint-list.aspx
+   * @property {Object} lastHttpResponse
+   */
+  Object.defineProperty(this, 'lastHttpResponse', {
+    get() {
+      return _lastHttpResponse
+    },
+  })
+
+  /**
+   * Return a list of the items stored in the list. If no additional parameter
+   * is provided, all records are returned. For your reference, check out
+   * https://social.technet.microsoft.com/wiki/contents/articles/35796.sharepoint-2013-using-rest-api-for-selecting-filtering-sorting-and-pagination-in-sharepoint-list.aspx
+   * on how to build parameters
+   *
+   * @param {String} [params]
    * @return {Promise}
    */
-  this.getAll = (params) => {
-    return _http.get(endpoint.listItems(this.name) + (params || ''))
+  this.get = async (params) => {
+    const url = endpoint.listItems(this.name) + (params || '')
+    _lastHttpResponse = await _http.get(url)
+    return _lastHttpResponse.data
   }
 
   /**
-   * Perform a GET request to API to obtain a single record based on its ID
+   * Retrun a single list item with the given ID
    *
-   * @param {number} id Identification number for the record to be retrieved
+   * @param {Number} id
    * @return {Promise}
    */
-  this.getItem = (id) => {
-    return _http.get(`${endpoint.listItems(this.name)}(${id})`)
+  this.find = async (id) => {
+    const url = `${endpoint.listItems(this.name)}(${id})`
+    _lastHttpResponse = await _http.get(url)
+    return _lastHttpResponse.data
   }
 
   /**
-   * Performs a POST request to API to store a new record
+   * Save a new record in the SharePoint list
    *
-   * @param {Object} data The object (using JSON notation) to be saved
+   * @param {Object} data Use literal objects to send data
    * @return {Promise}
    */
-  this.createItem = (data) => {
-    return _http.post(endpoint.listItems(this.name), data)
+  this.create = async (data) => {
+    const url = endpoint.listItems(this.name)
+    _lastHttpResponse = await _http.post(url, data)
+    return _lastHttpResponse.data
   }
 
   /**
-   * Perform a POST request (with MERGE header) to API to update an existing record based on its ID
+   * Update data of an existing record in the SharePoint list
    *
-   * @param {number} id Identification number for the record to be modified
-   * @param {Object} data The object (using JSON notation) to be changed
+   * @param {Number} id
+   * @param {Object} data Use literal objects to send data
    * @return {Promise}
    */
-  this.updateItem = (id, data) => {
-    return _http.put(`${endpoint.listItems(this.name)}(${id})`, data)
+  this.update = async (id, data) => {
+    const url = `${endpoint.listItems(this.name)}(${id})`
+    _lastHttpResponse = await _http.put(url, data)
+    return _lastHttpResponse.data
   }
 
   /**
-   * Perform a POST request (with DELETE header) to API delete an existing record
+   * Delete an existing record from the SharePoint list
    *
-   * @param {number} id Identification number for the record to be deleted
+   * @param {Number} id
    * @return {Promise}
    */
-  this.deleteItem = (id) => {
-    return _http.delete(`${endpoint.listItems(this.name)}(${id})`)
+  this.delete = async (id) => {
+    const url = `${endpoint.listItems(this.name)}(${id})`
+    _lastHttpResponse = await _http.delete(url)
+    return _lastHttpResponse.data
   }
 
   /**
-   * Get the Request Digest for the context
+   * Return a list of the attached files in the list item
    *
+   * @param {Number} itemId
    * @return {Promise}
    */
-  this.getRequestDigest = () => {
-    return _http
-      .post(endpoint.contextInfo(), {})
-      .then(({ data }) => data.FormDigestValue || data.GetContextWebInformation.FormDigestValue)
-  }
-
-  /**
-   * Perform a GET request to API return a list of the files attached to a list item
-   *
-   * @param {number} itemId Identification number for the record to be changed
-   * @return {Promise}
-   */
-  this.getAttachments = (itemId) => {
-    return _http.get(endpoint.listItemsAttachment(this.title, itemId))
+  this.getAttachments = async (itemId) => {
+    const url = endpoint.listItemsAttachment(this.title, itemId)
+    _lastHttpResponse = await _http.get(url)
+    return _lastHttpResponse.data
   }
 
   /**
    * Upload a file attachment to a list item
    *
-   * @param {number} itemId
-   * @param {string|HTMLElement|FileList|File} fileInput Some reference of the input type 'file':
+   * @param {Number} itemId
+   * @param {String|HTMLElement|FileList|File} fileInput Some reference of the input type 'file':
    *          String - if it is a query selector;
    *          HTMLElement - if it is a direct reference to the input element;
    *          FileList - if it is direct reference to the 'files' attribute of the element; and
@@ -141,73 +173,47 @@ module.exports = function XomSharePointList(listTitle, axiosInstance) {
    *        For the three first options, as it will result in a array of files (FileList), only
    *        the first File of the collection will be selected. If you want to get the byte buffer
    *        of other files, provide a File instance explicitaly
-   * @param {string} [fileName] Define a different name to be set to the uploaded file
+   * @param {String} [attchmentName] Define a custom name to the attached file
    * @return {Promise}
    */
-  this.uploadAttachment = (itemId, fileInput, fileName) => {
-    return Promise.all([
-      genFileBuffer(fileInput),
-      this.getRequestDigest(),
-    ])
-      .then(([fileBuffer, requestDigest]) => {
-        fileName = fileName || (() => {
-          switch (fileInput.constructor.name) {
-            case 'String':
-              fileInput = document.querySelector(fileInput)
-              /* fall through */
-            case 'HTMLInputElement':
-              fileInput = fileInput.files
-              /* fall through */
-            case 'FileList':
-              [fileInput] = fileInput
-              /* fall through */
-            case 'File':
-              return fileInput.name
-            default:
-              return null
-          }
-        })()
-        return _http.post(`${endpoint.listItemsAttachment(this.title, itemId)}/add(filename='${fileName}')`, fileBuffer, {
-          digest: requestDigest,
-        })
-      })
+  this.attach = async (itemId, fileInput, attchmentName) => {
+    attchmentName = attchmentName || genFileName(fileInput)
+    const requestDigest = await _requestDigest
+    const fileBuffer = await genFileBuffer(fileInput)
+    const url = `${endpoint.listItemsAttachment(this.title, itemId)}/add(filename='${attchmentName}')`
+    _lastHttpResponse = await _http.post(url, fileBuffer, { requestDigest })
+    return _lastHttpResponse.data
   }
 
   /**
-   * Perform a POST request to rename a given list item attachment
+   * Rename a given file attachment
    *
-   * @param {number} itemId Identification number for the record to be changed
-   * @param {string} oldFileName Existing file name
-   * @param {string} newFileName Name to be set to selected file
+   * @param {Number} itemId
+   * @param {String} attachmentName
+   * @param {String} newName
    * @return {Promise}
    */
-  this.renameAttachment = (itemId, oldFileName, newFileName) => {
-    return Promise.all([
-      this.getAttachments(itemId),
-      this.getRequestDigest(),
-    ])
-      .then(([attachments, requestDigest]) => {
-        const targetFile = attachments.data.filter((att) => att.FileName === oldFileName)[0]
-        const newUrl = targetFile.ServerRelativeUrl.replace(oldFileName, newFileName)
-        return _http.put(`${endpoint.serverResource(targetFile.ServerRelativeUrl)}/moveto(newurl='${newUrl}', flags=1)`, {}, {
-          digest: requestDigest,
-        })
-      })
+  this.rename = async (itemId, attachmentName, newName) => {
+    const requestDigest = await _requestDigest
+    const attachments = await this.getAttachments(itemId)
+    const targetFile = attachments.filter((att) => att.FileName === attachmentName)[0]
+    const newUrl = targetFile.ServerRelativeUrl.replace(attachmentName, newName)
+    const url = `${endpoint.serverResource(targetFile.ServerRelativeUrl)}/moveTo(newurl='${newUrl}', flags=1)`
+    _lastHttpResponse = await _http.put(url, {}, { requestDigest })
+    return _lastHttpResponse.data
   }
 
   /**
-   * Perform a POST request to delete a given list item attachment
+   * Remove a given file attachment from the list item
    *
-   * @param {number} itemId Identification number for the record to be changed
-   * @param {string} fileName Existing file name
+   * @param {Number} itemId
+   * @param {String} attachmentName
    * @return {Promise}
    */
-  this.deleteAttachment = (itemId, fileName) => {
-    return this.getRequestDigest()
-      .then((requestDigest) => {
-        return _http.delete(`${endpoint.listItemsAttachment(this.title, itemId)}/getByFileName('${fileName}')`, {
-          digest: requestDigest,
-        })
-      })
+  this.remove = async (itemId, attachmentName) => {
+    const requestDigest = await _requestDigest
+    const url = `${endpoint.listItemsAttachment(this.title, itemId)}/getByFileName('${attachmentName}')`
+    _lastHttpResponse = await _http.delete(url, { requestDigest })
+    return _lastHttpResponse.data
   }
 }

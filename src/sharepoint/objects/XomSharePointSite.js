@@ -8,11 +8,19 @@ const XomSharePointSurvey = require('./XomSharePointSurvey')
  * site through its REST API
  *
  * @constructor
- * @param {string} [baseSiteUrl] Base URL for the SharePoint site to connect to.
+ * @param {String} [baseSiteUrl] Base URL for the SharePoint site to connect to.
  *                               If none URL is provided, the instance will assume
  *                               the current site/subsite
  */
 module.exports = function XomSharePointSite(baseSiteUrl) {
+
+  /**
+   * Store the full response of the previous request
+   *
+   * @private
+   * @var {Object}
+   */
+  let _lastHttpResponse = null
 
   /**
    * Private instance of Axios
@@ -26,7 +34,7 @@ module.exports = function XomSharePointSite(baseSiteUrl) {
   /**
    * Define property to get & set 'baseUrl' value
    *
-   * @property {string} baseUrl
+   * @property {String} baseUrl
    */
   Object.defineProperty(this, 'baseUrl', {
     get() {
@@ -38,10 +46,21 @@ module.exports = function XomSharePointSite(baseSiteUrl) {
   })
 
   /**
+   * Define property to get & set 'lastHttpResponse' value
+   *
+   * @property {Object} lastHttpResponse
+   */
+  Object.defineProperty(this, 'lastHttpResponse', {
+    get() {
+      return _lastHttpResponse
+    },
+  })
+
+  /**
    * Extract useful parts of account/login name
    *
-   * @param {string} account Account/login name to be trimmed
-   * @return {string}
+   * @param {String} account Account/login name to be trimmed
+   * @return {String}
    */
   const trimAccount = (account) => {
     return String(account)
@@ -70,40 +89,33 @@ module.exports = function XomSharePointSite(baseSiteUrl) {
    *
    * @return {Promise}
    */
-  this.getInfo = () => {
-    return _http.get(endpoint.siteInfo())
+  this.getInfo = async () => {
+    const url = endpoint.siteInfo()
+    _lastHttpResponse = await _http.get(url)
+    return _lastHttpResponse.data
   }
 
   /**
    * Queries the SharePoint API to get user information. Inform nothing to get
    * current user information or pass an specific user ID
    *
-   * @param {number} [id] ID of the user you want the information for
+   * @param {Number} [id] ID of the user you want the information for
    * @return {Promise}
    */
-  this.getUserInfo = (id) => {
+  this.getUserInfo = async (id) => {
     if (!id) {
       return this.getMyInfo()
     }
-    return _http
-      .get(`${(endpoint.userInfo())}?$top=1`)
-      .then((response) => {
-        const idField = response.data[0].Id ? 'Id' : 'Id0'
-        return Promise.all([
-          _http.get(endpoint.user(id)),
-          _http.get(`${endpoint.userInfo()}?$filter=(${idField} eq ${id})`),
-        ])
-      })
-      .then((responses) => {
-        return {
-          ...responses[0],
-          ...responses[1],
-          ...{ data: addUserProperties({
-            ...responses[0].data,
-            ...responses[1].data,
-          }) },
-        }
-      })
+    const response = await _http.get(`${(endpoint.userInfo())}?$top=1`)
+    const idField = response.data[0].Id ? 'Id' : 'Id0'
+    _lastHttpResponse = await Promise.all([
+      _http.get(endpoint.user(id)),
+      _http.get(`${endpoint.userInfo()}?$filter=(${idField} eq ${id})`),
+    ])
+    return addUserProperties({
+      ..._lastHttpResponse[0].data,
+      ..._lastHttpResponse[1].data,
+    })
   }
 
   /**
@@ -112,31 +124,27 @@ module.exports = function XomSharePointSite(baseSiteUrl) {
    * @deprecated
    * @return {Promise}
    */
-  this.getMyInfo = () => {
-    return Promise.all([
+  this.getMyInfo = async () => {
+    _lastHttpResponse = await Promise.all([
       _http.get(endpoint.currentUser()),
       _http.get(endpoint.currentUserInfo()),
     ])
-      .then((responses) => {
-        return {
-          ...responses[0],
-          ...responses[1],
-          ...{ data: addUserProperties({
-            ...responses[0].data,
-            ...responses[1].data,
-          }) },
-        }
-      })
+    return addUserProperties({
+      ..._lastHttpResponse[0].data,
+      ..._lastHttpResponse[1].data,
+    })
   }
 
   /**
    * Queries SharePoint API searching for user name
    *
-   * @param {string} name Partial name of the user
+   * @param {String} name Partial name of the user
    * @return {Promise}
    */
-  this.searchUser = (name) => {
-    return _http.get(`${endpoint.userInfo()}?$filter=substringof('${name}',Name)`)
+  this.searchUser = async (name) => {
+    const url = `${endpoint.userInfo()}?$filter=substringof('${name}',Name)`
+    _lastHttpResponse = await _http.get(url)
+    return _lastHttpResponse.data
   }
 
   /**
@@ -144,14 +152,16 @@ module.exports = function XomSharePointSite(baseSiteUrl) {
    *
    * @return {Promise}
    */
-  this.getResources = () => {
-    return _http.get(endpoint.resourcesIndex())
+  this.getResources = async () => {
+    const url = endpoint.resourcesIndex()
+    _lastHttpResponse = await _http.get(url)
+    return _lastHttpResponse.data
   }
 
   /**
    * Return a reference to connect to a SharePoint list
    *
-   * @param {string} listTitle SharePoint list title
+   * @param {String} listTitle SharePoint list title
    * @return {XomSharePointList}
    */
   this.getList = (listTitle) => {
@@ -161,7 +171,7 @@ module.exports = function XomSharePointSite(baseSiteUrl) {
   /**
    * Return a reference to connect to a SharePoint survey
    *
-   * @param {string} surveyTitle SharePoint survey title
+   * @param {String} surveyTitle SharePoint survey title
    * @return {XomSharePointList}
    */
   this.getSurvey = (surveyTitle) => {

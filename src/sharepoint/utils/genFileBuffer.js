@@ -1,9 +1,8 @@
-/* eslint-disable operator-linebreak */
 
 /**
  * Generate a byte buffer from a HTML file input
  *
- * @param {string|HTMLElement|FileList|File} input Some reference of the input type 'file':
+ * @param {String|HTMLElement|FileList|File} input Some reference of the input type 'file':
  *          String - if it is a query selector;
  *          HTMLElement - if it is a direct reference to the input element;
  *          FileList - if it is direct reference to the 'files' attribute of the element; and

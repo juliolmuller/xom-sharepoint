@@ -5,7 +5,7 @@
  * @param {Axios} axiosInstance
  */
 module.exports = function redefineDeleteRequest(axiosInstance) {
-  axiosInstance.delete = function(url, config) {
+  axiosInstance.delete = async function(url, config) {
     config = config || {}
     config.headers = config.headers || {
       ...this.defaults.headers.common,
@@ -13,17 +13,12 @@ module.exports = function redefineDeleteRequest(axiosInstance) {
       'If-Match': '*',
     }
 
-    if (config.digest) {
-      return this.post(url, {}, config)
-    }
+    const getResponse = config.requestDigest
+      ? { data: { Success: true, Error: false } }
+      : await this.get(url)
+    const delResponse = await this.post(url, {}, config)
+    delResponse.data = getResponse.data
 
-    return new Promise((resolve) => {
-      this.get(url).then(({ data }) => {
-        this.post(url, {}, config).then((response) => {
-          response.data = data
-          resolve(response)
-        })
-      })
-    })
+    return delResponse
   }
 }
