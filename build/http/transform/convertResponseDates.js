@@ -1,10 +1,13 @@
 "use strict";
 
+var numOnly = require('@lacussoft/num-only');
 /**
  * Regular expression pattern for dates coming from SharePoint
  *
  * @const {RegExp}
  */
+
+
 var SP_DATE_PATTERN = /^\/Date\((\d+)\)\/$/;
 /**
  * Amount of milliseconds per minute
@@ -21,8 +24,9 @@ var MILLISECONDS_PER_MINUTE = 60000;
  */
 
 function convertToDate(spDate) {
-  spDate = String(spDate).replace(/\D/g, '');
-  spDate = new Date(Number(spDate));
+  spDate = numOnly(spDate);
+  spDate = Number(spDate);
+  spDate = new Date(spDate);
   spDate = spDate.getTime() + spDate.getTimezoneOffset() * MILLISECONDS_PER_MINUTE;
   return new Date(spDate);
 }

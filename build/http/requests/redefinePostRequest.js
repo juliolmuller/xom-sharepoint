@@ -12,8 +12,8 @@ module.exports = function redefinePostRequest(axiosInstance) {
     config = config || {};
     config.headers = config.headers || this.defaults.headers.common;
 
-    if (config.digest) {
-      config.headers['X-RequestDigest'] = config.digest;
+    if (config.requestDigest) {
+      config.headers['X-RequestDigest'] = config.requestDigest;
     }
 
     return _post(url, data, config);

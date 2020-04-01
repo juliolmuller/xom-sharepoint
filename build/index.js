@@ -1,6 +1,10 @@
 "use strict";
 
-var XomSharePoint = require('./objects/XomSharePoint');
+require('core-js/stable');
+
+require('regenerator-runtime/runtime');
+
+var XomSharePointSite = require('./objects/XomSharePointSite');
 /**
  * Instantiate a XomSharePoint object to connect to a SharePoint site and,
  * therefore, exchange data with its contents (lists, libraries, permissions)
@@ -12,5 +16,5 @@ var XomSharePoint = require('./objects/XomSharePoint');
 
 
 module.exports = function xomFactory(baseSiteUrl) {
-  return new XomSharePoint(baseSiteUrl);
+  return new XomSharePointSite(baseSiteUrl);
 };

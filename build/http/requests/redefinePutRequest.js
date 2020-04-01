@@ -6,33 +6,70 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
 /**
  * Redefine axios' PUT request
  *
  * @param {Axios} axiosInstance
  */
 module.exports = function redefinePutRequest(axiosInstance) {
-  axiosInstance.put = function (url, data, config) {
-    var _this = this;
+  axiosInstance.put = /*#__PURE__*/function () {
+    var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(url, data, config) {
+      var putResponse, getResponse;
+      return regeneratorRuntime.wrap(function _callee$(_context) {
+        while (1) {
+          switch (_context.prev = _context.next) {
+            case 0:
+              config = config || {};
+              config.headers = config.headers || _objectSpread({}, this.defaults.headers.common, {
+                'X-Http-Method': config.requestDigest ? 'PUT ' : 'MERGE',
+                'If-Match': '*'
+              });
+              _context.next = 4;
+              return this.post(url, data, config);
 
-    config = config || {};
-    config.headers = config.headers || _objectSpread({}, this.defaults.headers.common, {
-      'X-Http-Method': config.digest ? 'PUT ' : 'MERGE',
-      'If-Match': '*'
-    });
+            case 4:
+              putResponse = _context.sent;
 
-    if (config.digest) {
-      return this.post(url, data, config);
-    }
+              if (!config.requestDigest) {
+                _context.next = 9;
+                break;
+              }
 
-    return new Promise(function (resolve) {
-      _this.post(url, data, config).then(function (response) {
-        _this.get(url).then(function (_ref) {
-          var data = _ref.data;
-          response.data = data;
-          resolve(response);
-        });
-      });
-    });
-  };
+              _context.t0 = {
+                data: {
+                  Success: true,
+                  Error: false
+                }
+              };
+              _context.next = 12;
+              break;
+
+            case 9:
+              _context.next = 11;
+              return this.get(url);
+
+            case 11:
+              _context.t0 = _context.sent;
+
+            case 12:
+              getResponse = _context.t0;
+              putResponse.data = getResponse.data;
+              return _context.abrupt("return", putResponse);
+
+            case 15:
+            case "end":
+              return _context.stop();
+          }
+        }
+      }, _callee, this);
+    }));
+
+    return function (_x, _x2, _x3) {
+      return _ref.apply(this, arguments);
+    };
+  }();
 };
