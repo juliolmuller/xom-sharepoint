@@ -1,6 +1,6 @@
 {
   "name": "xom-sharepoint",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "description": "HTTTP client based on Axios to easily fetch SharePoint through its REST API.",
   "author": "Julio L. Muller",
   "license": "MIT",
@@ -29,21 +29,21 @@
     "test": "echo \"No tests yet\" && exit 1"
   },
   "peerDependencies": {
-    "axios": "0.19.*"
+    "axios": "~0.19.2"
   },
   "devDependencies": {
-    "@babel/cli": "7.*",
-    "@babel/core": "7.*",
-    "@babel/preset-env": "7.*",
-    "axios": "0.19.*",
-    "eslint": "6.*",
-    "eslint-config-airbnb-base": "14.*",
-    "eslint-plugin-import": "2.*",
-    "parcel-bundler": "1.*"
+    "@babel/cli": "^7.8.4",
+    "@babel/core": "^7.9.0",
+    "@babel/preset-env": "^7.9.0",
+    "axios": "~0.19.2",
+    "eslint": "^6.8.0",
+    "eslint-config-airbnb-base": "^14.1.0",
+    "eslint-plugin-import": "^2.20.2",
+    "parcel-bundler": "^1.12.4"
   },
   "dependencies": {
-    "@lacussoft/num-only": "1.*",
-    "core-js": "3.*",
-    "regenerator-runtime": "0.13.*"
+    "@lacussoft/num-only": "^1.0.3",
+    "core-js": "^3.6.4",
+    "regenerator-runtime": "~0.13.5"
   }
 }

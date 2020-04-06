@@ -13869,12 +13869,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
  * @param {Axios} axiosInstance
  */
 module.exports = function redefineDeleteRequest(axiosInstance) {
-  axiosInstance.delete =
-  /*#__PURE__*/
-  function () {
-    var _ref = _asyncToGenerator(
-    /*#__PURE__*/
-    regeneratorRuntime.mark(function _callee(url, config) {
+  axiosInstance.delete = /*#__PURE__*/function () {
+    var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(url, config) {
       var getResponse, delResponse;
       return regeneratorRuntime.wrap(function _callee$(_context) {
         while (1) {
@@ -13947,12 +13943,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
  * @param {Axios} axiosInstance
  */
 module.exports = function redefinePutRequest(axiosInstance) {
-  axiosInstance.put =
-  /*#__PURE__*/
-  function () {
-    var _ref = _asyncToGenerator(
-    /*#__PURE__*/
-    regeneratorRuntime.mark(function _callee(url, data, config) {
+  axiosInstance.put = /*#__PURE__*/function () {
+    var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(url, data, config) {
       var putResponse, getResponse;
       return regeneratorRuntime.wrap(function _callee$(_context) {
         while (1) {
@@ -14415,12 +14407,8 @@ module.exports = function XomSharePointList(listTitle, httpInstance) {
    * @return {Promise}
    */
 
-  this.get =
-  /*#__PURE__*/
-  function () {
-    var _ref2 = _asyncToGenerator(
-    /*#__PURE__*/
-    regeneratorRuntime.mark(function _callee(params) {
+  this.get = /*#__PURE__*/function () {
+    var _ref2 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(params) {
       var url;
       return regeneratorRuntime.wrap(function _callee$(_context) {
         while (1) {
@@ -14454,12 +14442,8 @@ module.exports = function XomSharePointList(listTitle, httpInstance) {
    */
 
 
-  this.find =
-  /*#__PURE__*/
-  function () {
-    var _ref3 = _asyncToGenerator(
-    /*#__PURE__*/
-    regeneratorRuntime.mark(function _callee2(id) {
+  this.find = /*#__PURE__*/function () {
+    var _ref3 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(id) {
       var url;
       return regeneratorRuntime.wrap(function _callee2$(_context2) {
         while (1) {
@@ -14493,12 +14477,8 @@ module.exports = function XomSharePointList(listTitle, httpInstance) {
    */
 
 
-  this.create =
-  /*#__PURE__*/
-  function () {
-    var _ref4 = _asyncToGenerator(
-    /*#__PURE__*/
-    regeneratorRuntime.mark(function _callee3(data) {
+  this.create = /*#__PURE__*/function () {
+    var _ref4 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(data) {
       var url;
       return regeneratorRuntime.wrap(function _callee3$(_context3) {
         while (1) {
@@ -14533,12 +14513,8 @@ module.exports = function XomSharePointList(listTitle, httpInstance) {
    */
 
 
-  this.update =
-  /*#__PURE__*/
-  function () {
-    var _ref5 = _asyncToGenerator(
-    /*#__PURE__*/
-    regeneratorRuntime.mark(function _callee4(id, data) {
+  this.update = /*#__PURE__*/function () {
+    var _ref5 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4(id, data) {
       var url;
       return regeneratorRuntime.wrap(function _callee4$(_context4) {
         while (1) {
@@ -14572,12 +14548,8 @@ module.exports = function XomSharePointList(listTitle, httpInstance) {
    */
 
 
-  this.delete =
-  /*#__PURE__*/
-  function () {
-    var _ref6 = _asyncToGenerator(
-    /*#__PURE__*/
-    regeneratorRuntime.mark(function _callee5(id) {
+  this.delete = /*#__PURE__*/function () {
+    var _ref6 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee5(id) {
       var url;
       return regeneratorRuntime.wrap(function _callee5$(_context5) {
         while (1) {
@@ -14611,12 +14583,8 @@ module.exports = function XomSharePointList(listTitle, httpInstance) {
    */
 
 
-  this.getAttachments =
-  /*#__PURE__*/
-  function () {
-    var _ref7 = _asyncToGenerator(
-    /*#__PURE__*/
-    regeneratorRuntime.mark(function _callee6(itemId) {
+  this.getAttachments = /*#__PURE__*/function () {
+    var _ref7 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee6(itemId) {
       var url;
       return regeneratorRuntime.wrap(function _callee6$(_context6) {
         while (1) {
@@ -14659,12 +14627,8 @@ module.exports = function XomSharePointList(listTitle, httpInstance) {
    */
 
 
-  this.attach =
-  /*#__PURE__*/
-  function () {
-    var _ref8 = _asyncToGenerator(
-    /*#__PURE__*/
-    regeneratorRuntime.mark(function _callee7(itemId, fileInput, attchmentName) {
+  this.attach = /*#__PURE__*/function () {
+    var _ref8 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee7(itemId, fileInput, attchmentName) {
       var requestDigest, fileBuffer, url;
       return regeneratorRuntime.wrap(function _callee7$(_context7) {
         while (1) {
@@ -14713,12 +14677,8 @@ module.exports = function XomSharePointList(listTitle, httpInstance) {
    */
 
 
-  this.rename =
-  /*#__PURE__*/
-  function () {
-    var _ref9 = _asyncToGenerator(
-    /*#__PURE__*/
-    regeneratorRuntime.mark(function _callee8(itemId, attachmentName, newName) {
+  this.rename = /*#__PURE__*/function () {
+    var _ref9 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee8(itemId, attachmentName, newName) {
       var requestDigest, attachments, targetFile, newUrl, url;
       return regeneratorRuntime.wrap(function _callee8$(_context8) {
         while (1) {
@@ -14769,12 +14729,8 @@ module.exports = function XomSharePointList(listTitle, httpInstance) {
    */
 
 
-  this.remove =
-  /*#__PURE__*/
-  function () {
-    var _ref10 = _asyncToGenerator(
-    /*#__PURE__*/
-    regeneratorRuntime.mark(function _callee9(itemId, attachmentName) {
+  this.remove = /*#__PURE__*/function () {
+    var _ref10 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee9(itemId, attachmentName) {
       var requestDigest, url;
       return regeneratorRuntime.wrap(function _callee9$(_context9) {
         while (1) {
@@ -14898,11 +14854,7 @@ module.exports = function XomSharePointSurvey(surveyTitle, httpInstance) {
    * @return {Promise}
    */
 
-  this.getQuestions =
-  /*#__PURE__*/
-  _asyncToGenerator(
-  /*#__PURE__*/
-  regeneratorRuntime.mark(function _callee() {
+  this.getQuestions = /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {
     var url;
     return regeneratorRuntime.wrap(function _callee$(_context) {
       while (1) {
@@ -14940,12 +14892,8 @@ module.exports = function XomSharePointSurvey(surveyTitle, httpInstance) {
    * @return {Promise}
    */
 
-  this.get =
-  /*#__PURE__*/
-  function () {
-    var _ref2 = _asyncToGenerator(
-    /*#__PURE__*/
-    regeneratorRuntime.mark(function _callee2(params) {
+  this.get = /*#__PURE__*/function () {
+    var _ref2 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(params) {
       var url;
       return regeneratorRuntime.wrap(function _callee2$(_context2) {
         while (1) {
@@ -14979,12 +14927,8 @@ module.exports = function XomSharePointSurvey(surveyTitle, httpInstance) {
    */
 
 
-  this.find =
-  /*#__PURE__*/
-  function () {
-    var _ref3 = _asyncToGenerator(
-    /*#__PURE__*/
-    regeneratorRuntime.mark(function _callee3(id) {
+  this.find = /*#__PURE__*/function () {
+    var _ref3 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(id) {
       var url;
       return regeneratorRuntime.wrap(function _callee3$(_context3) {
         while (1) {
@@ -15029,12 +14973,8 @@ module.exports = function XomSharePointSurvey(surveyTitle, httpInstance) {
    */
 
 
-  this.create =
-  /*#__PURE__*/
-  function () {
-    var _ref4 = _asyncToGenerator(
-    /*#__PURE__*/
-    regeneratorRuntime.mark(function _callee4(data) {
+  this.create = /*#__PURE__*/function () {
+    var _ref4 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4(data) {
       var url;
       return regeneratorRuntime.wrap(function _callee4$(_context4) {
         while (1) {
@@ -15069,12 +15009,8 @@ module.exports = function XomSharePointSurvey(surveyTitle, httpInstance) {
    */
 
 
-  this.update =
-  /*#__PURE__*/
-  function () {
-    var _ref5 = _asyncToGenerator(
-    /*#__PURE__*/
-    regeneratorRuntime.mark(function _callee5(id, data) {
+  this.update = /*#__PURE__*/function () {
+    var _ref5 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee5(id, data) {
       var url;
       return regeneratorRuntime.wrap(function _callee5$(_context5) {
         while (1) {
@@ -15108,12 +15044,8 @@ module.exports = function XomSharePointSurvey(surveyTitle, httpInstance) {
    */
 
 
-  this.delete =
-  /*#__PURE__*/
-  function () {
-    var _ref6 = _asyncToGenerator(
-    /*#__PURE__*/
-    regeneratorRuntime.mark(function _callee6(id) {
+  this.delete = /*#__PURE__*/function () {
+    var _ref6 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee6(id) {
       var url;
       return regeneratorRuntime.wrap(function _callee6$(_context6) {
         while (1) {
@@ -15248,11 +15180,7 @@ module.exports = function XomSharePointSite(baseSiteUrl) {
    */
 
 
-  this.getInfo =
-  /*#__PURE__*/
-  _asyncToGenerator(
-  /*#__PURE__*/
-  regeneratorRuntime.mark(function _callee() {
+  this.getInfo = /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {
     var url;
     return regeneratorRuntime.wrap(function _callee$(_context) {
       while (1) {
@@ -15281,12 +15209,8 @@ module.exports = function XomSharePointSite(baseSiteUrl) {
    * @return {Promise}
    */
 
-  this.getUserInfo =
-  /*#__PURE__*/
-  function () {
-    var _ref2 = _asyncToGenerator(
-    /*#__PURE__*/
-    regeneratorRuntime.mark(function _callee2(id) {
+  this.getUserInfo = /*#__PURE__*/function () {
+    var _ref2 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(id) {
       var response, idField;
       return regeneratorRuntime.wrap(function _callee2$(_context2) {
         while (1) {
@@ -15333,11 +15257,7 @@ module.exports = function XomSharePointSite(baseSiteUrl) {
    */
 
 
-  this.getMyInfo =
-  /*#__PURE__*/
-  _asyncToGenerator(
-  /*#__PURE__*/
-  regeneratorRuntime.mark(function _callee3() {
+  this.getMyInfo = /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3() {
     return regeneratorRuntime.wrap(function _callee3$(_context3) {
       while (1) {
         switch (_context3.prev = _context3.next) {
@@ -15363,12 +15283,8 @@ module.exports = function XomSharePointSite(baseSiteUrl) {
    * @return {Promise}
    */
 
-  this.searchUser =
-  /*#__PURE__*/
-  function () {
-    var _ref4 = _asyncToGenerator(
-    /*#__PURE__*/
-    regeneratorRuntime.mark(function _callee4(name) {
+  this.searchUser = /*#__PURE__*/function () {
+    var _ref4 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4(name) {
       var url;
       return regeneratorRuntime.wrap(function _callee4$(_context4) {
         while (1) {
@@ -15401,11 +15317,7 @@ module.exports = function XomSharePointSite(baseSiteUrl) {
    */
 
 
-  this.getResources =
-  /*#__PURE__*/
-  _asyncToGenerator(
-  /*#__PURE__*/
-  regeneratorRuntime.mark(function _callee5() {
+  this.getResources = /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee5() {
     var url;
     return regeneratorRuntime.wrap(function _callee5$(_context5) {
       while (1) {
