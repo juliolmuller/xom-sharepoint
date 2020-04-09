@@ -20,10 +20,11 @@ var toPascalCase = require('../utils/toPascalCase');
  * @constructor
  * @param {String} listTitle List title to connect to
  * @param {Axios} [httpInstance] Customized Axios instance to perform HTTP requests
+ * @param {Promise} [reqDigest] Request promised to the hashed request digest
  */
 
 
-module.exports = function XomSharePointList(listTitle, httpInstance) {
+module.exports = function XomSharePointList(listTitle, httpInstance, reqDigest) {
   var _this = this;
 
   /**
@@ -51,14 +52,14 @@ module.exports = function XomSharePointList(listTitle, httpInstance) {
 
   var _http = httpInstance || httpFactory();
   /**
-   * Store the full response of the previous request
+   * Store the hashed request digest
    *
    * @private
    * @var {String}
    */
 
 
-  var _requestDigest = _http.post(endpoint.contextInfo(), {}).then(function (_ref) {
+  var _requestDigest = reqDigest || _http.post(endpoint.contextInfo(), {}).then(function (_ref) {
     var data = _ref.data;
     return data.FormDigestValue || data.GetContextWebInformation.FormDigestValue;
   });

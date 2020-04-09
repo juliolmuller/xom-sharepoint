@@ -48,6 +48,18 @@ module.exports = function XomSharePointSite(baseSiteUrl) {
 
   var _http = httpFactory(baseSiteUrl);
   /**
+   * Store the hashed request digest
+   *
+   * @private
+   * @var {Promise}
+   */
+
+
+  var _requestDigest = _http.post(endpoint.contextInfo(), {}).then(function (_ref) {
+    var data = _ref.data;
+    return data.FormDigestValue || data.GetContextWebInformation.FormDigestValue;
+  });
+  /**
    * Define property to get & set 'baseUrl' value
    *
    * @property {String} baseUrl
@@ -137,7 +149,7 @@ module.exports = function XomSharePointSite(baseSiteUrl) {
    */
 
   this.getUserInfo = /*#__PURE__*/function () {
-    var _ref2 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(id) {
+    var _ref3 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(id) {
       var response, idField;
       return regeneratorRuntime.wrap(function _callee2$(_context2) {
         while (1) {
@@ -173,7 +185,7 @@ module.exports = function XomSharePointSite(baseSiteUrl) {
     }));
 
     return function (_x) {
-      return _ref2.apply(this, arguments);
+      return _ref3.apply(this, arguments);
     };
   }();
   /**
@@ -211,7 +223,7 @@ module.exports = function XomSharePointSite(baseSiteUrl) {
    */
 
   this.searchUser = /*#__PURE__*/function () {
-    var _ref4 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4(name) {
+    var _ref5 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4(name) {
       var url;
       return regeneratorRuntime.wrap(function _callee4$(_context4) {
         while (1) {
@@ -234,7 +246,7 @@ module.exports = function XomSharePointSite(baseSiteUrl) {
     }));
 
     return function (_x2) {
-      return _ref4.apply(this, arguments);
+      return _ref5.apply(this, arguments);
     };
   }();
   /**
@@ -273,8 +285,99 @@ module.exports = function XomSharePointSite(baseSiteUrl) {
    */
 
   this.getList = function (listTitle) {
-    return new XomSharePointList(listTitle, _http);
+    return new XomSharePointList(listTitle, _http, _requestDigest);
   };
+  /**
+   * Create a new SharePoint list
+   *
+   * @param {String} listTitle SharePoint list title
+   * @param {Number} baseTemplate Tempalte code for the new list (default is 100)
+   * @return {Promise}
+   */
+
+
+  this.createList = /*#__PURE__*/function () {
+    var _ref7 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee6(listTitle, baseTemplate) {
+      var requestDigest, url;
+      return regeneratorRuntime.wrap(function _callee6$(_context6) {
+        while (1) {
+          switch (_context6.prev = _context6.next) {
+            case 0:
+              _context6.next = 2;
+              return _requestDigest;
+
+            case 2:
+              requestDigest = _context6.sent;
+              url = endpoint.resourcesIndex();
+              _context6.next = 6;
+              return _http.post(url, {
+                __metadata: {
+                  type: 'SP.List'
+                },
+                BaseTemplate: baseTemplate || 100,
+                Title: listTitle
+              }, {
+                requestDigest: requestDigest
+              });
+
+            case 6:
+              _lastHttpResponse = _context6.sent;
+              return _context6.abrupt("return", _lastHttpResponse.data);
+
+            case 8:
+            case "end":
+              return _context6.stop();
+          }
+        }
+      }, _callee6);
+    }));
+
+    return function (_x3, _x4) {
+      return _ref7.apply(this, arguments);
+    };
+  }();
+  /**
+   * Delete an existing SharePoint list
+   *
+   * @param {String} listTitle SharePoint list title
+   * @return {Promise}
+   */
+
+
+  this.deleteList = /*#__PURE__*/function () {
+    var _ref8 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee7(listTitle) {
+      var requestDigest, url;
+      return regeneratorRuntime.wrap(function _callee7$(_context7) {
+        while (1) {
+          switch (_context7.prev = _context7.next) {
+            case 0:
+              _context7.next = 2;
+              return _requestDigest;
+
+            case 2:
+              requestDigest = _context7.sent;
+              url = endpoint.list(listTitle);
+              _context7.next = 6;
+              return _http["delete"](url, {
+                requestDigest: requestDigest
+              });
+
+            case 6:
+              _lastHttpResponse = _context7.sent;
+              return _context7.abrupt("return", _lastHttpResponse.data);
+
+            case 8:
+            case "end":
+              return _context7.stop();
+          }
+        }
+      }, _callee7);
+    }));
+
+    return function (_x5) {
+      return _ref8.apply(this, arguments);
+    };
+  }();
   /**
    * Return a reference to connect to a SharePoint survey
    *

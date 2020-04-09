@@ -1,10 +1,10 @@
 # XOM SharePoint
 
-[![npm version](https://img.shields.io/npm/v/xom-sharepoint.svg?style=flat-square)](https://www.npmjs.org/package/xom-sharepoint)
+[![npm version](https://img.shields.io/npm/v/xom-sharepoint.svg)](https://www.npmjs.org/package/xom-sharepoint)
 [![install size](https://packagephobia.now.sh/badge?p=xom-sharepoint)](https://packagephobia.now.sh/result?p=xom-sharepoint)
-[![npm downloads](https://img.shields.io/npm/dm/xom-sharepoint.svg?style=flat-square)](http://npm-stat.com/charts.html?package=xom-sharepoint)
+[![npm downloads](https://img.shields.io/npm/dm/xom-sharepoint.svg)](http://npm-stat.com/charts.html?package=xom-sharepoint)
 
-HTTTP client based on `[axios](https://github.com/axios/axios)` to easily fetch SharePoint API. It is the ideal package to include in your [Vue](https://vuejs.org/) or [React](https://reactjs.org/) project, not integrated to **Angular** though.
+HTTTP client based on [`axios`](https://github.com/axios/axios) to easily fetch SharePoint API. It is the ideal package to include in your [Vue](https://vuejs.org/) or [React](https://reactjs.org/) project, not integrated to **Angular** though.
 
 ## Installation
 
