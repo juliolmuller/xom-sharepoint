@@ -32,6 +32,16 @@ module.exports = function XomSharePointSite(baseSiteUrl) {
   const _http = httpFactory(baseSiteUrl)
 
   /**
+   * Store the hashed request digest
+   *
+   * @private
+   * @var {Promise}
+   */
+  const _requestDigest = _http
+    .post(endpoint.contextInfo(), {})
+    .then(({ data }) => data.FormDigestValue || data.GetContextWebInformation.FormDigestValue)
+
+  /**
    * Define property to get & set 'baseUrl' value
    *
    * @property {String} baseUrl
@@ -165,7 +175,39 @@ module.exports = function XomSharePointSite(baseSiteUrl) {
    * @return {XomSharePointList}
    */
   this.getList = (listTitle) => {
-    return new XomSharePointList(listTitle, _http)
+    return new XomSharePointList(listTitle, _http, _requestDigest)
+  }
+
+  /**
+   * Create a new SharePoint list
+   *
+   * @param {String} listTitle SharePoint list title
+   * @param {Number} baseTemplate Tempalte code for the new list (default is 100)
+   * @return {Promise}
+   */
+  this.createList = async (listTitle, baseTemplate) => {
+    const requestDigest = await _requestDigest
+    const url = endpoint.resourcesIndex()
+    _lastHttpResponse = await _http.post(url, {
+      __metadata: { type: 'SP.List' },
+      BaseTemplate: baseTemplate || 100,
+      Title: listTitle,
+    }, { requestDigest })
+    return _lastHttpResponse.data
+  }
+
+  /**
+   * Delete an existing SharePoint list
+   *
+   * @param {String} listTitle SharePoint list title
+   * @return {Promise}
+   */
+
+  this.deleteList = async (listTitle) => {
+    const requestDigest = await _requestDigest
+    const url = endpoint.list(listTitle)
+    _lastHttpResponse = await _http.delete(url, { requestDigest })
+    return _lastHttpResponse.data
   }
 
   /**
