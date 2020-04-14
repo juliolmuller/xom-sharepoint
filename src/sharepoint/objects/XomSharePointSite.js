@@ -124,7 +124,7 @@ module.exports = function XomSharePointSite(baseSiteUrl) {
     ])
     return addUserProperties({
       ..._lastHttpResponse[0].data,
-      ..._lastHttpResponse[1].data,
+      ..._lastHttpResponse[1].data[0],
     })
   }
 

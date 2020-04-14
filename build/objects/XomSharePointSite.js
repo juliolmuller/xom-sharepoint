@@ -174,7 +174,7 @@ module.exports = function XomSharePointSite(baseSiteUrl) {
 
             case 8:
               _lastHttpResponse = _context2.sent;
-              return _context2.abrupt("return", addUserProperties(_objectSpread({}, _lastHttpResponse[0].data, {}, _lastHttpResponse[1].data)));
+              return _context2.abrupt("return", addUserProperties(_objectSpread({}, _lastHttpResponse[0].data, {}, _lastHttpResponse[1].data[0])));
 
             case 10:
             case "end":
