@@ -5,9 +5,12 @@
  * @param {*} data
  * @return {*}
  */
-module.exports = function extractResponseData(data) {
+module.exports = function(data) {
   if (data && data.d) {
-    return data.d.results || data.d
+    return {
+      __next: data.d.__next,
+      ...(data.d.results || data.d),
+    }
   }
   return data
 }

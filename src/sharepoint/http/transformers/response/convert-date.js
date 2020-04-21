@@ -3,14 +3,14 @@ const numOnly = require('@lacussoft/num-only')
 /**
  * Regular expression pattern for dates coming from SharePoint
  *
- * @const {RegExp}
+ * @constant {RegExp}
  */
 const SP_DATE_PATTERN = /^\/Date\((\d+)\)\/$/
 
 /**
  * Amount of milliseconds per minute
  *
- * @const {number}
+ * @constant {number}
  */
 const MILLISECONDS_PER_MINUTE = 60000
 
@@ -46,7 +46,7 @@ function sweepObject(obj) {
  *
  * @param {*} data
  */
-module.exports = function convertResponseDates(data) {
+module.exports = function(data) {
   if (data) {
     try {
       if (data.constructor === Array) {
