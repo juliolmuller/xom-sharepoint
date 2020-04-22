@@ -1,22 +1,24 @@
-const http = require('../../axios-instance')
 
 /**
  * Add the header for the request digest token
  *
- * @var {Array<Function>}
+ * @param {Axios} httpInstance
+ * @return {Array<Function>}
  */
-module.exports = [
+module.exports = function(httpInstance) {
+  return [
 
-  // on success
-  async (config) => {
-    const { digest, method } = config
-    if (digest !== false && (/post/i).test(method)) {
-      config.method = 'post'
-      config.headers = {
-        ...config.headers,
-        'X-RequestDigest': await http.defaults.requestDigest,
+    // on success
+    async (config) => {
+      const { digest, method } = config
+      if (digest !== false && (/post/i).test(method)) {
+        config.method = 'post'
+        config.headers = {
+          ...config.headers,
+          'X-RequestDigest': await httpInstance.defaults.requestDigest,
+        }
       }
-    }
-    return config
-  },
-]
+      return config
+    },
+  ]
+}

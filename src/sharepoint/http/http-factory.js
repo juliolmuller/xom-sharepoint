@@ -1,16 +1,20 @@
-const http = require('./axios-instance')
+const axios = require('axios').default
 const reqTransformers = require('./transformers/request')
 const respTransformers = require('./transformers/response')
-const reqInterceptors = require('./interceptors/request')
-const respInterceptors = require('./interceptors/response')
+const requestInterceptors = require('./interceptors/request')
+const responseInterceptors = require('./interceptors/response')
+const { getRequestDigest } = require('../facades/requests')
 
 /**
- * Configure the custom instance of axios and provide it
+ * Create and configure the custom instance of axios and provide it
  *
  * @param {string} [siteUrl] If no URL is provided, current site's will be used
  * @return {Axios}
  */
 module.exports = function(siteUrl) {
+
+  // Create a new axios instance
+  const http = axios.create()
 
   // Set base URL for requests
   http.defaults.baseURL = siteUrl || (() => {
@@ -21,13 +25,22 @@ module.exports = function(siteUrl) {
     return window.location.href.toLowerCase().split(delimiters)[0]
   })()
 
-  // Set data transformers
+  // Set request transformers and interceptors
   http.defaults.transformRequest = reqTransformers
-  http.defaults.transformResponse = respTransformers
+  requestInterceptors.forEach((intc) => {
+    return http.interceptors.request
+      .use(...(intc.constructor === Function ? intc(http) : intc))
+  })
 
-  // Set interceptors
-  reqInterceptors.forEach((intc) => http.interceptors.request.use(...intc))
-  respInterceptors.forEach((intc) => http.interceptors.response.use(...intc))
+  // Set response transformers and interceptors
+  http.defaults.transformResponse = respTransformers
+  responseInterceptors.forEach((intc) => {
+    return http.interceptors.response
+      .use(...(intc.constructor === Function ? intc(http) : intc))
+  })
+
+  // Eagerly get request digest
+  http.defaults.requestDigest = getRequestDigest(http)
 
   return http
 }
