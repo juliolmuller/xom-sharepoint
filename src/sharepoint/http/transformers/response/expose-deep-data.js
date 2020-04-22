@@ -7,10 +7,10 @@
  */
 module.exports = function(data) {
   if (data && data.d) {
-    return {
-      __next: data.d.__next,
-      ...(data.d.results || data.d),
-    }
+    const { d } = data
+    data = d.results || d
+    data.__next = d.__next
+    return data
   }
   return data
 }
