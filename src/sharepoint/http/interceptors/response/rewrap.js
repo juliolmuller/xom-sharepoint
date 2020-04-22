@@ -13,7 +13,4 @@ module.exports = [
     data.__response = response
     return data
   },
-
-  // on error
-  Promise.reject,
 ]

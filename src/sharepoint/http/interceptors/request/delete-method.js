@@ -15,7 +15,4 @@ module.exports = [
     }
     return config
   },
-
-  // on error
-  Promise.reject,
 ]

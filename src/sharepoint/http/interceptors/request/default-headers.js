@@ -8,12 +8,9 @@ const headers = require('../../config/headers-common')
 module.exports = [
 
   // on success
-  async (config) => {
+  (config) => {
     config.withCredentials = true
     config.headers = headers
     return config
   },
-
-  // on error
-  Promise.reject,
 ]

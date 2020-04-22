@@ -10,7 +10,7 @@ module.exports = [
   // on success
   async (config) => {
     const { digest, method } = config
-    if (digest !== false && (/patch/i).test(method)) {
+    if (digest !== false && (/post/i).test(method)) {
       config.method = 'post'
       config.headers = {
         ...config.headers,
@@ -19,7 +19,4 @@ module.exports = [
     }
     return config
   },
-
-  // on error
-  Promise.reject,
 ]
