@@ -9,8 +9,11 @@ module.exports = [
   // on success
   (response) => {
     const { data } = response
-    delete response.data
-    data.__response = response
-    return data
+    if (data) {
+      delete response.data
+      data.__response = response
+      return data
+    }
+    return response
   },
 ]
