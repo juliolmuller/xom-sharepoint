@@ -2,7 +2,7 @@
 /**
  * Extract file name based on a given input object
  *
- * @param {String|HTMLElement|FileList|File} input Some reference of the input type 'file':
+ * @param {String|HTMLElement|FileList|File} baseInput Some reference of the input type 'file':
  *          String - if it is a query selector;
  *          HTMLElement - if it is a direct reference to the input element;
  *          FileList - if it is direct reference to the 'files' attribute of the element; and
@@ -11,7 +11,8 @@
  *        the first File of the collection will be selected
  * @return {String}
  */
-module.exports = function genFileName(input) {
+module.exports = function genFileName(baseInput) {
+  let input = baseInput
   switch (input.constructor.name) {
     case 'String':
       input = document.querySelector(input)

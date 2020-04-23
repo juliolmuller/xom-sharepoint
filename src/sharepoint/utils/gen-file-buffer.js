@@ -2,7 +2,7 @@
 /**
  * Generate a byte buffer from a HTML file input
  *
- * @param {String|HTMLElement|FileList|File} input Some reference of the input type 'file':
+ * @param {String|HTMLElement|FileList|File} baseInput Some reference of the input type 'file':
  *          String - if it is a query selector;
  *          HTMLElement - if it is a direct reference to the input element;
  *          FileList - if it is direct reference to the 'files' attribute of the element; and
@@ -12,7 +12,8 @@
  *        of other files, provide a File instance explicitaly
  * @return {Promise<ArrayBuffer>}
  */
-module.exports = function genFileBuffer(input) {
+module.exports = function genFileBuffer(baseInput) {
+  let input = baseInput
   const reader = new FileReader()
   const file = (() => {
     switch (input.constructor.name) {
