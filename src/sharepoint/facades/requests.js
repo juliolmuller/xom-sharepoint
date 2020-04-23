@@ -1,7 +1,11 @@
+/* eslint-disable arrow-body-style */
+
 const endpoints = require('./endpoints')
 
 /**
  * Define all possible requests to the SharePoint API
+ *
+ * @var {Object<Function>}
  */
 const requests = {}
 
@@ -271,7 +275,7 @@ requests.patchListItem = async (http, title, itemId, type, data) => {
   })
   const updatedItem = await requests.getListItemById(http, title, itemId)
   delete patchResp.data
-  updatedItem.__request = patchResp
+  updatedItem.__response = patchResp
   return updatedItem
 }
 
@@ -287,7 +291,7 @@ requests.deleteListItem = async (http, title, itemId) => {
   const originalItem = await requests.getListItemById(http, title, itemId)
   const deleteResp = await http.delete(endpoints.lists.itemById(title, itemId))
   delete deleteResp.data
-  originalItem.__request = deleteResp
+  originalItem.__response = deleteResp
   return originalItem
 }
 

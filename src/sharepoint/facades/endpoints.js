@@ -21,42 +21,42 @@ endpoints.baseApiUri = () => '/_api/web'
 /**
  * Return URI for site metadata
  *
- * @return {string}
+ * @return {String}
  */
 endpoints.site.info = () => endpoints.baseApiUri()
 
 /**
  * Return URI for site metadata
  *
- * @return {string}
+ * @return {String}
  */
 endpoints.site.resources = () => endpoints.baseApiUri()
 
 /**
  * Return URI for site context information
  *
- * @return {string}
+ * @return {String}
  */
 endpoints.site.contextInfo = () => '/_api/ContextInfo'
 
 /**
  * Return URI for site's parent info
  *
- * @return {string}
+ * @return {String}
  */
 endpoints.site.parentSite = () => `${endpoints.baseApiUri()}/ParentWeb`
 
 /**
  * Return URI for site's recycle bin
  *
- * @return {string}
+ * @return {String}
  */
 endpoints.site.recycleBin = () => `${endpoints.baseApiUri()}/RecycleBin`
 
 /**
  * Return URI for site regional settings
  *
- * @return {string}
+ * @return {String}
  */
 endpoints.site.regionalSettings = () => `${endpoints.baseApiUri()}/RegionalSettings`
 
@@ -93,8 +93,8 @@ endpoints.users.listItems = (query = '') => `${endpoints.users.listMetadata}/Ite
 /**
  * Return URI to get a given user information
  *
- * @param {number} id
- * @return {string}
+ * @param {Number} id
+ * @return {String}
  */
 endpoints.users.byId = (id) => `${endpoints.users.listMetadata}/Items(${id})`
 
@@ -102,16 +102,16 @@ endpoints.users.byId = (id) => `${endpoints.users.listMetadata}/Items(${id})`
  * Return URI to get aall lists metadata
  *
  * @param {String} [query]
- * @return {string}
+ * @return {String}
  */
 endpoints.lists.index = (query = '') => `${endpoints.baseApiUri()}/Lists${query}`
 
 /**
  * Return URI to get a given list metadata
  *
- * @param {string} title
+ * @param {String} title
  * @param {String} [query]
- * @return {string}
+ * @return {String}
  */
 endpoints.lists.byTitle = (title, query = '') => `${endpoints.lists.index()}/GetByTitle('${title}')${query}`
 
@@ -137,17 +137,17 @@ endpoints.lists.items = (title, query = '') => `${endpoints.lists.byTitle(title)
  * Return URI to get an specific list item
  *
  * @param {String} title
- * @param {number} itemId
- * @return {string}
+ * @param {Number} itemId
+ * @return {String}
  */
 endpoints.lists.itemById = (title, itemId) => endpoints.lists.items(title, `(${itemId})`)
 
 /**
  * Return URI to handle list items attachments
  *
- * @param {string} title
- * @param {number} itemId
- * @return {string}
+ * @param {String} title
+ * @param {Number} itemId
+ * @return {String}
  */
 endpoints.lists.itemAttachments = (title, itemId) => `${endpoints.lists.itemById(title, itemId)}/AttachmentFiles`
 
@@ -155,7 +155,7 @@ endpoints.lists.itemAttachments = (title, itemId) => `${endpoints.lists.itemById
  * Return URI for all the libraries
  *
  * @param {String} [query]
- * @return {string}
+ * @return {String}
  */
 endpoints.libs.index = (query = '') => `${endpoints.baseApiUri()}/Folders${query}`
 

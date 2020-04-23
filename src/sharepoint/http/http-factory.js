@@ -8,10 +8,10 @@ const { getRequestDigest } = require('../facades/requests')
 /**
  * Create and configure the custom instance of axios and provide it
  *
- * @param {string} [siteUrl] If no URL is provided, current site's will be used
+ * @param {String} [siteUrl] If no URL is provided, current site's will be used
  * @return {Axios}
  */
-module.exports = function(siteUrl) {
+module.exports = (siteUrl) => {
 
   // Create a new axios instance
   const http = axios.create()
@@ -27,17 +27,13 @@ module.exports = function(siteUrl) {
 
   // Set request transformers and interceptors
   http.defaults.transformRequest = reqTransformers
-  requestInterceptors.forEach((intc) => {
-    return http.interceptors.request
-      .use(...(intc.constructor === Function ? intc(http) : intc))
-  })
+  requestInterceptors.forEach((intc) => http.interceptors.request
+    .use(...(intc.constructor === Function ? intc(http) : intc)))
 
   // Set response transformers and interceptors
   http.defaults.transformResponse = respTransformers
-  responseInterceptors.forEach((intc) => {
-    return http.interceptors.response
-      .use(...(intc.constructor === Function ? intc(http) : intc))
-  })
+  responseInterceptors.forEach((intc) => http.interceptors.response
+    .use(...(intc.constructor === Function ? intc(http) : intc)))
 
   // Eagerly get request digest
   http.defaults.requestDigest = getRequestDigest(http)

@@ -5,20 +5,18 @@
  * @param {Axios} httpInstance
  * @return {Array<Function>}
  */
-module.exports = function(httpInstance) {
-  return [
+module.exports = (httpInstance) => [
 
-    // on success
-    async (config) => {
-      const { digest, method } = config
-      if (digest !== false && (/post/i).test(method)) {
-        config.method = 'post'
-        config.headers = {
-          ...config.headers,
-          'X-RequestDigest': await httpInstance.defaults.requestDigest,
-        }
+  // on success
+  async (config) => {
+    const { digest, method } = config
+    if (digest !== false && (/post/i).test(method)) {
+      config.method = 'post'
+      config.headers = {
+        ...config.headers,
+        'X-RequestDigest': await httpInstance.defaults.requestDigest,
       }
-      return config
-    },
-  ]
-}
+    }
+    return config
+  },
+]
