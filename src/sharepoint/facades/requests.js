@@ -200,10 +200,11 @@ requests.getListByTitle = (http, title, query = '') => {
  *
  * @param {Axios} http
  * @param {String} title
- * @return {Promise<Array>}
+ * @return {Promise<String>}
  */
-requests.getListItemType = (http, title) => {
-  return requests.getListByTitle(http, title, '?$select=ListItemEntityTypeFullName')
+requests.getListItemType = async (http, title) => {
+  const resp = await requests.getListByTitle(http, title, '?$select=ListItemEntityTypeFullName')
+  return resp.ListItemEntityTypeFullName
 }
 
 /**
@@ -236,10 +237,11 @@ requests.getListItems = (http, title, query = '') => {
  * @param {Axios} http
  * @param {String} title
  * @param {Number} itemId
+ * @param {String} [query]
  * @return {Promise<Object>}
  */
-requests.getListItemById = (http, title, itemId) => {
-  return http.get(endpoints.lists.itemById(title, itemId))
+requests.getListItemById = (http, title, itemId, query = '') => {
+  return http.get(endpoints.lists.itemById(title, itemId, query))
 }
 
 /**
@@ -251,7 +253,7 @@ requests.getListItemById = (http, title, itemId) => {
  * @param {Object} data
  * @return {Promise<Array>}
  */
-requests.postListItems = (http, title, type, data) => {
+requests.postListItem = (http, title, type, data) => {
   return http.post(endpoints.lists.items(title), {
     __metadata: { type },
     ...data,

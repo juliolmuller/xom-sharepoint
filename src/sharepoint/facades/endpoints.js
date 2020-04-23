@@ -138,9 +138,10 @@ endpoints.lists.items = (title, query = '') => `${endpoints.lists.byTitle(title)
  *
  * @param {String} title
  * @param {Number} itemId
+ * @param {String} [query]
  * @return {String}
  */
-endpoints.lists.itemById = (title, itemId) => endpoints.lists.items(title, `(${itemId})`)
+endpoints.lists.itemById = (title, itemId, query = '') => endpoints.lists.items(title, `(${itemId})${query}`)
 
 /**
  * Return URI to handle list items attachments
