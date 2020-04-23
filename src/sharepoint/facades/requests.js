@@ -309,4 +309,48 @@ requests.getListItemAttachments = (http, title, itemId) => {
   return http.get(endpoints.lists.itemAttachments(title, itemId))
 }
 
+/**
+ * Upload an attachment to a given list item
+ *
+ * @param {Axios} http
+ * @param {String} title
+ * @param {Number} itemId
+ * @param {String} fileName
+ * @param {ArrayBuffer} fileBuffer
+ * @return {Promise<Object>}
+ */
+requests.uploadListItemAttachment = (http, title, itemId, fileName, fileBuffer) => {
+  return http.post(endpoints.lists.itemAttachmentsUpload(title, itemId, fileName), fileBuffer)
+}
+
+/**
+ * Rename an existing attachment from a given list item
+ *
+ * @param {Axios} http
+ * @param {String} title
+ * @param {Number} itemId
+ * @param {String} oldFileName
+ * @param {String} newFileName
+ * @return {Promise<Object>}
+ */
+requests.renameListItemAttachment = async (http, title, itemId, oldFileName, newFileName) => {
+  const attachments = await requests.getListItemAttachments(http, title, itemId)
+  const oldFileUrl = attachments.find((att) => att.FileName === oldFileName).ServerRelativeUrl
+  const newFileUrl = oldFileUrl.replace(oldFileName, newFileName)
+  return http.patch(endpoints.lists.itemAttachmentsRename(oldFileUrl, newFileUrl))
+}
+
+/**
+ * Delete an attachment of a given list item
+ *
+ * @param {Axios} http
+ * @param {String} title
+ * @param {Number} itemId
+ * @param {String} fileName
+ * @return {Promise<Object>}
+ */
+requests.uploadListItemAttachment = (http, title, itemId, fileName) => {
+  return http.delete(endpoints.lists.itemAttachmentByName(title, itemId, fileName))
+}
+
 module.exports = requests

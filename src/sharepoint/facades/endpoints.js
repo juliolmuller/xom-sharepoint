@@ -153,6 +153,35 @@ endpoints.lists.itemById = (title, itemId, query = '') => endpoints.lists.items(
 endpoints.lists.itemAttachments = (title, itemId) => `${endpoints.lists.itemById(title, itemId)}/AttachmentFiles`
 
 /**
+ * Return URI to handle list items attachments
+ *
+ * @param {String} title
+ * @param {Number} itemId
+ * @param {String} fileName
+ * @return {String}
+ */
+endpoints.lists.itemAttachmentByName = (title, itemId, fileName) => `${endpoints.lists.itemById(title, itemId)}/AttachmentFiles/GetByFileName('${fileName}')`
+
+/**
+ * Return URI to handle upload of list items attachments
+ *
+ * @param {String} title
+ * @param {Number} itemId
+ * @param {String} fileName
+ * @return {String}
+ */
+endpoints.lists.itemAttachmentsUpload = (title, itemId, fileName) => `${endpoints.lists.itemAttachments(title, itemId)}/Add(filename='${fileName}')`
+
+/**
+ * Return URI to handle renaming of list items attachments
+ *
+ * @param {String} oldFileUrl
+ * @param {String} newFileUrl
+ * @return {String}
+ */
+endpoints.lists.itemAttachmentsRename = (oldFileUrl, newFileUrl) => `${endpoints.libs.fileByUrl(oldFileUrl)}/MoveTo(newurl='${newFileUrl}',flags=1)`
+
+/**
  * Return URI for all the libraries
  *
  * @param {String} [query]
