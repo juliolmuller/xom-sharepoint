@@ -11,7 +11,7 @@ module.exports = [
     const { data } = response
     if (data) {
       delete response.data
-      data.__response = response
+      Object.defineProperty(data, '__response', { value: response })
       return data
     }
     return response
