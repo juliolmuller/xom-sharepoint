@@ -203,6 +203,6 @@ endpoints.libs.folderByUrl = (relativeUrl) => `${endpoints.baseApiUri()}/GetFold
  * @param {String} relativeUrl
  * @return {String}
  */
-endpoints.libs.fileByUrl = (relativeUrl) => `${endpoints.baseApiUri()}/GetFileByServerRelativeUrl('${relativeUrl}}')`
+endpoints.libs.fileByUrl = (relativeUrl) => `${endpoints.baseApiUri()}/GetFileByServerRelativeUrl('${relativeUrl}')`
 
 module.exports = endpoints

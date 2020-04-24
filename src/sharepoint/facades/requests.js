@@ -349,7 +349,7 @@ requests.renameListItemAttachment = async (http, title, itemId, oldFileName, new
  * @param {String} fileName
  * @return {Promise<Object>}
  */
-requests.uploadListItemAttachment = (http, title, itemId, fileName) => {
+requests.deleteListItemAttachment = (http, title, itemId, fileName) => {
   return http.delete(endpoints.lists.itemAttachmentByName(title, itemId, fileName))
 }
 
