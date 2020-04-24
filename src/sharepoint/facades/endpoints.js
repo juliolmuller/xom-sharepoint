@@ -80,7 +80,7 @@ endpoints.users.listMetadata = () => `${endpoints.baseApiUri()}/SiteUserInfoList
  * @param {String} [query]
  * @return {String}
  */
-endpoints.users.listFields = (query = '') => `${endpoints.users.listMetadata}/Fields${query}`
+endpoints.users.listFields = (query = '') => `${endpoints.users.listMetadata()}/Fields${query}`
 
 /**
  * Return URI to get users records
@@ -88,7 +88,7 @@ endpoints.users.listFields = (query = '') => `${endpoints.users.listMetadata}/Fi
  * @param {String} [query]
  * @return {String}
  */
-endpoints.users.listItems = (query = '') => `${endpoints.users.listMetadata}/Items${query}`
+endpoints.users.listItems = (query = '') => `${endpoints.users.listMetadata()}/Items${query}`
 
 /**
  * Return URI to get a given user information
@@ -96,7 +96,7 @@ endpoints.users.listItems = (query = '') => `${endpoints.users.listMetadata}/Ite
  * @param {Number} id
  * @return {String}
  */
-endpoints.users.byId = (id) => `${endpoints.users.listMetadata}/Items(${id})`
+endpoints.users.byId = (id) => `${endpoints.users.listMetadata()}/Items(${id})`
 
 /**
  * Return URI to get aall lists metadata
