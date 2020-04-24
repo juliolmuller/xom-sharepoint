@@ -1,6 +1,7 @@
-const endpoint = require('../config/endpoint')
-const httpFactory = require('../http/xomHttpFactory')
-const toPascalCase = require('../utils/toPascalCase')
+/* eslint-disable arrow-body-style */
+/* eslint-disable no-underscore-dangle */
+
+const requests = require('../facades/requests')
 
 /**
  * Contain the necessary information to stablish a connection to a SharePoint
@@ -8,7 +9,7 @@ const toPascalCase = require('../utils/toPascalCase')
  *
  * @constructor
  * @param {String} surveyTitle Survey title to connect to
- * @param {Axios} [httpInstance] Customized Axios instance to perform HTTP requests
+ * @param {Axios} httpInstance Customized Axios instance to perform HTTP requests
  */
 module.exports = function XomSharePointSurvey(surveyTitle, httpInstance) {
 
@@ -21,21 +22,22 @@ module.exports = function XomSharePointSurvey(surveyTitle, httpInstance) {
   let _title = surveyTitle
 
   /**
-   * Store the full response of the previous request
-   *
-   * @private
-   * @var {Object}
-   */
-  let _lastHttpResponse = null
-
-  /**
    * Private instance of Axios
    *
    * @private
    * @final
    * @var {Axios}
    */
-  const _http = httpInstance || httpFactory()
+  const _http = httpInstance
+
+  /**
+   * Eagerly fetches list metadata to get list items type
+   *
+   * @private
+   * @final
+   * @var {Promise<String>}
+   */
+  const _itemsType = requests.getListItemType(_http, _title)
 
   /**
    * Define property to get & set 'title' value
@@ -46,49 +48,30 @@ module.exports = function XomSharePointSurvey(surveyTitle, httpInstance) {
     get() {
       return _title
     },
-    set(listTitle) {
-      _title = listTitle
-    },
-  })
-
-  /**
-   * Define property to get 'name' value
-   *
-   * @property {String} name
-   */
-  Object.defineProperty(this, 'name', {
-    get() {
-      return toPascalCase(_title)
-    },
-  })
-
-  /**
-   * Define property to get & set 'lastHttpResponse' value
-   *
-   * @property {Object} lastHttpResponse
-   */
-  Object.defineProperty(this, 'lastHttpResponse', {
-    get() {
-      return _lastHttpResponse
+    set(title) {
+      _title = String(title)
     },
   })
 
   /**
    * Get fields that corresponds to the questions and their choices
    *
-   * @return {Promise}
+   * @return {Promise<Array>}
    */
   this.getQuestions = async () => {
-    const url = `${endpoint.listFields(this.title)}?$filter=(CanBeDeleted eq true)`
-    _lastHttpResponse = await _http.get(url)
-    return _lastHttpResponse.data.map((field) => {
+    const response = await requests.getListFields(_http, _title, '?$filter=(CanBeDeleted eq true)')
+    const questions = response.map((field) => {
       return {
-        Field: `${toPascalCase(field.Title)}Value`,
+        Field: field.InternalName,
+        Description: field.Description,
         Question: field.Title,
         Type: field.TypeDisplayName,
         Choices: field.Choices && field.Choices.results,
+        DefaultValue: field.DefaultValue,
       }
     })
+    Object.defineProperty(questions, '__response', { value: response.__response })
+    return questions
   }
 
   /**
@@ -98,46 +81,31 @@ module.exports = function XomSharePointSurvey(surveyTitle, httpInstance) {
    * on how to build parameters
    *
    * @param {String} [params]
-   * @return {Promise}
+   * @return {Promise<Array>}
    */
-  this.get = async (params) => {
-    const url = endpoint.listItems(this.name) + (params || '')
-    _lastHttpResponse = await _http.get(url)
-    return _lastHttpResponse.data
+  this.getResponses = (params) => {
+    return requests.getListItems(_http, _title, params)
   }
 
   /**
    * Retrun a single response by its ID
    *
    * @param {Number} id
-   * @return {Promise}
+   * @param {String} [params]
+   * @return {Promise<Object>}
    */
-  this.find = async (id) => {
-    const url = `${endpoint.listItems(this.name)}(${id})`
-    _lastHttpResponse = await _http.get(url)
-    return _lastHttpResponse.data
-  }
-
-  /**
-   * Return the responses created by a given user
-   *
-   * @param {Number} userId
-   * @return {Promise}
-   */
-  this.findByUser = (userId) => {
-    return this.get(`?$filter=(CreatedById eq ${userId})`)
+  this.findResponse = (id, params) => {
+    return requests.getListItemById(_http, _title, id, params)
   }
 
   /**
    * Save a new response in the SharePoint survey list
    *
    * @param {Object} data Use literal objects to send data
-   * @return {Promise}
+   * @return {Promise<Object>}
    */
-  this.create = async (data) => {
-    const url = endpoint.listItems(this.name)
-    _lastHttpResponse = await _http.post(url, data)
-    return _lastHttpResponse.data
+  this.submitResponse = async (data) => {
+    return requests.postListItem(_http, _title, await _itemsType, data)
   }
 
   /**
@@ -145,23 +113,19 @@ module.exports = function XomSharePointSurvey(surveyTitle, httpInstance) {
    *
    * @param {Number} id
    * @param {Object} data Use literal objects to send data
-   * @return {Promise}
+   * @return {Promise<Object>}
    */
-  this.update = async (id, data) => {
-    const url = `${endpoint.listItems(this.name)}(${id})`
-    _lastHttpResponse = await _http.put(url, data)
-    return _lastHttpResponse.data
+  this.changeResponse = async (id, data) => {
+    return requests.patchListItem(_http, _title, id, await _itemsType, data)
   }
 
   /**
    * Delete an existing response
    *
    * @param {Number} id
-   * @return {Promise}
+   * @return {Promise<Object>}
    */
-  this.delete = async (id) => {
-    const url = `${endpoint.listItems(this.name)}(${id})`
-    _lastHttpResponse = await _http.delete(url)
-    return _lastHttpResponse.data
+  this.delete = (id) => {
+    return requests.deleteListItem(_http, _title, id)
   }
 }
