@@ -1,5 +1,8 @@
-const endpoint = require('../config/endpoint')
-const httpFactory = require('../http/xomHttpFactory')
+/* eslint-disable arrow-body-style */
+/* eslint-disable no-underscore-dangle */
+
+const requests = require('../facades/requests')
+const httpFactory = require('../http/http-factory')
 const XomSharePointList = require('./XomSharePointList')
 const XomSharePointSurvey = require('./XomSharePointSurvey')
 
@@ -15,15 +18,7 @@ const XomSharePointSurvey = require('./XomSharePointSurvey')
 module.exports = function XomSharePointSite(baseSiteUrl) {
 
   /**
-   * Store the full response of the previous request
-   *
-   * @private
-   * @var {Object}
-   */
-  let _lastHttpResponse = null
-
-  /**
-   * Private instance of Axios
+   * Base custom instance of Axios
    *
    * @private
    * @final
@@ -32,14 +27,14 @@ module.exports = function XomSharePointSite(baseSiteUrl) {
   const _http = httpFactory(baseSiteUrl)
 
   /**
-   * Store the hashed request digest
+   * Eagerly store current user data (as Promise)
    *
    * @private
-   * @var {Promise}
+   * @final
+   * @var {Promise<Object>}
    */
-  const _requestDigest = _http
-    .post(endpoint.contextInfo(), {})
-    .then(({ data }) => data.FormDigestValue || data.GetContextWebInformation.FormDigestValue)
+  const _currUser = requests.getSiteCurrentUser(_http)
+    .then(({ Id }) => requests.getSiteUserById(_http, Id))
 
   /**
    * Define property to get & set 'baseUrl' value
@@ -56,53 +51,12 @@ module.exports = function XomSharePointSite(baseSiteUrl) {
   })
 
   /**
-   * Define property to get & set 'lastHttpResponse' value
-   *
-   * @property {Object} lastHttpResponse
-   */
-  Object.defineProperty(this, 'lastHttpResponse', {
-    get() {
-      return _lastHttpResponse
-    },
-  })
-
-  /**
-   * Extract useful parts of account/login name
-   *
-   * @param {String} account Account/login name to be trimmed
-   * @return {String}
-   */
-  const trimAccount = (account) => {
-    return String(account)
-      .replace(/(.*)[|](.*)/, '$2')
-      .replace(/\\/, '_')
-  }
-
-  /**
-   * Add essential properties to the user object
-   *
-   * @param {Object} user User object literal
-   */
-  const addUserProperties = (user) => {
-    user.Id = user.Id || user.Id0
-    user.Account = user.LoginName || user.AccountName || user.Account
-    user.AccountName = trimAccount(user.Account)
-    user.UserId = user.AccountName.replace(/(.*)[_](.*)/, '$2')
-    user.Name = user.Name || user.DisplayName
-    user.PersonalUrl = `https://mysite.na.xom.com/personal//${user.AccountName}`
-    user.PictureUrl = `http://lyncpictures/service/api/image/${user.AccountName}`
-    return user
-  }
-
-  /**
    * Get the SharePoint site metadata
    *
    * @return {Promise}
    */
-  this.getInfo = async () => {
-    const url = endpoint.siteInfo()
-    _lastHttpResponse = await _http.get(url)
-    return _lastHttpResponse.data
+  this.getInfo = () => {
+    return requests.getSite(_http)
   }
 
   /**
@@ -112,60 +66,21 @@ module.exports = function XomSharePointSite(baseSiteUrl) {
    * @param {Number} [id] ID of the user you want the information for
    * @return {Promise}
    */
-  this.getUserInfo = async (id) => {
-    if (!id) {
-      return this.getMyInfo()
+  this.getUserInfo = (id) => {
+    if (id) {
+      return requests.getSiteUserById(_http, id)
     }
-    const response = await _http.get(`${(endpoint.userInfo())}?$top=1`)
-    const idField = response.data[0].Id ? 'Id' : 'Id0'
-    _lastHttpResponse = await Promise.all([
-      _http.get(endpoint.user(id)),
-      _http.get(`${endpoint.userInfo()}?$filter=(${idField} eq ${id})`),
-    ])
-    return addUserProperties({
-      ..._lastHttpResponse[0].data,
-      ..._lastHttpResponse[1].data[0],
-    })
-  }
-
-  /**
-   * Queries the SharePoint API to get current user information
-   *
-   * @deprecated
-   * @return {Promise}
-   */
-  this.getMyInfo = async () => {
-    _lastHttpResponse = await Promise.all([
-      _http.get(endpoint.currentUser()),
-      _http.get(endpoint.currentUserInfo()),
-    ])
-    return addUserProperties({
-      ..._lastHttpResponse[0].data,
-      ..._lastHttpResponse[1].data,
-    })
+    return _currUser
   }
 
   /**
    * Queries SharePoint API searching for user name
    *
-   * @param {String} name Partial name of the user
+   * @param {String} search Partial name/userID of the user
    * @return {Promise}
    */
-  this.searchUser = async (name) => {
-    const url = `${endpoint.userInfo()}?$filter=substringof('${name}',Name)`
-    _lastHttpResponse = await _http.get(url)
-    return _lastHttpResponse.data
-  }
-
-  /**
-   * Return an array with all the resources stored in the site (lists)
-   *
-   * @return {Promise}
-   */
-  this.getResources = async () => {
-    const url = endpoint.resourcesIndex()
-    _lastHttpResponse = await _http.get(url)
-    return _lastHttpResponse.data
+  this.searchUser = (search) => {
+    return requests.getSiteUsersListItems(_http, `?$filter=substringof('${search}',Title) or substringof('${search}',UserName)`)
   }
 
   /**
@@ -175,25 +90,17 @@ module.exports = function XomSharePointSite(baseSiteUrl) {
    * @return {XomSharePointList}
    */
   this.getList = (listTitle) => {
-    return new XomSharePointList(listTitle, _http, _requestDigest)
+    return new XomSharePointList(listTitle, _http)
   }
 
   /**
    * Create a new SharePoint list
    *
    * @param {String} listTitle SharePoint list title
-   * @param {Number} baseTemplate Tempalte code for the new list (default is 100)
    * @return {Promise}
    */
-  this.createList = async (listTitle, baseTemplate) => {
-    const requestDigest = await _requestDigest
-    const url = endpoint.resourcesIndex()
-    _lastHttpResponse = await _http.post(url, {
-      __metadata: { type: 'SP.List' },
-      BaseTemplate: baseTemplate || 100,
-      Title: listTitle,
-    }, { requestDigest })
-    return _lastHttpResponse.data
+  this.createList = (listTitle) => {
+    return requests.createList(_http, listTitle)
   }
 
   /**
@@ -203,18 +110,15 @@ module.exports = function XomSharePointSite(baseSiteUrl) {
    * @return {Promise}
    */
 
-  this.deleteList = async (listTitle) => {
-    const requestDigest = await _requestDigest
-    const url = endpoint.list(listTitle)
-    _lastHttpResponse = await _http.delete(url, { requestDigest })
-    return _lastHttpResponse.data
+  this.deleteList = (listTitle) => {
+    return requests.deleteList(_http, listTitle)
   }
 
   /**
    * Return a reference to connect to a SharePoint survey
    *
    * @param {String} surveyTitle SharePoint survey title
-   * @return {XomSharePointList}
+   * @return {XomSharePointSurvey}
    */
   this.getSurvey = (surveyTitle) => {
     return new XomSharePointSurvey(surveyTitle, _http)
