@@ -1,8 +1,9 @@
-const endpoint = require('../config/endpoint')
-const genFileBuffer = require('../utils/genFileBuffer')
-const genFileName = require('../utils/genFileName')
-const httpFactory = require('../http/xomHttpFactory')
-const toPascalCase = require('../utils/toPascalCase')
+/* eslint-disable arrow-body-style */
+/* eslint-disable no-underscore-dangle */
+
+const requests = require('../facades/requests')
+const genFileBuffer = require('../utils/gen-file-buffer')
+const genFileName = require('../utils/gen-file-name')
 
 /**
  * Contain the necessary information to stablish a connection to a SharePoint
@@ -10,10 +11,9 @@ const toPascalCase = require('../utils/toPascalCase')
  *
  * @constructor
  * @param {String} listTitle List title to connect to
- * @param {Axios} [httpInstance] Customized Axios instance to perform HTTP requests
- * @param {Promise} [reqDigest] Request promised to the hashed request digest
+ * @param {Axios} httpInstance Customized Axios instance to perform HTTP requests
  */
-module.exports = function XomSharePointList(listTitle, httpInstance, reqDigest) {
+module.exports = function XomSharePointList(listTitle, httpInstance) {
 
   /**
    * Store the SharePoint list title
@@ -24,31 +24,22 @@ module.exports = function XomSharePointList(listTitle, httpInstance, reqDigest) 
   let _title = listTitle
 
   /**
-   * Store the full response of the previous request
-   *
-   * @private
-   * @var {Object}
-   */
-  let _lastHttpResponse = null
-
-  /**
    * Private instance of Axios
    *
    * @private
    * @final
    * @var {Axios}
    */
-  const _http = httpInstance || httpFactory()
+  const _http = httpInstance
 
   /**
-   * Store the hashed request digest
+   * Eagerly fetches list metadata to get list items type
    *
    * @private
-   * @var {String}
+   * @final
+   * @var {Promise<String>}
    */
-  const _requestDigest = reqDigest || _http
-    .post(endpoint.contextInfo(), {})
-    .then(({ data }) => data.FormDigestValue || data.GetContextWebInformation.FormDigestValue)
+  const _itemsType = requests.getListItemType(_http, _title)
 
   /**
    * Define property to get & set 'title' value
@@ -60,31 +51,20 @@ module.exports = function XomSharePointList(listTitle, httpInstance, reqDigest) 
       return _title
     },
     set(title) {
-      _title = title
+      _title = String(title)
     },
   })
 
   /**
-   * Define property to get 'name' value
+   * Retrun the list fields metadata
    *
-   * @property {String} name
+   * @param {Boolean} [customOnly]
+   * @return {Promise<Object>}
    */
-  Object.defineProperty(this, 'name', {
-    get() {
-      return toPascalCase(_title)
-    },
-  })
-
-  /**
-   * Define property to get & set 'lastHttpResponse' value
-   *
-   * @property {Object} lastHttpResponse
-   */
-  Object.defineProperty(this, 'lastHttpResponse', {
-    get() {
-      return _lastHttpResponse
-    },
-  })
+  this.fields = (customOnly) => {
+    const query = customOnly ? '?$filter=(CanBeDeleted eq true)' : ''
+    return requests.getListFields(_http, _title, query)
+  }
 
   /**
    * Return a list of the items stored in the list. If no additional parameter
@@ -93,36 +73,31 @@ module.exports = function XomSharePointList(listTitle, httpInstance, reqDigest) 
    * on how to build parameters
    *
    * @param {String} [params]
-   * @return {Promise}
+   * @return {Promise<Array>}
    */
-  this.get = async (params) => {
-    const url = endpoint.listItems(this.name) + (params || '')
-    _lastHttpResponse = await _http.get(url)
-    return _lastHttpResponse.data
+  this.get = (params) => {
+    return requests.getListItems(_http, _title, params)
   }
 
   /**
    * Retrun a single list item with the given ID
    *
    * @param {Number} id
-   * @return {Promise}
+   * @param {String} [params]
+   * @return {Promise<Object>}
    */
-  this.find = async (id) => {
-    const url = `${endpoint.listItems(this.name)}(${id})`
-    _lastHttpResponse = await _http.get(url)
-    return _lastHttpResponse.data
+  this.find = (id, params) => {
+    return requests.getListItemById(_http, _title, id, params)
   }
 
   /**
    * Save a new record in the SharePoint list
    *
    * @param {Object} data Use literal objects to send data
-   * @return {Promise}
+   * @return {Promise<Object>}
    */
   this.create = async (data) => {
-    const url = endpoint.listItems(this.name)
-    _lastHttpResponse = await _http.post(url, data)
-    return _lastHttpResponse.data
+    return requests.postListItem(_http, _title, await _itemsType, data)
   }
 
   /**
@@ -130,36 +105,30 @@ module.exports = function XomSharePointList(listTitle, httpInstance, reqDigest) 
    *
    * @param {Number} id
    * @param {Object} data Use literal objects to send data
-   * @return {Promise}
+   * @return {Promise<Object>}
    */
   this.update = async (id, data) => {
-    const url = `${endpoint.listItems(this.name)}(${id})`
-    _lastHttpResponse = await _http.put(url, data)
-    return _lastHttpResponse.data
+    return requests.patchListItem(_http, _title, id, await _itemsType, data)
   }
 
   /**
    * Delete an existing record from the SharePoint list
    *
    * @param {Number} id
-   * @return {Promise}
+   * @return {Promise<Object>}
    */
-  this.delete = async (id) => {
-    const url = `${endpoint.listItems(this.name)}(${id})`
-    _lastHttpResponse = await _http.delete(url)
-    return _lastHttpResponse.data
+  this.delete = (id) => {
+    return requests.deleteListItem(_http, _title, id)
   }
 
   /**
    * Return a list of the attached files in the list item
    *
    * @param {Number} itemId
-   * @return {Promise}
+   * @return {Promise<Array>}
    */
-  this.getAttachments = async (itemId) => {
-    const url = endpoint.listItemsAttachment(this.title, itemId)
-    _lastHttpResponse = await _http.get(url)
-    return _lastHttpResponse.data
+  this.getAttachmentsFrom = (itemId) => {
+    return requests.getListItemAttachments(_http, _title, itemId)
   }
 
   /**
@@ -175,15 +144,12 @@ module.exports = function XomSharePointList(listTitle, httpInstance, reqDigest) 
    *        the first File of the collection will be selected. If you want to get the byte buffer
    *        of other files, provide a File instance explicitaly
    * @param {String} [attchmentName] Define a custom name to the attached file
-   * @return {Promise}
+   * @return {Promise<Object>}
    */
-  this.attach = async (itemId, fileInput, attchmentName) => {
-    attchmentName = attchmentName || genFileName(fileInput)
-    const requestDigest = await _requestDigest
+  this.attachTo = async (itemId, fileInput, attchmentName) => {
+    const fileName = attchmentName || genFileName(fileInput)
     const fileBuffer = await genFileBuffer(fileInput)
-    const url = `${endpoint.listItemsAttachment(this.title, itemId)}/add(filename='${attchmentName}')`
-    _lastHttpResponse = await _http.post(url, fileBuffer, { requestDigest })
-    return _lastHttpResponse.data
+    return requests.uploadListItemAttachment(_http, _title, itemId, fileName, fileBuffer)
   }
 
   /**
@@ -192,16 +158,10 @@ module.exports = function XomSharePointList(listTitle, httpInstance, reqDigest) 
    * @param {Number} itemId
    * @param {String} attachmentName
    * @param {String} newName
-   * @return {Promise}
+   * @return {Promise<Object>}
    */
-  this.rename = async (itemId, attachmentName, newName) => {
-    const requestDigest = await _requestDigest
-    const attachments = await this.getAttachments(itemId)
-    const targetFile = attachments.filter((att) => att.FileName === attachmentName)[0]
-    const newUrl = targetFile.ServerRelativeUrl.replace(attachmentName, newName)
-    const url = `${endpoint.serverResource(targetFile.ServerRelativeUrl)}/moveTo(newurl='${newUrl}', flags=1)`
-    _lastHttpResponse = await _http.put(url, {}, { requestDigest })
-    return _lastHttpResponse.data
+  this.renameAttachment = async (itemId, attachmentName, newName) => {
+    return requests.renameListItemAttachment(_http, _title, itemId, attachmentName, newName)
   }
 
   /**
@@ -209,12 +169,9 @@ module.exports = function XomSharePointList(listTitle, httpInstance, reqDigest) 
    *
    * @param {Number} itemId
    * @param {String} attachmentName
-   * @return {Promise}
+   * @return {Promise<Object>}
    */
-  this.remove = async (itemId, attachmentName) => {
-    const requestDigest = await _requestDigest
-    const url = `${endpoint.listItemsAttachment(this.title, itemId)}/getByFileName('${attachmentName}')`
-    _lastHttpResponse = await _http.delete(url, { requestDigest })
-    return _lastHttpResponse.data
+  this.removeAttachment = (itemId, attachmentName) => {
+    return requests.deleteListItemAttachment(_http, _title, itemId, attachmentName)
   }
 }
