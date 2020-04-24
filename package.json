@@ -26,7 +26,7 @@
     "build:dist": "parcel build src/dist.js --no-minify -o xom-sharepoint.js && parcel build src/dist.js -o xom-sharepoint.min.js",
     "build:node": "babel src/sharepoint --out-dir build",
     "watch": "parcel watch src/sharepoint/XomSharePoint.js",
-    "test": "echo \"No tests yet\" && exit 1"
+    "test": "jest"
   },
   "peerDependencies": {
     "axios": "~0.19.2"
@@ -39,6 +39,7 @@
     "eslint": "^6.8.0",
     "eslint-config-airbnb-base": "^14.1.0",
     "eslint-plugin-import": "^2.20.2",
+    "jest": "^25.4.0",
     "parcel-bundler": "^1.12.4"
   },
   "eslintConfig": {
