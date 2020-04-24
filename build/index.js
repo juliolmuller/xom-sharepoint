@@ -1,9 +1,5 @@
 "use strict";
 
-require('core-js/stable');
-
-require('regenerator-runtime/runtime');
-
 var XomSharePointSite = require('./objects/XomSharePointSite');
 /**
  * Instantiate a XomSharePoint object to connect to a SharePoint site and,

@@ -23,3 +23,12 @@ Or, if you are not in a Node enviroment, you can use the bundled files in `dist/
 ```html
 <script src="https://cdn.jsdelivr.net/npm/xom-sharepoint@latest/dist/xom-sharepoint.min.js"></script>
 ```
+
+<!--
+======================================================
+  Support Documentation:
+======================================================
+
+https://docs.microsoft.com/en-us/sharepoint/dev/sp-add-ins/working-with-lists-and-list-items-with-rest
+
+-->

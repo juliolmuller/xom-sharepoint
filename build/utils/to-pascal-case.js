@@ -1,10 +1,12 @@
 "use strict";
 
+/* eslint-disable no-param-reassign */
+
 /**
  * Convert a given string to Pascal case pattern
  *
- * @param {string} str Base string to be converted
- * @return {string}
+ * @param {String} str Base string to be converted
+ * @return {String}
  */
 module.exports = function toPascalCase(str) {
   str = String(str);

@@ -1,10 +1,11 @@
 "use strict";
 
+/* eslint-disable no-param-reassign */
 var numOnly = require('@lacussoft/num-only');
 /**
  * Regular expression pattern for dates coming from SharePoint
  *
- * @const {RegExp}
+ * @constant {RegExp}
  */
 
 
@@ -12,14 +13,14 @@ var SP_DATE_PATTERN = /^\/Date\((\d+)\)\/$/;
 /**
  * Amount of milliseconds per minute
  *
- * @const {number}
+ * @constant {Number}
  */
 
 var MILLISECONDS_PER_MINUTE = 60000;
 /**
  * Convert a SharePoint date notation to a JS Date object
  *
- * @param {string} spDate
+ * @param {String} spDate
  * @return {Date}
  */
 
@@ -33,7 +34,7 @@ function convertToDate(spDate) {
 /**
  * Iterate object properties to convert dates
  *
- * @param {object} obj
+ * @param {Object} obj
  */
 
 
@@ -51,7 +52,7 @@ function sweepObject(obj) {
  */
 
 
-module.exports = function convertResponseDates(data) {
+module.exports = function (data) {
   if (data) {
     try {
       if (data.constructor === Array) {
