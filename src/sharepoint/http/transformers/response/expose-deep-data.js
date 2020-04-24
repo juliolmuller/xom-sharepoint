@@ -10,7 +10,7 @@ module.exports = (data) => {
     const { d } = data
     // eslint-disable-next-line no-param-reassign
     data = d.results || d
-    Object.defineProperty(data, '__next', { value: d.__next })
+    Object.defineProperty(data, '__next', { value: d.__next, writable: true })
     return data
   }
   return data

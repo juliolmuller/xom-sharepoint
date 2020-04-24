@@ -11,7 +11,7 @@ module.exports = [
     const { data } = response
     if (data) {
       delete response.data
-      Object.defineProperty(data, '__response', { value: response })
+      Object.defineProperty(data, '__response', { value: response, writable: true })
       return data
     }
     return response
