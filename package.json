@@ -1,6 +1,6 @@
 {
   "name": "xom-sharepoint",
-  "version": "0.11.0",
+  "version": "0.12.0",
   "description": "HTTTP client based on Axios to easily fetch SharePoint through its REST API.",
   "author": "Julio L. Muller",
   "license": "MIT",
@@ -39,55 +39,45 @@
     "@babel/core": "^7.9.0",
     "@babel/plugin-transform-runtime": "^7.9.0",
     "@babel/preset-env": "^7.9.5",
+    "@lacussoft/eslint-config-standard": "^1.0.0",
     "axios": "~0.19.2",
     "eslint": "^6.8.0",
-    "eslint-config-airbnb-base": "^14.1.0",
-    "eslint-plugin-import": "^2.20.2",
     "jest": "^25.4.0",
     "parcel-bundler": "^1.12.4"
   },
   "eslintConfig": {
     "env": {
       "browser": true,
+      "node": true,
       "es6": true
-    },
-    "extends": [
-      "airbnb-base"
-    ],
-    "globals": {
-      "Atomics": "readonly",
-      "SharedArrayBuffer": "readonly"
     },
     "parserOptions": {
       "ecmaVersion": 2018,
       "sourceType": "module"
     },
+    "extends": "@lacussoft/standard",
     "rules": {
-      "arrow-body-style": ["error", "as-needed"],
-      "arrow-parens": ["error", "always"],
-      "func-names": "off",
-      "object-curly-newline": "off",
+      "curly": ["error", "all"],
+      "no-multiple-empty-lines": ["error", {
+        "max": 2,
+        "maxBOF": 1,
+        "maxEOF": 1
+      }],
       "no-param-reassign": ["error", {
         "props": false
-      }],
-      "no-shadow": ["warn", {
-        "builtinGlobals": false
       }],
       "no-underscore-dangle": ["error", {
         "allow": ["__metadata", "__next", "__response"]
       }],
-      "padded-blocks": "off",
-      "quote-props": ["error", "consistent-as-needed"],
-      "semi": ["error", "never"],
-      "space-before-function-paren": ["error", {
-        "anonymous": "always",
-        "named": "never",
-        "asyncArrow": "always"
-      }]
+      "padded-blocks": "off"
     }
   },
   "babel": {
-    "presets": ["@babel/preset-env"],
-    "plugins": ["@babel/plugin-transform-runtime"]
+    "presets": [
+      "@babel/preset-env"
+    ],
+    "plugins": [
+      "@babel/plugin-transform-runtime"
+    ]
   }
 }
