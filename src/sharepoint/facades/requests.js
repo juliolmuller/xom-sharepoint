@@ -114,39 +114,6 @@ requests.getSiteUserById = (http, id) => {
 }
 
 /**
- * Fetch list of all site folders/libraries
- *
- * @param {Axios} http
- * @param {String} [query]
- * @return {Promise<Array>}
- */
-requests.getFolders = (http, query = '') => {
-  return http.get(endpoints.libs.index(query))
-}
-
-/**
- * Fetch the content with a given folder/library based on its relative URL
- *
- * @param {Axios} http
- * @param {String} relativeUrl
- * @return {Promise<Object>}
- */
-requests.getFolderByUrl = (http, relativeUrl) => {
-  return http.get(endpoints.libs.folderByUrl(relativeUrl))
-}
-
-/**
- * Fetch the content with a given file within a library based on its relative URL
- *
- * @param {Axios} http
- * @param {String} relativeUrl
- * @return {Promise<Object>}
- */
-requests.getFileByUrl = (http, relativeUrl) => {
-  return http.get(endpoints.libs.fileByUrl(relativeUrl))
-}
-
-/**
  * Fetch list of all site lists
  *
  * @param {Axios} http
@@ -351,6 +318,85 @@ requests.renameListItemAttachment = async (http, title, itemId, oldFileName, new
  */
 requests.deleteListItemAttachment = (http, title, itemId, fileName) => {
   return http.delete(endpoints.lists.itemAttachmentByName(title, itemId, fileName))
+}
+
+/**
+ * Fetch list of all site folders/libraries
+ *
+ * @param {Axios} http
+ * @param {String} [query]
+ * @return {Promise<Array>}
+ */
+requests.getFolders = (http, query = '') => {
+  return http.get(endpoints.folders.index(query))
+}
+
+/**
+ * Fetch the content with a given folder/library based on its relative URL
+ *
+ * @param {Axios} http
+ * @param {String} relativeUrl
+ * @return {Promise<Object>}
+ */
+requests.getFolderByUrl = (http, relativeUrl) => {
+  return http.get(endpoints.folders.folderByUrl(relativeUrl))
+}
+
+/**
+ * Fetch the existing folders within a given folder based on its relative URL
+ *
+ * @param {Axios} http
+ * @param {String} relativeUrl
+ * @param {String} [query]
+ * @return {Promise<Object>}
+ */
+requests.getFoldersInFolder = (http, relativeUrl, query = '') => {
+  return http.get(endpoints.folders.foldersInFolder(relativeUrl, query))
+}
+
+requests.createFolder = (http, relativeUrl, folderName) => {
+  return http.post(endpoints.folders.index(), {
+    ServerRelativeUrl: `${relativeUrl}/${folderName}`,
+    __metadata: {
+      type: 'SP.Folder',
+    },
+  })
+}
+
+/**
+ * Fetch the existing folders within a given folder based on its relative URL
+ *
+ * @param {Axios} http
+ * @param {String} relativeUrl
+ * @param {String} [query]
+ * @return {Promise<Object>}
+ */
+requests.getFilesInFolder = (http, relativeUrl, query = '') => {
+  return http.get(endpoints.folders.filesInFolder(relativeUrl, query))
+}
+
+/**
+ * Fetch the content with a given file within a library based on its relative URL
+ *
+ * @param {Axios} http
+ * @param {String} relativeUrl
+ * @return {Promise<Object>}
+ */
+requests.getFileByUrl = (http, relativeUrl) => {
+  return http.get(endpoints.folders.fileByUrl(relativeUrl))
+}
+
+/**
+ * Fetch the existing folders within a given folder based on its relative URL
+ *
+ * @param {Axios} http
+ * @param {String} relativeUrl
+ * @param {String} fileName
+ * @param {ArrayBuffer} fileBuffer
+ * @return {Promise<Object>}
+ */
+requests.uploadFileToFolder = (http, relativeUrl, fileName, fileBuffer) => {
+  return http.post(endpoints.folders.newFileToFolder(relativeUrl, fileName), fileBuffer)
 }
 
 module.exports = requests

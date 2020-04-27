@@ -254,26 +254,9 @@ module.exports = function XomSharePointList(listTitle, httpInstance) {
    */
 
 
-  this.renameAttachment = /*#__PURE__*/function () {
-    var _ref4 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee4(itemId, attachmentName, newName) {
-      return _regenerator["default"].wrap(function _callee4$(_context4) {
-        while (1) {
-          switch (_context4.prev = _context4.next) {
-            case 0:
-              return _context4.abrupt("return", requests.renameListItemAttachment(_http, _title, itemId, attachmentName, newName));
-
-            case 1:
-            case "end":
-              return _context4.stop();
-          }
-        }
-      }, _callee4);
-    }));
-
-    return function (_x7, _x8, _x9) {
-      return _ref4.apply(this, arguments);
-    };
-  }();
+  this.renameAttachment = function (itemId, attachmentName, newName) {
+    return requests.renameListItemAttachment(_http, _title, itemId, attachmentName, newName);
+  };
   /**
    * Remove a given file attachment from the list item
    *

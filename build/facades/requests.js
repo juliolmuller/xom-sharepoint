@@ -162,43 +162,6 @@ requests.getSiteUserById = function (http, id) {
   return http.get(endpoints.users.byId(id));
 };
 /**
- * Fetch list of all site folders/libraries
- *
- * @param {Axios} http
- * @param {String} [query]
- * @return {Promise<Array>}
- */
-
-
-requests.getFolders = function (http) {
-  var query = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
-  return http.get(endpoints.libs.index(query));
-};
-/**
- * Fetch the content with a given folder/library based on its relative URL
- *
- * @param {Axios} http
- * @param {String} relativeUrl
- * @return {Promise<Object>}
- */
-
-
-requests.getFolderByUrl = function (http, relativeUrl) {
-  return http.get(endpoints.libs.folderByUrl(relativeUrl));
-};
-/**
- * Fetch the content with a given file within a library based on its relative URL
- *
- * @param {Axios} http
- * @param {String} relativeUrl
- * @return {Promise<Object>}
- */
-
-
-requests.getFileByUrl = function (http, relativeUrl) {
-  return http.get(endpoints.libs.fileByUrl(relativeUrl));
-};
-/**
  * Fetch list of all site lists
  *
  * @param {Axios} http
@@ -526,6 +489,94 @@ requests.renameListItemAttachment = /*#__PURE__*/function () {
 
 requests.deleteListItemAttachment = function (http, title, itemId, fileName) {
   return http["delete"](endpoints.lists.itemAttachmentByName(title, itemId, fileName));
+};
+/**
+ * Fetch list of all site folders/libraries
+ *
+ * @param {Axios} http
+ * @param {String} [query]
+ * @return {Promise<Array>}
+ */
+
+
+requests.getFolders = function (http) {
+  var query = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
+  return http.get(endpoints.folders.index(query));
+};
+/**
+ * Fetch the content with a given folder/library based on its relative URL
+ *
+ * @param {Axios} http
+ * @param {String} relativeUrl
+ * @return {Promise<Object>}
+ */
+
+
+requests.getFolderByUrl = function (http, relativeUrl) {
+  return http.get(endpoints.folders.folderByUrl(relativeUrl));
+};
+/**
+ * Fetch the existing folders within a given folder based on its relative URL
+ *
+ * @param {Axios} http
+ * @param {String} relativeUrl
+ * @param {String} [query]
+ * @return {Promise<Object>}
+ */
+
+
+requests.getFoldersInFolder = function (http, relativeUrl) {
+  var query = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '';
+  return http.get(endpoints.folders.foldersInFolder(relativeUrl, query));
+};
+
+requests.createFolder = function (http, relativeUrl, folderName) {
+  return http.post(endpoints.folders.index(), {
+    ServerRelativeUrl: "".concat(relativeUrl, "/").concat(folderName),
+    __metadata: {
+      type: 'SP.Folder'
+    }
+  });
+};
+/**
+ * Fetch the existing folders within a given folder based on its relative URL
+ *
+ * @param {Axios} http
+ * @param {String} relativeUrl
+ * @param {String} [query]
+ * @return {Promise<Object>}
+ */
+
+
+requests.getFilesInFolder = function (http, relativeUrl) {
+  var query = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '';
+  return http.get(endpoints.folders.filesInFolder(relativeUrl, query));
+};
+/**
+ * Fetch the content with a given file within a library based on its relative URL
+ *
+ * @param {Axios} http
+ * @param {String} relativeUrl
+ * @return {Promise<Object>}
+ */
+
+
+requests.getFileByUrl = function (http, relativeUrl) {
+  return http.get(endpoints.folders.fileByUrl(relativeUrl));
+};
+/**
+ * Fetch the existing folders within a given folder based on its relative URL
+ *
+ * @param {Axios} http
+ * @param {String} relativeUrl
+ * @param {String} fileName
+ * @param {ArrayBuffer} fileBuffer
+ * @return {Promise<Object>}
+ */
+
+
+requests.uploadFileToFolder = function (http, relativeUrl, fileName, fileBuffer) {
+  return http.post(endpoints.folders.newFileToFolder(relativeUrl, fileName), fileBuffer);
 };
 
 module.exports = requests;

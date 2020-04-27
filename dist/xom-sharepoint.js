@@ -916,7 +916,7 @@ var endpoints = {
   site: {},
   users: {},
   lists: {},
-  libs: {}
+  folders: {}
 };
 /**
  * Return the base API URI
@@ -1155,7 +1155,7 @@ endpoints.lists.itemAttachmentsUpload = function (title, itemId, fileName) {
 
 
 endpoints.lists.itemAttachmentsRename = function (oldFileUrl, newFileUrl) {
-  return "".concat(endpoints.libs.fileByUrl(oldFileUrl), "/MoveTo(newurl='").concat(newFileUrl, "',flags=1)");
+  return "".concat(endpoints.folders.fileByUrl(oldFileUrl), "/MoveTo(newurl='").concat(newFileUrl, "',flags=1)");
 };
 /**
  * Return URI for all the libraries
@@ -1165,7 +1165,7 @@ endpoints.lists.itemAttachmentsRename = function (oldFileUrl, newFileUrl) {
  */
 
 
-endpoints.libs.index = function () {
+endpoints.folders.index = function () {
   var query = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
   return "".concat(endpoints.baseApiUri(), "/Folders").concat(query);
 };
@@ -1177,8 +1177,48 @@ endpoints.libs.index = function () {
  */
 
 
-endpoints.libs.folderByUrl = function (relativeUrl) {
-  return "".concat(endpoints.baseApiUri(), "/GetFolderByServerRelativeUrl('").concat(relativeUrl, "}')");
+endpoints.folders.folderByUrl = function (relativeUrl) {
+  return "".concat(endpoints.baseApiUri(), "/GetFolderByServerRelativeUrl('").concat(relativeUrl, "')");
+};
+/**
+ * Return URL to list of folders within a given folder
+ *
+ * @param {String} relativeUrl
+ * @param {String} [query]
+ * @return {String}
+ */
+
+
+endpoints.folders.foldersInFolder = function (relativeUrl) {
+  var query = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
+  return "".concat(endpoints.folders.folderByUrl(relativeUrl), "/Folders").concat(query);
+};
+/**
+ * Return URL to list of files within a given folder
+ *
+ * @param {String} relativeUrl
+ * @param {String} [query]
+ * @return {String}
+ */
+
+
+endpoints.folders.filesInFolder = function (relativeUrl) {
+  var query = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
+  return "".concat(endpoints.folders.folderByUrl(relativeUrl), "/Files").concat(query);
+};
+/**
+ * Return URL to upload a file to a folder
+ *
+ * @param {String} relativeUrl
+ * @param {String} fileName
+ * @param {Boolean} [overwrite]
+ * @return {String}
+ */
+
+
+endpoints.folders.newFileToFolder = function (relativeUrl, fileName) {
+  var overwrite = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
+  return "".concat(endpoints.folders.filesInFolder(relativeUrl), "/Add(overwrite=").concat(overwrite, ",url='").concat(fileName, "')");
 };
 /**
  * Return URI to access files by relative URL
@@ -1188,7 +1228,7 @@ endpoints.libs.folderByUrl = function (relativeUrl) {
  */
 
 
-endpoints.libs.fileByUrl = function (relativeUrl) {
+endpoints.folders.fileByUrl = function (relativeUrl) {
   return "".concat(endpoints.baseApiUri(), "/GetFileByServerRelativeUrl('").concat(relativeUrl, "')");
 };
 
@@ -1356,43 +1396,6 @@ requests.getSiteUsersListItems = function (http) {
 
 requests.getSiteUserById = function (http, id) {
   return http.get(endpoints.users.byId(id));
-};
-/**
- * Fetch list of all site folders/libraries
- *
- * @param {Axios} http
- * @param {String} [query]
- * @return {Promise<Array>}
- */
-
-
-requests.getFolders = function (http) {
-  var query = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
-  return http.get(endpoints.libs.index(query));
-};
-/**
- * Fetch the content with a given folder/library based on its relative URL
- *
- * @param {Axios} http
- * @param {String} relativeUrl
- * @return {Promise<Object>}
- */
-
-
-requests.getFolderByUrl = function (http, relativeUrl) {
-  return http.get(endpoints.libs.folderByUrl(relativeUrl));
-};
-/**
- * Fetch the content with a given file within a library based on its relative URL
- *
- * @param {Axios} http
- * @param {String} relativeUrl
- * @return {Promise<Object>}
- */
-
-
-requests.getFileByUrl = function (http, relativeUrl) {
-  return http.get(endpoints.libs.fileByUrl(relativeUrl));
 };
 /**
  * Fetch list of all site lists
@@ -1722,6 +1725,94 @@ requests.renameListItemAttachment = /*#__PURE__*/function () {
 
 requests.deleteListItemAttachment = function (http, title, itemId, fileName) {
   return http.delete(endpoints.lists.itemAttachmentByName(title, itemId, fileName));
+};
+/**
+ * Fetch list of all site folders/libraries
+ *
+ * @param {Axios} http
+ * @param {String} [query]
+ * @return {Promise<Array>}
+ */
+
+
+requests.getFolders = function (http) {
+  var query = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
+  return http.get(endpoints.folders.index(query));
+};
+/**
+ * Fetch the content with a given folder/library based on its relative URL
+ *
+ * @param {Axios} http
+ * @param {String} relativeUrl
+ * @return {Promise<Object>}
+ */
+
+
+requests.getFolderByUrl = function (http, relativeUrl) {
+  return http.get(endpoints.folders.folderByUrl(relativeUrl));
+};
+/**
+ * Fetch the existing folders within a given folder based on its relative URL
+ *
+ * @param {Axios} http
+ * @param {String} relativeUrl
+ * @param {String} [query]
+ * @return {Promise<Object>}
+ */
+
+
+requests.getFoldersInFolder = function (http, relativeUrl) {
+  var query = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '';
+  return http.get(endpoints.folders.foldersInFolder(relativeUrl, query));
+};
+
+requests.createFolder = function (http, relativeUrl, folderName) {
+  return http.post(endpoints.folders.index(), {
+    ServerRelativeUrl: "".concat(relativeUrl, "/").concat(folderName),
+    __metadata: {
+      type: 'SP.Folder'
+    }
+  });
+};
+/**
+ * Fetch the existing folders within a given folder based on its relative URL
+ *
+ * @param {Axios} http
+ * @param {String} relativeUrl
+ * @param {String} [query]
+ * @return {Promise<Object>}
+ */
+
+
+requests.getFilesInFolder = function (http, relativeUrl) {
+  var query = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '';
+  return http.get(endpoints.folders.filesInFolder(relativeUrl, query));
+};
+/**
+ * Fetch the content with a given file within a library based on its relative URL
+ *
+ * @param {Axios} http
+ * @param {String} relativeUrl
+ * @return {Promise<Object>}
+ */
+
+
+requests.getFileByUrl = function (http, relativeUrl) {
+  return http.get(endpoints.folders.fileByUrl(relativeUrl));
+};
+/**
+ * Fetch the existing folders within a given folder based on its relative URL
+ *
+ * @param {Axios} http
+ * @param {String} relativeUrl
+ * @param {String} fileName
+ * @param {ArrayBuffer} fileBuffer
+ * @return {Promise<Object>}
+ */
+
+
+requests.uploadFileToFolder = function (http, relativeUrl, fileName, fileBuffer) {
+  return http.post(endpoints.folders.newFileToFolder(relativeUrl, fileName), fileBuffer);
 };
 
 module.exports = requests;
@@ -3622,13 +3713,13 @@ var MILLISECONDS_PER_MINUTE = 60000;
  * @return {Date}
  */
 
-function convertToDate(spDate) {
+var convertToDate = function convertToDate(spDate) {
   spDate = numOnly(spDate);
   spDate = Number(spDate);
   spDate = new Date(spDate);
   spDate = spDate.getTime() + spDate.getTimezoneOffset() * MILLISECONDS_PER_MINUTE;
   return new Date(spDate);
-}
+};
 /**
  * Iterate object properties to convert dates
  *
@@ -3636,13 +3727,13 @@ function convertToDate(spDate) {
  */
 
 
-function sweepObject(obj) {
+var sweepObject = function sweepObject(obj) {
   Object.keys(obj).forEach(function (key) {
     if (SP_DATE_PATTERN.test(obj[key])) {
       obj[key] = convertToDate(obj[key]);
     }
   });
-}
+};
 /**
  * Seep the response object(s) and convert dates
  *
@@ -3659,7 +3750,7 @@ module.exports = function (data) {
         sweepObject(data);
       }
     } catch (e) {
-      /* Ignore */
+      /* do nothing */
     }
   }
 
@@ -3941,29 +4032,25 @@ var _require = require('../facades/requests'),
 
 
 module.exports = function (siteUrl) {
-  // Create a new axios instance
-  var http = axios.create(); // Set base URL for requests
+  var http = axios.create();
 
   http.defaults.baseURL = siteUrl || function () {
     var delimiters = new RegExp(['/lists/', '/folders/', '/_layouts/', '/_api/', '/_vti_bin/', '/sitepages/'].join('|'));
     return window.location.href.toLowerCase().split(delimiters)[0];
-  }(); // Set request transformers and interceptors
-
+  }();
 
   http.defaults.transformRequest = reqTransformers;
   requestInterceptors.forEach(function (intc) {
     var _http$interceptors$re;
 
     return (_http$interceptors$re = http.interceptors.request).use.apply(_http$interceptors$re, (0, _toConsumableArray2.default)(intc.constructor === Function ? intc(http) : intc));
-  }); // Set response transformers and interceptors
-
+  });
   http.defaults.transformResponse = respTransformers;
   responseInterceptors.forEach(function (intc) {
     var _http$interceptors$re2;
 
     return (_http$interceptors$re2 = http.interceptors.response).use.apply(_http$interceptors$re2, (0, _toConsumableArray2.default)(intc.constructor === Function ? intc(http) : intc));
-  }); // Eagerly get request digest
-
+  });
   http.defaults.requestDigest = getRequestDigest(http);
   return http;
 };
@@ -4393,26 +4480,9 @@ module.exports = function XomSharePointList(listTitle, httpInstance) {
    */
 
 
-  this.renameAttachment = /*#__PURE__*/function () {
-    var _ref4 = (0, _asyncToGenerator2.default)( /*#__PURE__*/_regenerator.default.mark(function _callee4(itemId, attachmentName, newName) {
-      return _regenerator.default.wrap(function _callee4$(_context4) {
-        while (1) {
-          switch (_context4.prev = _context4.next) {
-            case 0:
-              return _context4.abrupt("return", requests.renameListItemAttachment(_http, _title, itemId, attachmentName, newName));
-
-            case 1:
-            case "end":
-              return _context4.stop();
-          }
-        }
-      }, _callee4);
-    }));
-
-    return function (_x7, _x8, _x9) {
-      return _ref4.apply(this, arguments);
-    };
-  }();
+  this.renameAttachment = function (itemId, attachmentName, newName) {
+    return requests.renameListItemAttachment(_http, _title, itemId, attachmentName, newName);
+  };
   /**
    * Remove a given file attachment from the list item
    *
@@ -4642,7 +4712,162 @@ module.exports = function XomSharePointSurvey(surveyTitle, httpInstance) {
     return requests.deleteListItem(_http, _title, id);
   };
 };
-},{"@babel/runtime/regenerator":"PMvg","@babel/runtime/helpers/asyncToGenerator":"agGE","../facades/requests":"Mtaa"}],"DCCh":[function(require,module,exports) {
+},{"@babel/runtime/regenerator":"PMvg","@babel/runtime/helpers/asyncToGenerator":"agGE","../facades/requests":"Mtaa"}],"aDcs":[function(require,module,exports) {
+"use strict";
+
+var _regenerator = _interopRequireDefault(require("@babel/runtime/regenerator"));
+
+var _asyncToGenerator2 = _interopRequireDefault(require("@babel/runtime/helpers/asyncToGenerator"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/* eslint-disable arrow-body-style */
+
+/* eslint-disable no-underscore-dangle */
+var requests = require('../facades/requests');
+
+var genFileName = require('../utils/gen-file-name');
+
+var genFileBuffer = require('../utils/gen-file-buffer');
+/**
+ * Contain the necessary information to stablish a connection to a SharePoint
+ * file library through its REST API
+ *
+ * @constructor
+ * @param {String} folderAddress Library title to connect to
+ * @param {Axios} httpInstance Customized Axios instance to perform HTTP requests
+ */
+
+
+module.exports = function XomSharePointFolder(folderAddress, httpInstance) {
+  var _this = this;
+
+  /**
+   * Store the SharePoint folder relative URL
+   *
+   * @private
+   * @var {String}
+   */
+  var _address = folderAddress;
+  /**
+   * Private instance of Axios
+   *
+   * @private
+   * @final
+   * @var {Axios}
+   */
+
+  var _http = httpInstance;
+  /**
+   * Store files type
+   *
+   * @private
+   * @final
+   * @var {String}
+   */
+
+  var _filesType;
+  /**
+   * Define property to get 'relativeUrl' value
+   *
+   * @property {String} relativeUrl
+   */
+
+
+  Object.defineProperty(this, 'relativeUrl', {
+    get: function get() {
+      var baseUrl = new URL(_http.defaults.baseURL);
+      return "".concat(baseUrl.pathname, "/").concat(_address);
+    },
+    set: function set(address) {
+      _address = String(address);
+    }
+  });
+  /**
+   * Return a list of the folders within this folder
+   *
+   * @param {String} [params]
+   * @return {Promise<Array>}
+   */
+
+  this.getSubfolders = function () {
+    var params = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
+    return requests.getFoldersInFolder(_http, _this.relativeUrl, params);
+  };
+  /**
+   * Create a folder within this folder
+   *
+   * @param {String} folderName
+   * @return {Promise<Object>}
+   */
+
+
+  this.createFolder = function (folderName) {
+    return requests.createFolder(_http, _this.relativeUrl, folderName);
+  };
+  /**
+   * Return a list of the files within this folder
+   *
+   * @param {String} [params]
+   * @return {Promise<Array>}
+   */
+
+
+  this.getFiles = function () {
+    var params = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
+    return requests.getFilesInFolder(_http, _this.relativeUrl, params);
+  };
+  /**
+   * Upload a file into the folder
+   *
+   * @param {String|HTMLElement|FileList|File} fileInput Some reference of the input type 'file':
+   *          String - if it is a query selector;
+   *          HTMLElement - if it is a direct reference to the input element;
+   *          FileList - if it is direct reference to the 'files' attribute of the element; and
+   *          File - if it is a direct reference to the file.
+   *        For the three first options, as it will result in a array of files (FileList), only
+   *        the first File of the collection will be selected. If you want to get the byte buffer
+   *        of other files, provide a File instance explicitaly
+   * @param {String} [customFileName] Define a custom name to the attached file
+   * @return {Promise<Object>}
+   */
+
+
+  this.upload = /*#__PURE__*/function () {
+    var _ref = (0, _asyncToGenerator2.default)( /*#__PURE__*/_regenerator.default.mark(function _callee(fileInput, customFileName) {
+      var fileName, fileBuffer, result;
+      return _regenerator.default.wrap(function _callee$(_context) {
+        while (1) {
+          switch (_context.prev = _context.next) {
+            case 0:
+              fileName = customFileName || genFileName(fileInput);
+              _context.next = 3;
+              return genFileBuffer(fileInput);
+
+            case 3:
+              fileBuffer = _context.sent;
+              _context.next = 6;
+              return requests.uploadFileToFolder(_http, _this.relativeUrl, fileName, fileBuffer);
+
+            case 6:
+              result = _context.sent;
+              _filesType = _filesType || result.__metadata.type;
+              return _context.abrupt("return", result);
+
+            case 9:
+            case "end":
+              return _context.stop();
+          }
+        }
+      }, _callee);
+    }));
+
+    return function (_x, _x2) {
+      return _ref.apply(this, arguments);
+    };
+  }();
+};
+},{"@babel/runtime/regenerator":"PMvg","@babel/runtime/helpers/asyncToGenerator":"agGE","../facades/requests":"Mtaa","../utils/gen-file-name":"N2NR","../utils/gen-file-buffer":"PlsG"}],"DCCh":[function(require,module,exports) {
 /* eslint-disable arrow-body-style */
 
 /* eslint-disable no-underscore-dangle */
@@ -4653,6 +4878,8 @@ var httpFactory = require('../http/http-factory');
 var XomSharePointList = require('./XomSharePointList');
 
 var XomSharePointSurvey = require('./XomSharePointSurvey');
+
+var XomSharePointFolder = require('./XomSharePointFolder');
 /**
  * Contain the necessary information to stablish a connection to a SharePoint
  * site through its REST API
@@ -4781,8 +5008,19 @@ module.exports = function XomSharePointSite(baseSiteUrl) {
   this.getSurvey = function (surveyTitle) {
     return new XomSharePointSurvey(surveyTitle, _http);
   };
+  /**
+   * Return a reference to connect to a SharePoint file library
+   *
+   * @param {String} folderAddress SharePoint library/folder title
+   * @return {XomSharePointLibrary}
+   */
+
+
+  this.getFolder = function (folderAddress) {
+    return new XomSharePointFolder(folderAddress, _http);
+  };
 };
-},{"../facades/requests":"Mtaa","../http/http-factory":"f2bC","./XomSharePointList":"p0uT","./XomSharePointSurvey":"tCvt"}],"XVne":[function(require,module,exports) {
+},{"../facades/requests":"Mtaa","../http/http-factory":"f2bC","./XomSharePointList":"p0uT","./XomSharePointSurvey":"tCvt","./XomSharePointFolder":"aDcs"}],"XVne":[function(require,module,exports) {
 var XomSharePointSite = require('./objects/XomSharePointSite');
 /**
  * Instantiate a XomSharePoint object to connect to a SharePoint site and,

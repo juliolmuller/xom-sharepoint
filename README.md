@@ -30,5 +30,6 @@ Or, if you are not in a Node enviroment, you can use the bundled files in `dist/
 ======================================================
 
 https://docs.microsoft.com/en-us/sharepoint/dev/sp-add-ins/working-with-lists-and-list-items-with-rest
+https://docs.microsoft.com/en-us/sharepoint/dev/sp-add-ins/working-with-folders-and-files-with-rest
 
 -->

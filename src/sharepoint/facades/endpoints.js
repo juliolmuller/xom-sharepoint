@@ -8,7 +8,7 @@ const endpoints = {
   site: {},
   users: {},
   lists: {},
-  libs: {},
+  folders: {},
 }
 
 /**
@@ -179,7 +179,7 @@ endpoints.lists.itemAttachmentsUpload = (title, itemId, fileName) => `${endpoint
  * @param {String} newFileUrl
  * @return {String}
  */
-endpoints.lists.itemAttachmentsRename = (oldFileUrl, newFileUrl) => `${endpoints.libs.fileByUrl(oldFileUrl)}/MoveTo(newurl='${newFileUrl}',flags=1)`
+endpoints.lists.itemAttachmentsRename = (oldFileUrl, newFileUrl) => `${endpoints.folders.fileByUrl(oldFileUrl)}/MoveTo(newurl='${newFileUrl}',flags=1)`
 
 /**
  * Return URI for all the libraries
@@ -187,7 +187,7 @@ endpoints.lists.itemAttachmentsRename = (oldFileUrl, newFileUrl) => `${endpoints
  * @param {String} [query]
  * @return {String}
  */
-endpoints.libs.index = (query = '') => `${endpoints.baseApiUri()}/Folders${query}`
+endpoints.folders.index = (query = '') => `${endpoints.baseApiUri()}/Folders${query}`
 
 /**
  * Return URI to access folder by relative URL
@@ -195,7 +195,35 @@ endpoints.libs.index = (query = '') => `${endpoints.baseApiUri()}/Folders${query
  * @param {String} relativeUrl
  * @return {String}
  */
-endpoints.libs.folderByUrl = (relativeUrl) => `${endpoints.baseApiUri()}/GetFolderByServerRelativeUrl('${relativeUrl}}')`
+endpoints.folders.folderByUrl = (relativeUrl) => `${endpoints.baseApiUri()}/GetFolderByServerRelativeUrl('${relativeUrl}')`
+
+/**
+ * Return URL to list of folders within a given folder
+ *
+ * @param {String} relativeUrl
+ * @param {String} [query]
+ * @return {String}
+ */
+endpoints.folders.foldersInFolder = (relativeUrl, query = '') => `${endpoints.folders.folderByUrl(relativeUrl)}/Folders${query}`
+
+/**
+ * Return URL to list of files within a given folder
+ *
+ * @param {String} relativeUrl
+ * @param {String} [query]
+ * @return {String}
+ */
+endpoints.folders.filesInFolder = (relativeUrl, query = '') => `${endpoints.folders.folderByUrl(relativeUrl)}/Files${query}`
+
+/**
+ * Return URL to upload a file to a folder
+ *
+ * @param {String} relativeUrl
+ * @param {String} fileName
+ * @param {Boolean} [overwrite]
+ * @return {String}
+ */
+endpoints.folders.newFileToFolder = (relativeUrl, fileName, overwrite = true) => `${endpoints.folders.filesInFolder(relativeUrl)}/Add(overwrite=${overwrite},url='${fileName}')`
 
 /**
  * Return URI to access files by relative URL
@@ -203,6 +231,6 @@ endpoints.libs.folderByUrl = (relativeUrl) => `${endpoints.baseApiUri()}/GetFold
  * @param {String} relativeUrl
  * @return {String}
  */
-endpoints.libs.fileByUrl = (relativeUrl) => `${endpoints.baseApiUri()}/GetFileByServerRelativeUrl('${relativeUrl}')`
+endpoints.folders.fileByUrl = (relativeUrl) => `${endpoints.baseApiUri()}/GetFileByServerRelativeUrl('${relativeUrl}')`
 
 module.exports = endpoints
