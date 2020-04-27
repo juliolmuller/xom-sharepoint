@@ -13,10 +13,8 @@ const { getRequestDigest } = require('../facades/requests')
  */
 module.exports = (siteUrl) => {
 
-  // Create a new axios instance
   const http = axios.create()
 
-  // Set base URL for requests
   http.defaults.baseURL = siteUrl || (() => {
     const delimiters = new RegExp([
       '/lists/', '/folders/', '/_layouts/',
@@ -25,17 +23,13 @@ module.exports = (siteUrl) => {
     return window.location.href.toLowerCase().split(delimiters)[0]
   })()
 
-  // Set request transformers and interceptors
   http.defaults.transformRequest = reqTransformers
   requestInterceptors.forEach((intc) => http.interceptors.request
     .use(...(intc.constructor === Function ? intc(http) : intc)))
-
-  // Set response transformers and interceptors
   http.defaults.transformResponse = respTransformers
   responseInterceptors.forEach((intc) => http.interceptors.response
     .use(...(intc.constructor === Function ? intc(http) : intc)))
 
-  // Eagerly get request digest
   http.defaults.requestDigest = getRequestDigest(http)
 
   return http

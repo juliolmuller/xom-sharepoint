@@ -8,12 +8,15 @@ module.exports = [
 
   // on success
   (response) => {
+
     const { data } = response
+
     if (data) {
       delete response.data
       Object.defineProperty(data, '__response', { value: response, writable: true })
       return data
     }
+
     return response
   },
 ]

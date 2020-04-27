@@ -160,7 +160,7 @@ module.exports = function XomSharePointList(listTitle, httpInstance) {
    * @param {String} newName
    * @return {Promise<Object>}
    */
-  this.renameAttachment = async (itemId, attachmentName, newName) => {
+  this.renameAttachment = (itemId, attachmentName, newName) => {
     return requests.renameListItemAttachment(_http, _title, itemId, attachmentName, newName)
   }
 

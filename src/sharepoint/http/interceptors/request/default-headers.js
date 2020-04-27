@@ -9,8 +9,10 @@ module.exports = [
 
   // on success
   (config) => {
+
     config.withCredentials = true
     config.headers = headers
+
     return config
   },
 ]

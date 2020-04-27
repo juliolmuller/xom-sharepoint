@@ -9,10 +9,12 @@ module.exports = [
 
   // on success
   (config) => {
+
     if ((/delete/i).test(config.method)) {
       config.method = 'post'
       config.headers = headers
     }
+
     return config
   },
 ]

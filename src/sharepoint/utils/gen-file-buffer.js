@@ -13,6 +13,7 @@
  * @return {Promise<ArrayBuffer>}
  */
 module.exports = function genFileBuffer(baseInput) {
+
   let input = baseInput
   const reader = new FileReader()
   const file = (() => {
@@ -20,14 +21,18 @@ module.exports = function genFileBuffer(baseInput) {
       case 'String':
         input = document.querySelector(input)
         /* fall through */
+
       case 'HTMLInputElement':
         input = input.files
         /* fall through */
+
       case 'FileList':
         [input] = input
         /* fall through */
+
       case 'File':
         return input
+
       default:
         throw new TypeError('Type must be an instance of HTMLInputElement, FileList, File or String (input selector)')
     }

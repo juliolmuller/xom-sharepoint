@@ -22,11 +22,13 @@ const MILLISECONDS_PER_MINUTE = 60000
  * @param {String} spDate
  * @return {Date}
  */
-function convertToDate(spDate) {
+const convertToDate = (spDate) => {
+
   spDate = numOnly(spDate)
   spDate = Number(spDate)
   spDate = new Date(spDate)
   spDate = spDate.getTime() + (spDate.getTimezoneOffset() * MILLISECONDS_PER_MINUTE)
+
   return new Date(spDate)
 }
 
@@ -35,7 +37,8 @@ function convertToDate(spDate) {
  *
  * @param {Object} obj
  */
-function sweepObject(obj) {
+const sweepObject = (obj) => {
+
   Object.keys(obj).forEach((key) => {
     if (SP_DATE_PATTERN.test(obj[key])) {
       obj[key] = convertToDate(obj[key])
@@ -48,7 +51,8 @@ function sweepObject(obj) {
  *
  * @param {*} data
  */
-module.exports = function (data) {
+module.exports = (data) => {
+
   if (data) {
     try {
       if (data.constructor === Array) {
@@ -56,7 +60,10 @@ module.exports = function (data) {
       } else {
         sweepObject(data)
       }
-    } catch (e) { /* Ignore */ }
+    } catch (e) {
+      /* do nothing */
+    }
   }
+
   return data
 }
