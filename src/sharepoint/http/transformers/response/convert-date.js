@@ -1,53 +1,25 @@
-/* eslint-disable no-param-reassign */
-
-const numOnly = require('@lacussoft/num-only')
-
-/**
- * Regular expression pattern for dates coming from SharePoint
- *
- * @constant {RegExp}
- */
-const SP_DATE_PATTERN = /^\/Date\((\d+)\)\/$/
-
-/**
- * Amount of milliseconds per minute
- *
- * @constant {Number}
- */
-const MILLISECONDS_PER_MINUTE = 60000
-
-/**
- * Convert a SharePoint date notation to a JS Date object
- *
- * @param {String} spDate
- * @return {Date}
- */
-const convertToDate = (spDate) => {
-
-  spDate = numOnly(spDate)
-  spDate = Number(spDate)
-  spDate = new Date(spDate)
-  spDate = spDate.getTime() + (spDate.getTimezoneOffset() * MILLISECONDS_PER_MINUTE)
-
-  return new Date(spDate)
-}
 
 /**
  * Iterate object properties to convert dates
  *
  * @param {Object} obj
  */
-const sweepObject = (obj) => {
+const lookForDates = (obj) => {
+
+  const DATE_STR_LENGTH = 20
 
   Object.keys(obj).forEach((key) => {
-    if (SP_DATE_PATTERN.test(obj[key])) {
-      obj[key] = convertToDate(obj[key])
+    if (typeof obj[key] === 'string'
+        && obj[key].length === DATE_STR_LENGTH
+        && Date.parse(obj[key])
+    ) {
+      obj[key] = new Date(obj[key])
     }
   })
 }
 
 /**
- * Seep the response object(s) and convert dates
+ * Sweep the response object(s) and convert dates
  *
  * @param {*} data
  */
@@ -56,9 +28,9 @@ module.exports = (data) => {
   if (data) {
     try {
       if (data.constructor === Array) {
-        data.forEach(sweepObject)
+        data.forEach(lookForDates)
       } else {
-        sweepObject(data)
+        lookForDates(data)
       }
     } catch (e) {
       /* do nothing */
