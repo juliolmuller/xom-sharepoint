@@ -1,9 +1,5 @@
-/* eslint-disable arrow-body-style */
-/* eslint-disable no-underscore-dangle */
-
+const genFileBuffer = require('@lacussoft/to-arraybuffer')
 const requests = require('../facades/requests')
-const genFileBuffer = require('../utils/gen-file-buffer')
-const genFileName = require('../utils/gen-file-name')
 
 /**
  * Contain the necessary information to stablish a connection to a SharePoint
@@ -75,9 +71,7 @@ module.exports = function XomSharePointList(listTitle, httpInstance) {
    * @param {String} [params]
    * @return {Promise<Array>}
    */
-  this.get = (params) => {
-    return requests.getListItems(_http, _title, params)
-  }
+  this.get = (params) => requests.getListItems(_http, _title, params)
 
   /**
    * Retrun a single list item with the given ID
@@ -86,9 +80,7 @@ module.exports = function XomSharePointList(listTitle, httpInstance) {
    * @param {String} [params]
    * @return {Promise<Object>}
    */
-  this.find = (id, params) => {
-    return requests.getListItemById(_http, _title, id, params)
-  }
+  this.find = (id, params) => requests.getListItemById(_http, _title, id, params)
 
   /**
    * Save a new record in the SharePoint list
@@ -96,9 +88,7 @@ module.exports = function XomSharePointList(listTitle, httpInstance) {
    * @param {Object} data Use literal objects to send data
    * @return {Promise<Object>}
    */
-  this.create = async (data) => {
-    return requests.postListItem(_http, _title, await _itemsType, data)
-  }
+  this.create = async (data) => requests.postListItem(_http, _title, await _itemsType, data)
 
   /**
    * Update data of an existing record in the SharePoint list
@@ -107,9 +97,7 @@ module.exports = function XomSharePointList(listTitle, httpInstance) {
    * @param {Object} data Use literal objects to send data
    * @return {Promise<Object>}
    */
-  this.update = async (id, data) => {
-    return requests.patchListItem(_http, _title, id, await _itemsType, data)
-  }
+  this.update = async (id, data) => requests.patchListItem(_http, _title, id, await _itemsType, data)
 
   /**
    * Delete an existing record from the SharePoint list
@@ -117,9 +105,7 @@ module.exports = function XomSharePointList(listTitle, httpInstance) {
    * @param {Number} id
    * @return {Promise<Object>}
    */
-  this.delete = (id) => {
-    return requests.deleteListItem(_http, _title, id)
-  }
+  this.delete = (id) => requests.deleteListItem(_http, _title, id)
 
   /**
    * Return a list of the attached files in the list item
@@ -127,9 +113,7 @@ module.exports = function XomSharePointList(listTitle, httpInstance) {
    * @param {Number} itemId
    * @return {Promise<Array>}
    */
-  this.getAttachmentsFrom = (itemId) => {
-    return requests.getListItemAttachments(_http, _title, itemId)
-  }
+  this.getAttachmentsFrom = (itemId) => requests.getListItemAttachments(_http, _title, itemId)
 
   /**
    * Upload a file attachment to a list item
@@ -160,9 +144,7 @@ module.exports = function XomSharePointList(listTitle, httpInstance) {
    * @param {String} newName
    * @return {Promise<Object>}
    */
-  this.renameAttachment = (itemId, attachmentName, newName) => {
-    return requests.renameListItemAttachment(_http, _title, itemId, attachmentName, newName)
-  }
+  this.renameAttachment = (itemId, attachmentName, newName) => requests.renameListItemAttachment(_http, _title, itemId, attachmentName, newName)
 
   /**
    * Remove a given file attachment from the list item
@@ -171,7 +153,5 @@ module.exports = function XomSharePointList(listTitle, httpInstance) {
    * @param {String} attachmentName
    * @return {Promise<Object>}
    */
-  this.removeAttachment = (itemId, attachmentName) => {
-    return requests.deleteListItemAttachment(_http, _title, itemId, attachmentName)
-  }
+  this.removeAttachment = (itemId, attachmentName) => requests.deleteListItemAttachment(_http, _title, itemId, attachmentName)
 }

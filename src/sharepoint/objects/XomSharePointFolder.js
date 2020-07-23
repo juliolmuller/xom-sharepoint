@@ -1,9 +1,5 @@
-/* eslint-disable arrow-body-style */
-/* eslint-disable no-underscore-dangle */
-
+const genFileBuffer = require('@lacussoft/to-arraybuffer')
 const requests = require('../facades/requests')
-const genFileName = require('../utils/gen-file-name')
-const genFileBuffer = require('../utils/gen-file-buffer')
 
 /**
  * Contain the necessary information to stablish a connection to a SharePoint
@@ -62,9 +58,7 @@ module.exports = function XomSharePointFolder(folderAddress, httpInstance) {
    * @param {String} [params]
    * @return {Promise<Array>}
    */
-  this.getSubfolders = (params = '') => {
-    return requests.getFoldersInFolder(_http, this.relativeUrl, params)
-  }
+  this.getSubfolders = (params = '') => requests.getFoldersInFolder(_http, this.relativeUrl, params)
 
   /**
    * Create a folder within this folder
@@ -72,9 +66,7 @@ module.exports = function XomSharePointFolder(folderAddress, httpInstance) {
    * @param {String} folderName
    * @return {Promise<Object>}
    */
-  this.createFolder = (folderName) => {
-    return requests.createFolder(_http, this.relativeUrl, folderName)
-  }
+  this.createFolder = (folderName) => requests.createFolder(_http, this.relativeUrl, folderName)
 
   /**
    * Return a list of the files within this folder
@@ -82,9 +74,7 @@ module.exports = function XomSharePointFolder(folderAddress, httpInstance) {
    * @param {String} [params]
    * @return {Promise<Array>}
    */
-  this.getFiles = (params = '') => {
-    return requests.getFilesInFolder(_http, this.relativeUrl, params)
-  }
+  this.getFiles = (params = '') => requests.getFilesInFolder(_http, this.relativeUrl, params)
 
   /**
    * Upload a file into the folder
