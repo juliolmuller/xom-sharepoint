@@ -1,5 +1,3 @@
-/* eslint-disable arrow-body-style */
-
 const endpoints = require('./endpoints')
 
 /**
@@ -354,6 +352,14 @@ requests.getFoldersInFolder = (http, relativeUrl, query = '') => {
   return http.get(endpoints.folders.foldersInFolder(relativeUrl, query))
 }
 
+/**
+ * Creates a new folder given library or folder based on its relative URL
+ *
+ * @param {Axios} http
+ * @param {String} relativeUrl
+ * @param {String} folderName
+ * @return {Promise<Object>}
+ */
 requests.createFolder = (http, relativeUrl, folderName) => {
   return http.post(endpoints.folders.index(), {
     ServerRelativeUrl: `${relativeUrl}/${folderName}`,

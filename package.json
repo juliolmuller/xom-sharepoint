@@ -57,6 +57,7 @@
     },
     "extends": "@lacussoft/standard",
     "rules": {
+      "arrow-body-style": "off",
       "no-underscore-dangle": "off"
     }
   },
