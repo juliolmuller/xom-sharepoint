@@ -1,7 +1,4 @@
-/* eslint-disable arrow-body-style */
-/* eslint-disable no-underscore-dangle */
-
-const requests = require('../facades/requests')
+const requests = require('./facades/requests')
 
 /**
  * Contain the necessary information to stablish a connection to a SharePoint
@@ -60,16 +57,14 @@ module.exports = function XomSharePointSurvey(surveyTitle, httpInstance) {
    */
   this.getQuestions = async () => {
     const response = await requests.getListFields(_http, _title, '?$filter=(CanBeDeleted eq true)')
-    const questions = response.map((field) => {
-      return {
-        Field: field.InternalName,
-        Description: field.Description,
-        Question: field.Title,
-        Type: field.TypeDisplayName,
-        Choices: field.Choices && field.Choices.results,
-        DefaultValue: field.DefaultValue,
-      }
-    })
+    const questions = response.map((field) => ({
+      Field: field.InternalName,
+      Description: field.Description,
+      Question: field.Title,
+      Type: field.TypeDisplayName,
+      Choices: field.Choices && field.Choices.results,
+      DefaultValue: field.DefaultValue,
+    }))
     Object.defineProperty(questions, '__response', { value: response.__response })
     return questions
   }
@@ -83,9 +78,7 @@ module.exports = function XomSharePointSurvey(surveyTitle, httpInstance) {
    * @param {String} [params]
    * @return {Promise<Array>}
    */
-  this.getResponses = (params) => {
-    return requests.getListItems(_http, _title, params)
-  }
+  this.getResponses = (params) => requests.getListItems(_http, _title, params)
 
   /**
    * Retrun a single response by its ID
@@ -94,9 +87,7 @@ module.exports = function XomSharePointSurvey(surveyTitle, httpInstance) {
    * @param {String} [params]
    * @return {Promise<Object>}
    */
-  this.findResponse = (id, params) => {
-    return requests.getListItemById(_http, _title, id, params)
-  }
+  this.findResponse = (id, params) => requests.getListItemById(_http, _title, id, params)
 
   /**
    * Save a new response in the SharePoint survey list
@@ -104,9 +95,7 @@ module.exports = function XomSharePointSurvey(surveyTitle, httpInstance) {
    * @param {Object} data Use literal objects to send data
    * @return {Promise<Object>}
    */
-  this.submitResponse = async (data) => {
-    return requests.postListItem(_http, _title, await _itemsType, data)
-  }
+  this.submitResponse = async (data) => requests.postListItem(_http, _title, await _itemsType, data)
 
   /**
    * Update the response of an existing record
@@ -115,9 +104,7 @@ module.exports = function XomSharePointSurvey(surveyTitle, httpInstance) {
    * @param {Object} data Use literal objects to send data
    * @return {Promise<Object>}
    */
-  this.changeResponse = async (id, data) => {
-    return requests.patchListItem(_http, _title, id, await _itemsType, data)
-  }
+  this.changeResponse = async (id, data) => requests.patchListItem(_http, _title, id, await _itemsType, data)
 
   /**
    * Delete an existing response
@@ -125,7 +112,5 @@ module.exports = function XomSharePointSurvey(surveyTitle, httpInstance) {
    * @param {Number} id
    * @return {Promise<Object>}
    */
-  this.delete = (id) => {
-    return requests.deleteListItem(_http, _title, id)
-  }
+  this.delete = (id) => requests.deleteListItem(_http, _title, id)
 }

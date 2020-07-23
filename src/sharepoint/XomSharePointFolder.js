@@ -1,5 +1,5 @@
 const genFileBuffer = require('@lacussoft/to-arraybuffer')
-const requests = require('../facades/requests')
+const requests = require('./facades/requests')
 
 /**
  * Contain the necessary information to stablish a connection to a SharePoint
@@ -91,9 +91,8 @@ module.exports = function XomSharePointFolder(folderAddress, httpInstance) {
    * @return {Promise<Object>}
    */
   this.upload = async (fileInput, customFileName) => {
-    const fileName = customFileName || genFileName(fileInput)
     const fileBuffer = await genFileBuffer(fileInput)
-    const result = await requests.uploadFileToFolder(_http, this.relativeUrl, fileName, fileBuffer)
+    const result = await requests.uploadFileToFolder(_http, this.relativeUrl, customFileName, fileBuffer)
     _filesType = _filesType || result.__metadata.type
     return result
   }

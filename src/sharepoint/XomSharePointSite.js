@@ -1,8 +1,5 @@
-/* eslint-disable arrow-body-style */
-/* eslint-disable no-underscore-dangle */
-
-const requests = require('../facades/requests')
-const httpFactory = require('../http/http-factory')
+const requests = require('./facades/requests')
+const httpFactory = require('./http/http-factory')
 const XomSharePointList = require('./XomSharePointList')
 const XomSharePointSurvey = require('./XomSharePointSurvey')
 const XomSharePointFolder = require('./XomSharePointFolder')
@@ -56,9 +53,7 @@ module.exports = function XomSharePointSite(baseSiteUrl) {
    *
    * @return {Promise}
    */
-  this.getInfo = () => {
-    return requests.getSite(_http)
-  }
+  this.getInfo = () => requests.getSite(_http)
 
   /**
    * Queries the SharePoint API to get user information. Inform nothing to get
@@ -80,9 +75,7 @@ module.exports = function XomSharePointSite(baseSiteUrl) {
    * @param {String} search Partial name/userID of the user
    * @return {Promise}
    */
-  this.searchUser = (search) => {
-    return requests.getSiteUsersListItems(_http, `?$filter=substringof('${search}',Title) or substringof('${search}',UserName)`)
-  }
+  this.searchUser = (search) => requests.getSiteUsersListItems(_http, `?$filter=substringof('${search}',Title) or substringof('${search}',UserName)`)
 
   /**
    * Return a reference to connect to a SharePoint list
@@ -90,9 +83,7 @@ module.exports = function XomSharePointSite(baseSiteUrl) {
    * @param {String} listTitle SharePoint list title
    * @return {XomSharePointList}
    */
-  this.getList = (listTitle) => {
-    return new XomSharePointList(listTitle, _http)
-  }
+  this.getList = (listTitle) => new XomSharePointList(listTitle, _http)
 
   /**
    * Create a new SharePoint list
@@ -100,9 +91,7 @@ module.exports = function XomSharePointSite(baseSiteUrl) {
    * @param {String} listTitle SharePoint list title
    * @return {Promise}
    */
-  this.createList = (listTitle) => {
-    return requests.createList(_http, listTitle)
-  }
+  this.createList = (listTitle) => requests.createList(_http, listTitle)
 
   /**
    * Delete an existing SharePoint list
@@ -111,9 +100,7 @@ module.exports = function XomSharePointSite(baseSiteUrl) {
    * @return {Promise}
    */
 
-  this.deleteList = (listTitle) => {
-    return requests.deleteList(_http, listTitle)
-  }
+  this.deleteList = (listTitle) => requests.deleteList(_http, listTitle)
 
   /**
    * Return a reference to connect to a SharePoint survey
@@ -121,9 +108,7 @@ module.exports = function XomSharePointSite(baseSiteUrl) {
    * @param {String} surveyTitle SharePoint survey title
    * @return {XomSharePointSurvey}
    */
-  this.getSurvey = (surveyTitle) => {
-    return new XomSharePointSurvey(surveyTitle, _http)
-  }
+  this.getSurvey = (surveyTitle) => new XomSharePointSurvey(surveyTitle, _http)
 
   /**
    * Return a reference to connect to a SharePoint file library
@@ -131,7 +116,5 @@ module.exports = function XomSharePointSite(baseSiteUrl) {
    * @param {String} folderAddress SharePoint library/folder title
    * @return {XomSharePointLibrary}
    */
-  this.getFolder = (folderAddress) => {
-    return new XomSharePointFolder(folderAddress, _http)
-  }
+  this.getFolder = (folderAddress) => new XomSharePointFolder(folderAddress, _http)
 }

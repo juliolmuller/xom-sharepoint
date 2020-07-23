@@ -1,5 +1,5 @@
 const genFileBuffer = require('@lacussoft/to-arraybuffer')
-const requests = require('../facades/requests')
+const requests = require('./facades/requests')
 
 /**
  * Contain the necessary information to stablish a connection to a SharePoint
@@ -131,27 +131,27 @@ module.exports = function XomSharePointList(listTitle, httpInstance) {
    * @return {Promise<Object>}
    */
   this.attachTo = async (itemId, fileInput, attchmentName) => {
-    const fileName = attchmentName || genFileName(fileInput)
     const fileBuffer = await genFileBuffer(fileInput)
-    return requests.uploadListItemAttachment(_http, _title, itemId, fileName, fileBuffer)
+    return requests.uploadListItemAttachment(_http, _title, itemId, attchmentName, fileBuffer)
   }
 
   /**
    * Rename a given file attachment
    *
    * @param {Number} itemId
-   * @param {String} attachmentName
+   * @param {String} oldFileName
    * @param {String} newName
    * @return {Promise<Object>}
    */
-  this.renameAttachment = (itemId, attachmentName, newName) => requests.renameListItemAttachment(_http, _title, itemId, attachmentName, newName)
+  // eslint-disable-next-line max-len
+  this.renameAttachment = (itemId, oldFileName, newName) => requests.renameListItemAttachment(_http, _title, itemId, oldFileName, newName)
 
   /**
    * Remove a given file attachment from the list item
    *
    * @param {Number} itemId
-   * @param {String} attachmentName
+   * @param {String} fileName
    * @return {Promise<Object>}
    */
-  this.removeAttachment = (itemId, attachmentName) => requests.deleteListItemAttachment(_http, _title, itemId, attachmentName)
+  this.removeAttachment = (itemId, fileName) => requests.deleteListItemAttachment(_http, _title, itemId, fileName)
 }
