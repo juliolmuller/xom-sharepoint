@@ -1,3 +1,19 @@
+const qs = require('querystring')
+
+/**
+ * Function to easily convert an object into a query string
+ *
+ * @param {any} query
+ */
+const stringify = (query) => {
+  if (!query) {
+    return ''
+  }
+  if (typeof query === 'string') {
+    return (query[0] === '$' ? `?${query}` : query)
+  }
+  return `?${qs.stringify(query)}`
+}
 
 /**
  * Group of functions to get SharePoint API URI endpoints
@@ -80,7 +96,7 @@ endpoints.users.listMetadata = () => `${endpoints.baseApiUri()}/SiteUserInfoList
  * @param {String} [query]
  * @return {String}
  */
-endpoints.users.listFields = (query = '') => `${endpoints.users.listMetadata()}/Fields?${query}`
+endpoints.users.listFields = (query) => `${endpoints.users.listMetadata()}/Fields${stringify(query)}`
 
 /**
  * Return URI to get users records
@@ -88,7 +104,7 @@ endpoints.users.listFields = (query = '') => `${endpoints.users.listMetadata()}/
  * @param {String} [query]
  * @return {String}
  */
-endpoints.users.listItems = (query = '') => `${endpoints.users.listMetadata()}/Items?${query}`
+endpoints.users.listItems = (query) => `${endpoints.users.listMetadata()}/Items${stringify(query)}`
 
 /**
  * Return URI to get a given user information
@@ -104,7 +120,7 @@ endpoints.users.byId = (id) => `${endpoints.users.listMetadata()}/Items(${id})`
  * @param {String} [query]
  * @return {String}
  */
-endpoints.lists.index = (query = '') => `${endpoints.baseApiUri()}/Lists?${query}`
+endpoints.lists.index = (query) => `${endpoints.baseApiUri()}/Lists${stringify(query)}`
 
 /**
  * Return URI to get a given list metadata
@@ -113,7 +129,7 @@ endpoints.lists.index = (query = '') => `${endpoints.baseApiUri()}/Lists?${query
  * @param {String} [query]
  * @return {String}
  */
-endpoints.lists.byTitle = (listTitle, query = '') => `${endpoints.lists.index()}/GetByTitle('${listTitle}')?${query}`
+endpoints.lists.byTitle = (listTitle, query) => `${endpoints.lists.index()}/GetByTitle('${listTitle}')${stringify(query)}`
 
 /**
  * Return URI to get a given list fields
@@ -122,7 +138,7 @@ endpoints.lists.byTitle = (listTitle, query = '') => `${endpoints.lists.index()}
  * @param {String} [query]
  * @return {String}
  */
-endpoints.lists.fields = (listTitle, query = '') => `${endpoints.lists.byTitle(listTitle)}/Fields?${query}`
+endpoints.lists.fields = (listTitle, query) => `${endpoints.lists.byTitle(listTitle)}/Fields${stringify(query)}`
 
 /**
  * Return URI to get a given list items
@@ -131,7 +147,7 @@ endpoints.lists.fields = (listTitle, query = '') => `${endpoints.lists.byTitle(l
  * @param {String} [query]
  * @return {String}
  */
-endpoints.lists.items = (listTitle, query = '') => `${endpoints.lists.byTitle(listTitle)}/Items?${query}`
+endpoints.lists.items = (listTitle, query) => `${endpoints.lists.byTitle(listTitle)}/Items${stringify(query)}`
 
 /**
  * Return URI to get an specific list item
@@ -141,7 +157,7 @@ endpoints.lists.items = (listTitle, query = '') => `${endpoints.lists.byTitle(li
  * @param {String} [query]
  * @return {String}
  */
-endpoints.lists.itemById = (listTitle, itemId, query = '') => endpoints.lists.items(listTitle, `(${itemId})?${query}`)
+endpoints.lists.itemById = (listTitle, itemId, query) => endpoints.lists.items(listTitle, `(${itemId})${stringify(query)}`)
 
 /**
  * Return URI to handle list items attachments
@@ -187,7 +203,7 @@ endpoints.lists.itemAttachmentsRename = (oldFileUrl, newFileUrl) => `${endpoints
  * @param {String} [query]
  * @return {String}
  */
-endpoints.folders.index = (query = '') => `${endpoints.baseApiUri()}/Folders?${query}`
+endpoints.folders.index = (query) => `${endpoints.baseApiUri()}/Folders${stringify(query)}`
 
 /**
  * Return URI to access folder by relative URL
@@ -204,7 +220,7 @@ endpoints.folders.folderByUrl = (relativeUrl) => `${endpoints.baseApiUri()}/GetF
  * @param {String} [query]
  * @return {String}
  */
-endpoints.folders.foldersInFolder = (relativeUrl, query = '') => `${endpoints.folders.folderByUrl(relativeUrl)}/Folders?${query}`
+endpoints.folders.foldersInFolder = (relativeUrl, query) => `${endpoints.folders.folderByUrl(relativeUrl)}/Folders${stringify(query)}`
 
 /**
  * Return URL to list of files within a given folder
@@ -213,7 +229,7 @@ endpoints.folders.foldersInFolder = (relativeUrl, query = '') => `${endpoints.fo
  * @param {String} [query]
  * @return {String}
  */
-endpoints.folders.filesInFolder = (relativeUrl, query = '') => `${endpoints.folders.folderByUrl(relativeUrl)}/Files?${query}`
+endpoints.folders.filesInFolder = (relativeUrl, query) => `${endpoints.folders.folderByUrl(relativeUrl)}/Files${stringify(query)}`
 
 /**
  * Return URL to upload a file to a folder

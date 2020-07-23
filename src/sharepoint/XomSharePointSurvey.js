@@ -56,7 +56,7 @@ module.exports = function XomSharePointSurvey(surveyTitle, httpInstance) {
    * @return {Promise<Array>}
    */
   this.getQuestions = async () => {
-    const response = await requests.getListFields(_http, _title, '$filter=(CanBeDeleted eq true)')
+    const response = await requests.getListFields(_http, _title, { $filter: '(CanBeDeleted eq true)' })
     const questions = response.map((field) => ({
       Field: field.InternalName,
       Description: field.Description,

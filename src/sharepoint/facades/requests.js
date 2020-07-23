@@ -168,7 +168,7 @@ requests.getListByTitle = (http, listTitle, query = '') => {
  * @return {Promise<String>}
  */
 requests.getListItemType = async (http, listTitle) => {
-  const resp = await requests.getListByTitle(http, listTitle, '$select=ListItemEntityTypeFullName')
+  const resp = await requests.getListByTitle(http, listTitle, { $select: 'ListItemEntityTypeFullName' })
   return resp.ListItemEntityTypeFullName
 }
 
