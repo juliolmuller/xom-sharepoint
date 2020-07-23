@@ -71,7 +71,9 @@ module.exports = function XomSharePointList(listTitle, httpInstance) {
    * @param {String} [params]
    * @return {Promise<Array>}
    */
-  this.get = (params) => requests.getListItems(_http, _title, params)
+  this.get = (params) => {
+    return requests.getListItems(_http, _title, params)
+  }
 
   /**
    * Retrun a single list item with the given ID
@@ -80,7 +82,9 @@ module.exports = function XomSharePointList(listTitle, httpInstance) {
    * @param {String} [params]
    * @return {Promise<Object>}
    */
-  this.find = (id, params) => requests.getListItemById(_http, _title, id, params)
+  this.find = (id, params) => {
+    return requests.getListItemById(_http, _title, id, params)
+  }
 
   /**
    * Save a new record in the SharePoint list
@@ -88,7 +92,9 @@ module.exports = function XomSharePointList(listTitle, httpInstance) {
    * @param {Object} data Use literal objects to send data
    * @return {Promise<Object>}
    */
-  this.create = async (data) => requests.postListItem(_http, _title, await _itemsType, data)
+  this.create = async (data) => {
+    return requests.postListItem(_http, _title, await _itemsType, data)
+  }
 
   /**
    * Update data of an existing record in the SharePoint list
@@ -97,7 +103,9 @@ module.exports = function XomSharePointList(listTitle, httpInstance) {
    * @param {Object} data Use literal objects to send data
    * @return {Promise<Object>}
    */
-  this.update = async (id, data) => requests.patchListItem(_http, _title, id, await _itemsType, data)
+  this.update = async (id, data) => {
+    return requests.patchListItem(_http, _title, id, await _itemsType, data)
+  }
 
   /**
    * Delete an existing record from the SharePoint list
@@ -105,7 +113,9 @@ module.exports = function XomSharePointList(listTitle, httpInstance) {
    * @param {Number} id
    * @return {Promise<Object>}
    */
-  this.delete = (id) => requests.deleteListItem(_http, _title, id)
+  this.delete = (id) => {
+    return requests.deleteListItem(_http, _title, id)
+  }
 
   /**
    * Return a list of the attached files in the list item
@@ -113,38 +123,41 @@ module.exports = function XomSharePointList(listTitle, httpInstance) {
    * @param {Number} itemId
    * @return {Promise<Array>}
    */
-  this.getAttachmentsFrom = (itemId) => requests.getListItemAttachments(_http, _title, itemId)
+  this.getAttachmentsFrom = (itemId) => {
+    return requests.getListItemAttachments(_http, _title, itemId)
+  }
 
   /**
    * Upload a file attachment to a list item
    *
    * @param {Number} itemId
-   * @param {String|HTMLElement|FileList|File} fileInput Some reference of the input type 'file':
+   * @param {String} fileName Define a custom name to the attached file
+   * @param {String|HTMLInputElement|FileList|File|Blob|ArrayBuffer} fileReference
+   *          ArrayBuffer - raw data ready to be sent;
+   *          Blob - if it is a file reference created on the fly;
    *          String - if it is a query selector;
-   *          HTMLElement - if it is a direct reference to the input element;
-   *          FileList - if it is direct reference to the 'files' attribute of the element; and
-   *          File - if it is a direct reference to the file.
-   *        For the three first options, as it will result in a array of files (FileList), only
-   *        the first File of the collection will be selected. If you want to get the byte buffer
-   *        of other files, provide a File instance explicitaly
-   * @param {String} [attchmentName] Define a custom name to the attached file
+   *          HTMLInputElement - if it is a direct reference to the HTML element of type "file";
+   *          FileList - if it is a direct reference to the "files" attribute of the element;
+   *          File - if it is a direct reference to the file
    * @return {Promise<Object>}
    */
-  this.attachTo = async (itemId, fileInput, attchmentName) => {
-    const fileBuffer = await genFileBuffer(fileInput)
-    return requests.uploadListItemAttachment(_http, _title, itemId, attchmentName, fileBuffer)
+  this.attachTo = async (itemId, fileName, fileReference) => {
+    const fileBuffer = await genFileBuffer(fileReference)
+    return requests.uploadListItemAttachment(_http, _title, itemId, fileName, fileBuffer)
   }
 
   /**
    * Rename a given file attachment
    *
    * @param {Number} itemId
-   * @param {String} oldFileName
+   * @param {String} oldName
    * @param {String} newName
    * @return {Promise<Object>}
    */
   // eslint-disable-next-line max-len
-  this.renameAttachment = (itemId, oldFileName, newName) => requests.renameListItemAttachment(_http, _title, itemId, oldFileName, newName)
+  this.renameAttachment = (itemId, oldName, newName) => {
+    return requests.renameListItemAttachment(_http, _title, itemId, oldName, newName)
+  }
 
   /**
    * Remove a given file attachment from the list item
@@ -153,5 +166,7 @@ module.exports = function XomSharePointList(listTitle, httpInstance) {
    * @param {String} fileName
    * @return {Promise<Object>}
    */
-  this.removeAttachment = (itemId, fileName) => requests.deleteListItemAttachment(_http, _title, itemId, fileName)
+  this.removeAttachment = (itemId, fileName) => {
+    return requests.deleteListItemAttachment(_http, _title, itemId, fileName)
+  }
 }

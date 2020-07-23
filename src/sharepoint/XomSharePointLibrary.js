@@ -58,7 +58,9 @@ module.exports = function XomSharePointLibrary(folderAddress, httpInstance) {
    * @param {String} [params]
    * @return {Promise<Array>}
    */
-  this.getSubfolders = (params = '') => requests.getFoldersInFolder(_http, this.relativeUrl, params)
+  this.getSubfolders = (params = '') => {
+    return requests.getFoldersInFolder(_http, this.relativeUrl, params)
+  }
 
   /**
    * Create a folder within this folder
@@ -66,7 +68,9 @@ module.exports = function XomSharePointLibrary(folderAddress, httpInstance) {
    * @param {String} folderName
    * @return {Promise<Object>}
    */
-  this.createFolder = (folderName) => requests.createFolder(_http, this.relativeUrl, folderName)
+  this.createFolder = (folderName) => {
+    return requests.createFolder(_http, this.relativeUrl, folderName)
+  }
 
   /**
    * Return a list of the files within this folder
@@ -74,25 +78,26 @@ module.exports = function XomSharePointLibrary(folderAddress, httpInstance) {
    * @param {String} [params]
    * @return {Promise<Array>}
    */
-  this.getFiles = (params = '') => requests.getFilesInFolder(_http, this.relativeUrl, params)
+  this.getFiles = (params = '') => {
+    return requests.getFilesInFolder(_http, this.relativeUrl, params)
+  }
 
   /**
    * Upload a file into the folder
    *
-   * @param {String|HTMLElement|FileList|File} fileInput Some reference of the input type 'file':
+   * @param {String} fileName
+   * @param {String|HTMLInputElement|FileList|File|Blob|ArrayBuffer} fileReference
+   *          ArrayBuffer - raw data ready to be sent;
+   *          Blob - if it is a file reference created on the fly;
    *          String - if it is a query selector;
-   *          HTMLElement - if it is a direct reference to the input element;
-   *          FileList - if it is direct reference to the 'files' attribute of the element; and
-   *          File - if it is a direct reference to the file.
-   *        For the three first options, as it will result in a array of files (FileList), only
-   *        the first File of the collection will be selected. If you want to get the byte buffer
-   *        of other files, provide a File instance explicitaly
-   * @param {String} [customFileName] Define a custom name to the attached file
+   *          HTMLInputElement - if it is a direct reference to the HTML element of type "file";
+   *          FileList - if it is a direct reference to the "files" attribute of the element;
+   *          File - if it is a direct reference to the file
    * @return {Promise<Object>}
    */
-  this.upload = async (fileInput, customFileName) => {
-    const fileBuffer = await genFileBuffer(fileInput)
-    const result = await requests.uploadFileToFolder(_http, this.relativeUrl, customFileName, fileBuffer)
+  this.upload = async (fileName, fileReference) => {
+    const fileBuffer = await genFileBuffer(fileReference)
+    const result = await requests.uploadFileToFolder(_http, this.relativeUrl, fileName, fileBuffer)
     _filesType = _filesType || result.__metadata.type
     return result
   }

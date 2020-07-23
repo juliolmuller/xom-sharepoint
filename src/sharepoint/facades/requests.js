@@ -126,14 +126,14 @@ requests.getLists = (http, query = '') => {
  * Create a new list in the site
  *
  * @param {Axios} http
- * @param {String} title
+ * @param {String} listTitle
  * @return {Promise<Object>}
  */
-requests.createList = (http, title) => {
+requests.createList = (http, listTitle) => {
   return http.post(endpoints.lists.index(), {
     __metadata: { type: 'SP.List' },
     BaseTemplate: 100,
-    Title: title,
+    Title: listTitle,
   })
 }
 
@@ -141,34 +141,34 @@ requests.createList = (http, title) => {
  * Delete an existing list in the site
  *
  * @param {Axios} http
- * @param {String} title
+ * @param {String} listTitle
  * @return {Promise<Object>}
  */
-requests.deleteList = (http, title) => {
-  return http.delete(endpoints.lists.byTitle(title))
+requests.deleteList = (http, listTitle) => {
+  return http.delete(endpoints.lists.byTitle(listTitle))
 }
 
 /**
  * Fetch list metadata
  *
  * @param {Axios} http
- * @param {String} title
+ * @param {String} listTitle
  * @param {String} [query]
  * @return {Promise<Object>}
  */
-requests.getListByTitle = (http, title, query = '') => {
-  return http.get(endpoints.lists.byTitle(title, query))
+requests.getListByTitle = (http, listTitle, query = '') => {
+  return http.get(endpoints.lists.byTitle(listTitle, query))
 }
 
 /**
  * Fetch list metadata
  *
  * @param {Axios} http
- * @param {String} title
+ * @param {String} listTitle
  * @return {Promise<String>}
  */
-requests.getListItemType = async (http, title) => {
-  const resp = await requests.getListByTitle(http, title, '?$select=ListItemEntityTypeFullName')
+requests.getListItemType = async (http, listTitle) => {
+  const resp = await requests.getListByTitle(http, listTitle, '?$select=ListItemEntityTypeFullName')
   return resp.ListItemEntityTypeFullName
 }
 
@@ -176,50 +176,50 @@ requests.getListItemType = async (http, title) => {
  * Fetch list fields metadata
  *
  * @param {Axios} http
- * @param {String} title
+ * @param {String} listTitle
  * @param {String} [query]
  * @return {Promise<Array>}
  */
-requests.getListFields = (http, title, query = '') => {
-  return http.get(endpoints.lists.fields(title, query))
+requests.getListFields = (http, listTitle, query = '') => {
+  return http.get(endpoints.lists.fields(listTitle, query))
 }
 
 /**
  * Fetch list items
  *
  * @param {Axios} http
- * @param {String} title
+ * @param {String} listTitle
  * @param {String} [query]
  * @return {Promise<Array>}
  */
-requests.getListItems = (http, title, query = '') => {
-  return http.get(endpoints.lists.items(title, query))
+requests.getListItems = (http, listTitle, query = '') => {
+  return http.get(endpoints.lists.items(listTitle, query))
 }
 
 /**
  * Fetch a single list item
  *
  * @param {Axios} http
- * @param {String} title
+ * @param {String} listTitle
  * @param {Number} itemId
  * @param {String} [query]
  * @return {Promise<Object>}
  */
-requests.getListItemById = (http, title, itemId, query = '') => {
-  return http.get(endpoints.lists.itemById(title, itemId, query))
+requests.getListItemById = (http, listTitle, itemId, query = '') => {
+  return http.get(endpoints.lists.itemById(listTitle, itemId, query))
 }
 
 /**
  * Create a new record to the list
  *
  * @param {Axios} http
- * @param {String} title
+ * @param {String} listTitle
  * @param {String} type
  * @param {Object} data
  * @return {Promise<Array>}
  */
-requests.postListItem = (http, title, type, data) => {
-  return http.post(endpoints.lists.items(title), {
+requests.postListItem = (http, listTitle, type, data) => {
+  return http.post(endpoints.lists.items(listTitle), {
     __metadata: { type },
     ...data,
   })
@@ -229,18 +229,18 @@ requests.postListItem = (http, title, type, data) => {
  * Update an existing record in the list
  *
  * @param {Axios} http
- * @param {String} title
+ * @param {String} listTitle
  * @param {Number} itemId
  * @param {String} type
  * @param {Object} data
  * @return {Promise<Array>}
  */
-requests.patchListItem = async (http, title, itemId, type, data) => {
-  const patchResp = await http.patch(endpoints.lists.itemById(title, itemId), {
+requests.patchListItem = async (http, listTitle, itemId, type, data) => {
+  const patchResp = await http.patch(endpoints.lists.itemById(listTitle, itemId), {
     __metadata: { type },
     ...data,
   })
-  const updatedItem = await requests.getListItemById(http, title, itemId)
+  const updatedItem = await requests.getListItemById(http, listTitle, itemId)
   delete patchResp.data
   updatedItem.__response = patchResp
   return updatedItem
@@ -250,13 +250,13 @@ requests.patchListItem = async (http, title, itemId, type, data) => {
  * Update an existing record in the list
  *
  * @param {Axios} http
- * @param {String} title
+ * @param {String} listTitle
  * @param {Number} itemId
  * @return {Promise<Array>}
  */
-requests.deleteListItem = async (http, title, itemId) => {
-  const originalItem = await requests.getListItemById(http, title, itemId)
-  const deleteResp = await http.delete(endpoints.lists.itemById(title, itemId))
+requests.deleteListItem = async (http, listTitle, itemId) => {
+  const originalItem = await requests.getListItemById(http, listTitle, itemId)
+  const deleteResp = await http.delete(endpoints.lists.itemById(listTitle, itemId))
   delete deleteResp.data
   originalItem.__response = deleteResp
   return originalItem
@@ -266,40 +266,40 @@ requests.deleteListItem = async (http, title, itemId) => {
  * Fetch attachments of a given list item
  *
  * @param {Axios} http
- * @param {String} title
+ * @param {String} listTitle
  * @param {Number} itemId
  * @return {Promise<Array>}
  */
-requests.getListItemAttachments = (http, title, itemId) => {
-  return http.get(endpoints.lists.itemAttachments(title, itemId))
+requests.getListItemAttachments = (http, listTitle, itemId) => {
+  return http.get(endpoints.lists.itemAttachments(listTitle, itemId))
 }
 
 /**
  * Upload an attachment to a given list item
  *
  * @param {Axios} http
- * @param {String} title
+ * @param {String} listTitle
  * @param {Number} itemId
  * @param {String} fileName
  * @param {ArrayBuffer} fileBuffer
  * @return {Promise<Object>}
  */
-requests.uploadListItemAttachment = (http, title, itemId, fileName, fileBuffer) => {
-  return http.post(endpoints.lists.itemAttachmentsUpload(title, itemId, fileName), fileBuffer)
+requests.uploadListItemAttachment = (http, listTitle, itemId, fileName, fileBuffer) => {
+  return http.post(endpoints.lists.itemAttachmentsUpload(listTitle, itemId, fileName), fileBuffer)
 }
 
 /**
  * Rename an existing attachment from a given list item
  *
  * @param {Axios} http
- * @param {String} title
+ * @param {String} listTitle
  * @param {Number} itemId
  * @param {String} oldFileName
  * @param {String} newFileName
  * @return {Promise<Object>}
  */
-requests.renameListItemAttachment = async (http, title, itemId, oldFileName, newFileName) => {
-  const attachments = await requests.getListItemAttachments(http, title, itemId)
+requests.renameListItemAttachment = async (http, listTitle, itemId, oldFileName, newFileName) => {
+  const attachments = await requests.getListItemAttachments(http, listTitle, itemId)
   const oldFileUrl = attachments.find((att) => att.FileName === oldFileName).ServerRelativeUrl
   const newFileUrl = oldFileUrl.replace(oldFileName, newFileName)
   return http.patch(endpoints.lists.itemAttachmentsRename(oldFileUrl, newFileUrl))
@@ -309,13 +309,13 @@ requests.renameListItemAttachment = async (http, title, itemId, oldFileName, new
  * Delete an attachment of a given list item
  *
  * @param {Axios} http
- * @param {String} title
+ * @param {String} listTitle
  * @param {Number} itemId
  * @param {String} fileName
  * @return {Promise<Object>}
  */
-requests.deleteListItemAttachment = (http, title, itemId, fileName) => {
-  return http.delete(endpoints.lists.itemAttachmentByName(title, itemId, fileName))
+requests.deleteListItemAttachment = (http, listTitle, itemId, fileName) => {
+  return http.delete(endpoints.lists.itemAttachmentByName(listTitle, itemId, fileName))
 }
 
 /**

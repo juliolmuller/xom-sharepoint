@@ -109,68 +109,68 @@ endpoints.lists.index = (query = '') => `${endpoints.baseApiUri()}/Lists${query}
 /**
  * Return URI to get a given list metadata
  *
- * @param {String} title
+ * @param {String} listTitle
  * @param {String} [query]
  * @return {String}
  */
-endpoints.lists.byTitle = (title, query = '') => `${endpoints.lists.index()}/GetByTitle('${title}')${query}`
+endpoints.lists.byTitle = (listTitle, query = '') => `${endpoints.lists.index()}/GetByTitle('${listTitle}')${query}`
 
 /**
  * Return URI to get a given list fields
  *
- * @param {String} title
+ * @param {String} listTitle
  * @param {String} [query]
  * @return {String}
  */
-endpoints.lists.fields = (title, query = '') => `${endpoints.lists.byTitle(title)}/Fields${query}`
+endpoints.lists.fields = (listTitle, query = '') => `${endpoints.lists.byTitle(listTitle)}/Fields${query}`
 
 /**
  * Return URI to get a given list items
  *
- * @param {String} title
+ * @param {String} listTitle
  * @param {String} [query]
  * @return {String}
  */
-endpoints.lists.items = (title, query = '') => `${endpoints.lists.byTitle(title)}/Items${query}`
+endpoints.lists.items = (listTitle, query = '') => `${endpoints.lists.byTitle(listTitle)}/Items${query}`
 
 /**
  * Return URI to get an specific list item
  *
- * @param {String} title
+ * @param {String} listTitle
  * @param {Number} itemId
  * @param {String} [query]
  * @return {String}
  */
-endpoints.lists.itemById = (title, itemId, query = '') => endpoints.lists.items(title, `(${itemId})${query}`)
+endpoints.lists.itemById = (listTitle, itemId, query = '') => endpoints.lists.items(listTitle, `(${itemId})${query}`)
 
 /**
  * Return URI to handle list items attachments
  *
- * @param {String} title
+ * @param {String} listTitle
  * @param {Number} itemId
  * @return {String}
  */
-endpoints.lists.itemAttachments = (title, itemId) => `${endpoints.lists.itemById(title, itemId)}/AttachmentFiles`
+endpoints.lists.itemAttachments = (listTitle, itemId) => `${endpoints.lists.itemById(listTitle, itemId)}/AttachmentFiles`
 
 /**
  * Return URI to handle list items attachments
  *
- * @param {String} title
+ * @param {String} listTitle
  * @param {Number} itemId
  * @param {String} fileName
  * @return {String}
  */
-endpoints.lists.itemAttachmentByName = (title, itemId, fileName) => `${endpoints.lists.itemById(title, itemId)}/AttachmentFiles/GetByFileName('${fileName}')`
+endpoints.lists.itemAttachmentByName = (listTitle, itemId, fileName) => `${endpoints.lists.itemById(listTitle, itemId)}/AttachmentFiles/GetByFileName('${fileName}')`
 
 /**
  * Return URI to handle upload of list items attachments
  *
- * @param {String} title
+ * @param {String} listTitle
  * @param {Number} itemId
  * @param {String} fileName
  * @return {String}
  */
-endpoints.lists.itemAttachmentsUpload = (title, itemId, fileName) => `${endpoints.lists.itemAttachments(title, itemId)}/Add(filename='${fileName}')`
+endpoints.lists.itemAttachmentsUpload = (listTitle, itemId, fileName) => `${endpoints.lists.itemAttachments(listTitle, itemId)}/Add(filename='${fileName}')`
 
 /**
  * Return URI to handle renaming of list items attachments
