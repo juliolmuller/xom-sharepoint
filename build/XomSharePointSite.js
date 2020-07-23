@@ -1,17 +1,14 @@
 "use strict";
 
-/* eslint-disable arrow-body-style */
+var requests = require('./facades/requests');
 
-/* eslint-disable no-underscore-dangle */
-var requests = require('../facades/requests');
-
-var httpFactory = require('../http/http-factory');
+var httpFactory = require('./http/http-factory');
 
 var XomSharePointList = require('./XomSharePointList');
 
 var XomSharePointSurvey = require('./XomSharePointSurvey');
 
-var XomSharePointFolder = require('./XomSharePointFolder');
+var XomSharePointLibrary = require('./XomSharePointLibrary');
 /**
  * Contain the necessary information to stablish a connection to a SharePoint
  * site through its REST API
@@ -94,7 +91,9 @@ module.exports = function XomSharePointSite(baseSiteUrl) {
 
 
   this.searchUser = function (search) {
-    return requests.getSiteUsersListItems(_http, "?$filter=substringof('".concat(search, "',Title) or substringof('").concat(search, "',UserName)"));
+    return requests.getSiteUsersListItems(_http, {
+      $filter: "substringof('".concat(search, "',Title) or substringof('").concat(search, "',UserName)")
+    });
   };
   /**
    * Return a reference to connect to a SharePoint list
@@ -149,6 +148,6 @@ module.exports = function XomSharePointSite(baseSiteUrl) {
 
 
   this.getFolder = function (folderAddress) {
-    return new XomSharePointFolder(folderAddress, _http);
+    return new XomSharePointLibrary(folderAddress, _http);
   };
 };

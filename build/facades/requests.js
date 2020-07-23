@@ -12,7 +12,6 @@ function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (O
 
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { (0, _defineProperty2["default"])(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 
-/* eslint-disable arrow-body-style */
 var endpoints = require('./endpoints');
 /**
  * Define all possible requests to the SharePoint API
@@ -178,64 +177,66 @@ requests.getLists = function (http) {
  * Create a new list in the site
  *
  * @param {Axios} http
- * @param {String} title
+ * @param {String} listTitle
  * @return {Promise<Object>}
  */
 
 
-requests.createList = function (http, title) {
+requests.createList = function (http, listTitle) {
   return http.post(endpoints.lists.index(), {
     __metadata: {
       type: 'SP.List'
     },
     BaseTemplate: 100,
-    Title: title
+    Title: listTitle
   });
 };
 /**
  * Delete an existing list in the site
  *
  * @param {Axios} http
- * @param {String} title
+ * @param {String} listTitle
  * @return {Promise<Object>}
  */
 
 
-requests.deleteList = function (http, title) {
-  return http["delete"](endpoints.lists.byTitle(title));
+requests.deleteList = function (http, listTitle) {
+  return http["delete"](endpoints.lists.byTitle(listTitle));
 };
 /**
  * Fetch list metadata
  *
  * @param {Axios} http
- * @param {String} title
+ * @param {String} listTitle
  * @param {String} [query]
  * @return {Promise<Object>}
  */
 
 
-requests.getListByTitle = function (http, title) {
+requests.getListByTitle = function (http, listTitle) {
   var query = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '';
-  return http.get(endpoints.lists.byTitle(title, query));
+  return http.get(endpoints.lists.byTitle(listTitle, query));
 };
 /**
  * Fetch list metadata
  *
  * @param {Axios} http
- * @param {String} title
+ * @param {String} listTitle
  * @return {Promise<String>}
  */
 
 
 requests.getListItemType = /*#__PURE__*/function () {
-  var _ref2 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee2(http, title) {
+  var _ref2 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee2(http, listTitle) {
     var resp;
     return _regenerator["default"].wrap(function _callee2$(_context2) {
       while (1) {
         switch (_context2.prev = _context2.next) {
           case 0:
             _context2.next = 2;
-            return requests.getListByTitle(http, title, '?$select=ListItemEntityTypeFullName');
+            return requests.getListByTitle(http, listTitle, {
+              $select: 'ListItemEntityTypeFullName'
+            });
 
           case 2:
             resp = _context2.sent;
@@ -257,58 +258,58 @@ requests.getListItemType = /*#__PURE__*/function () {
  * Fetch list fields metadata
  *
  * @param {Axios} http
- * @param {String} title
+ * @param {String} listTitle
  * @param {String} [query]
  * @return {Promise<Array>}
  */
 
 
-requests.getListFields = function (http, title) {
+requests.getListFields = function (http, listTitle) {
   var query = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '';
-  return http.get(endpoints.lists.fields(title, query));
+  return http.get(endpoints.lists.fields(listTitle, query));
 };
 /**
  * Fetch list items
  *
  * @param {Axios} http
- * @param {String} title
+ * @param {String} listTitle
  * @param {String} [query]
  * @return {Promise<Array>}
  */
 
 
-requests.getListItems = function (http, title) {
+requests.getListItems = function (http, listTitle) {
   var query = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '';
-  return http.get(endpoints.lists.items(title, query));
+  return http.get(endpoints.lists.items(listTitle, query));
 };
 /**
  * Fetch a single list item
  *
  * @param {Axios} http
- * @param {String} title
+ * @param {String} listTitle
  * @param {Number} itemId
  * @param {String} [query]
  * @return {Promise<Object>}
  */
 
 
-requests.getListItemById = function (http, title, itemId) {
+requests.getListItemById = function (http, listTitle, itemId) {
   var query = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : '';
-  return http.get(endpoints.lists.itemById(title, itemId, query));
+  return http.get(endpoints.lists.itemById(listTitle, itemId, query));
 };
 /**
  * Create a new record to the list
  *
  * @param {Axios} http
- * @param {String} title
+ * @param {String} listTitle
  * @param {String} type
  * @param {Object} data
  * @return {Promise<Array>}
  */
 
 
-requests.postListItem = function (http, title, type, data) {
-  return http.post(endpoints.lists.items(title), _objectSpread({
+requests.postListItem = function (http, listTitle, type, data) {
+  return http.post(endpoints.lists.items(listTitle), _objectSpread({
     __metadata: {
       type: type
     }
@@ -318,7 +319,7 @@ requests.postListItem = function (http, title, type, data) {
  * Update an existing record in the list
  *
  * @param {Axios} http
- * @param {String} title
+ * @param {String} listTitle
  * @param {Number} itemId
  * @param {String} type
  * @param {Object} data
@@ -327,14 +328,14 @@ requests.postListItem = function (http, title, type, data) {
 
 
 requests.patchListItem = /*#__PURE__*/function () {
-  var _ref3 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee3(http, title, itemId, type, data) {
+  var _ref3 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee3(http, listTitle, itemId, type, data) {
     var patchResp, updatedItem;
     return _regenerator["default"].wrap(function _callee3$(_context3) {
       while (1) {
         switch (_context3.prev = _context3.next) {
           case 0:
             _context3.next = 2;
-            return http.patch(endpoints.lists.itemById(title, itemId), _objectSpread({
+            return http.patch(endpoints.lists.itemById(listTitle, itemId), _objectSpread({
               __metadata: {
                 type: type
               }
@@ -343,7 +344,7 @@ requests.patchListItem = /*#__PURE__*/function () {
           case 2:
             patchResp = _context3.sent;
             _context3.next = 5;
-            return requests.getListItemById(http, title, itemId);
+            return requests.getListItemById(http, listTitle, itemId);
 
           case 5:
             updatedItem = _context3.sent;
@@ -367,26 +368,26 @@ requests.patchListItem = /*#__PURE__*/function () {
  * Update an existing record in the list
  *
  * @param {Axios} http
- * @param {String} title
+ * @param {String} listTitle
  * @param {Number} itemId
  * @return {Promise<Array>}
  */
 
 
 requests.deleteListItem = /*#__PURE__*/function () {
-  var _ref4 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee4(http, title, itemId) {
+  var _ref4 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee4(http, listTitle, itemId) {
     var originalItem, deleteResp;
     return _regenerator["default"].wrap(function _callee4$(_context4) {
       while (1) {
         switch (_context4.prev = _context4.next) {
           case 0:
             _context4.next = 2;
-            return requests.getListItemById(http, title, itemId);
+            return requests.getListItemById(http, listTitle, itemId);
 
           case 2:
             originalItem = _context4.sent;
             _context4.next = 5;
-            return http["delete"](endpoints.lists.itemById(title, itemId));
+            return http["delete"](endpoints.lists.itemById(listTitle, itemId));
 
           case 5:
             deleteResp = _context4.sent;
@@ -410,20 +411,20 @@ requests.deleteListItem = /*#__PURE__*/function () {
  * Fetch attachments of a given list item
  *
  * @param {Axios} http
- * @param {String} title
+ * @param {String} listTitle
  * @param {Number} itemId
  * @return {Promise<Array>}
  */
 
 
-requests.getListItemAttachments = function (http, title, itemId) {
-  return http.get(endpoints.lists.itemAttachments(title, itemId));
+requests.getListItemAttachments = function (http, listTitle, itemId) {
+  return http.get(endpoints.lists.itemAttachments(listTitle, itemId));
 };
 /**
  * Upload an attachment to a given list item
  *
  * @param {Axios} http
- * @param {String} title
+ * @param {String} listTitle
  * @param {Number} itemId
  * @param {String} fileName
  * @param {ArrayBuffer} fileBuffer
@@ -431,14 +432,14 @@ requests.getListItemAttachments = function (http, title, itemId) {
  */
 
 
-requests.uploadListItemAttachment = function (http, title, itemId, fileName, fileBuffer) {
-  return http.post(endpoints.lists.itemAttachmentsUpload(title, itemId, fileName), fileBuffer);
+requests.uploadListItemAttachment = function (http, listTitle, itemId, fileName, fileBuffer) {
+  return http.post(endpoints.lists.itemAttachmentsUpload(listTitle, itemId, fileName), fileBuffer);
 };
 /**
  * Rename an existing attachment from a given list item
  *
  * @param {Axios} http
- * @param {String} title
+ * @param {String} listTitle
  * @param {Number} itemId
  * @param {String} oldFileName
  * @param {String} newFileName
@@ -447,14 +448,14 @@ requests.uploadListItemAttachment = function (http, title, itemId, fileName, fil
 
 
 requests.renameListItemAttachment = /*#__PURE__*/function () {
-  var _ref5 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee5(http, title, itemId, oldFileName, newFileName) {
+  var _ref5 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee5(http, listTitle, itemId, oldFileName, newFileName) {
     var attachments, oldFileUrl, newFileUrl;
     return _regenerator["default"].wrap(function _callee5$(_context5) {
       while (1) {
         switch (_context5.prev = _context5.next) {
           case 0:
             _context5.next = 2;
-            return requests.getListItemAttachments(http, title, itemId);
+            return requests.getListItemAttachments(http, listTitle, itemId);
 
           case 2:
             attachments = _context5.sent;
@@ -480,15 +481,15 @@ requests.renameListItemAttachment = /*#__PURE__*/function () {
  * Delete an attachment of a given list item
  *
  * @param {Axios} http
- * @param {String} title
+ * @param {String} listTitle
  * @param {Number} itemId
  * @param {String} fileName
  * @return {Promise<Object>}
  */
 
 
-requests.deleteListItemAttachment = function (http, title, itemId, fileName) {
-  return http["delete"](endpoints.lists.itemAttachmentByName(title, itemId, fileName));
+requests.deleteListItemAttachment = function (http, listTitle, itemId, fileName) {
+  return http["delete"](endpoints.lists.itemAttachmentByName(listTitle, itemId, fileName));
 };
 /**
  * Fetch list of all site folders/libraries
@@ -529,6 +530,15 @@ requests.getFoldersInFolder = function (http, relativeUrl) {
   var query = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '';
   return http.get(endpoints.folders.foldersInFolder(relativeUrl, query));
 };
+/**
+ * Creates a new folder given library or folder based on its relative URL
+ *
+ * @param {Axios} http
+ * @param {String} relativeUrl
+ * @param {String} folderName
+ * @return {Promise<Object>}
+ */
+
 
 requests.createFolder = function (http, relativeUrl, folderName) {
   return http.post(endpoints.folders.index(), {

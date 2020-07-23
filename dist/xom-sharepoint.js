@@ -906,12 +906,213 @@ function _asyncToGenerator(fn) {
 }
 
 module.exports = _asyncToGenerator;
-},{}],"bWmH":[function(require,module,exports) {
+},{}],"J6GP":[function(require,module,exports) {
+// Copyright Joyent, Inc. and other Node contributors.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit
+// persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
+'use strict'; // If obj.hasOwnProperty has been overridden, then calling
+// obj.hasOwnProperty(prop) will break.
+// See: https://github.com/joyent/node/issues/1707
+
+function hasOwnProperty(obj, prop) {
+  return Object.prototype.hasOwnProperty.call(obj, prop);
+}
+
+module.exports = function (qs, sep, eq, options) {
+  sep = sep || '&';
+  eq = eq || '=';
+  var obj = {};
+
+  if (typeof qs !== 'string' || qs.length === 0) {
+    return obj;
+  }
+
+  var regexp = /\+/g;
+  qs = qs.split(sep);
+  var maxKeys = 1000;
+
+  if (options && typeof options.maxKeys === 'number') {
+    maxKeys = options.maxKeys;
+  }
+
+  var len = qs.length; // maxKeys <= 0 means that we should not limit keys count
+
+  if (maxKeys > 0 && len > maxKeys) {
+    len = maxKeys;
+  }
+
+  for (var i = 0; i < len; ++i) {
+    var x = qs[i].replace(regexp, '%20'),
+        idx = x.indexOf(eq),
+        kstr,
+        vstr,
+        k,
+        v;
+
+    if (idx >= 0) {
+      kstr = x.substr(0, idx);
+      vstr = x.substr(idx + 1);
+    } else {
+      kstr = x;
+      vstr = '';
+    }
+
+    k = decodeURIComponent(kstr);
+    v = decodeURIComponent(vstr);
+
+    if (!hasOwnProperty(obj, k)) {
+      obj[k] = v;
+    } else if (isArray(obj[k])) {
+      obj[k].push(v);
+    } else {
+      obj[k] = [obj[k], v];
+    }
+  }
+
+  return obj;
+};
+
+var isArray = Array.isArray || function (xs) {
+  return Object.prototype.toString.call(xs) === '[object Array]';
+};
+},{}],"bvhO":[function(require,module,exports) {
+// Copyright Joyent, Inc. and other Node contributors.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit
+// persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
+'use strict';
+
+var stringifyPrimitive = function (v) {
+  switch (typeof v) {
+    case 'string':
+      return v;
+
+    case 'boolean':
+      return v ? 'true' : 'false';
+
+    case 'number':
+      return isFinite(v) ? v : '';
+
+    default:
+      return '';
+  }
+};
+
+module.exports = function (obj, sep, eq, name) {
+  sep = sep || '&';
+  eq = eq || '=';
+
+  if (obj === null) {
+    obj = undefined;
+  }
+
+  if (typeof obj === 'object') {
+    return map(objectKeys(obj), function (k) {
+      var ks = encodeURIComponent(stringifyPrimitive(k)) + eq;
+
+      if (isArray(obj[k])) {
+        return map(obj[k], function (v) {
+          return ks + encodeURIComponent(stringifyPrimitive(v));
+        }).join(sep);
+      } else {
+        return ks + encodeURIComponent(stringifyPrimitive(obj[k]));
+      }
+    }).join(sep);
+  }
+
+  if (!name) return '';
+  return encodeURIComponent(stringifyPrimitive(name)) + eq + encodeURIComponent(stringifyPrimitive(obj));
+};
+
+var isArray = Array.isArray || function (xs) {
+  return Object.prototype.toString.call(xs) === '[object Array]';
+};
+
+function map(xs, f) {
+  if (xs.map) return xs.map(f);
+  var res = [];
+
+  for (var i = 0; i < xs.length; i++) {
+    res.push(f(xs[i], i));
+  }
+
+  return res;
+}
+
+var objectKeys = Object.keys || function (obj) {
+  var res = [];
+
+  for (var key in obj) {
+    if (Object.prototype.hasOwnProperty.call(obj, key)) res.push(key);
+  }
+
+  return res;
+};
+},{}],"fk5h":[function(require,module,exports) {
+'use strict';
+
+exports.decode = exports.parse = require('./decode');
+exports.encode = exports.stringify = require('./encode');
+},{"./decode":"J6GP","./encode":"bvhO"}],"bWmH":[function(require,module,exports) {
+var qs = require('querystring');
+/**
+ * Function to easily convert an object into a query string
+ *
+ * @param {any} query
+ */
+
+
+var stringify = function stringify(query) {
+  if (!query) {
+    return '';
+  }
+
+  if (typeof query === 'string') {
+    return query[0] === '$' ? "?".concat(query) : query;
+  }
+
+  return "?".concat(qs.stringify(query));
+};
 /**
  * Group of functions to get SharePoint API URI endpoints
  *
  * @const {Object}
  */
+
+
 var endpoints = {
   site: {},
   users: {},
@@ -1015,9 +1216,8 @@ endpoints.users.listMetadata = function () {
  */
 
 
-endpoints.users.listFields = function () {
-  var query = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
-  return "".concat(endpoints.users.listMetadata(), "/Fields").concat(query);
+endpoints.users.listFields = function (query) {
+  return "".concat(endpoints.users.listMetadata(), "/Fields").concat(stringify(query));
 };
 /**
  * Return URI to get users records
@@ -1027,9 +1227,8 @@ endpoints.users.listFields = function () {
  */
 
 
-endpoints.users.listItems = function () {
-  var query = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
-  return "".concat(endpoints.users.listMetadata(), "/Items").concat(query);
+endpoints.users.listItems = function (query) {
+  return "".concat(endpoints.users.listMetadata(), "/Items").concat(stringify(query));
 };
 /**
  * Return URI to get a given user information
@@ -1050,100 +1249,95 @@ endpoints.users.byId = function (id) {
  */
 
 
-endpoints.lists.index = function () {
-  var query = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
-  return "".concat(endpoints.baseApiUri(), "/Lists").concat(query);
+endpoints.lists.index = function (query) {
+  return "".concat(endpoints.baseApiUri(), "/Lists").concat(stringify(query));
 };
 /**
  * Return URI to get a given list metadata
  *
- * @param {String} title
+ * @param {String} listTitle
  * @param {String} [query]
  * @return {String}
  */
 
 
-endpoints.lists.byTitle = function (title) {
-  var query = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
-  return "".concat(endpoints.lists.index(), "/GetByTitle('").concat(title, "')").concat(query);
+endpoints.lists.byTitle = function (listTitle, query) {
+  return "".concat(endpoints.lists.index(), "/GetByTitle('").concat(listTitle, "')").concat(stringify(query));
 };
 /**
  * Return URI to get a given list fields
  *
- * @param {String} title
+ * @param {String} listTitle
  * @param {String} [query]
  * @return {String}
  */
 
 
-endpoints.lists.fields = function (title) {
-  var query = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
-  return "".concat(endpoints.lists.byTitle(title), "/Fields").concat(query);
+endpoints.lists.fields = function (listTitle, query) {
+  return "".concat(endpoints.lists.byTitle(listTitle), "/Fields").concat(stringify(query));
 };
 /**
  * Return URI to get a given list items
  *
- * @param {String} title
+ * @param {String} listTitle
  * @param {String} [query]
  * @return {String}
  */
 
 
-endpoints.lists.items = function (title) {
-  var query = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
-  return "".concat(endpoints.lists.byTitle(title), "/Items").concat(query);
+endpoints.lists.items = function (listTitle, query) {
+  return "".concat(endpoints.lists.byTitle(listTitle), "/Items").concat(stringify(query));
 };
 /**
  * Return URI to get an specific list item
  *
- * @param {String} title
+ * @param {String} listTitle
  * @param {Number} itemId
  * @param {String} [query]
  * @return {String}
  */
 
 
-endpoints.lists.itemById = function (title, itemId) {
-  var query = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '';
-  return endpoints.lists.items(title, "(".concat(itemId, ")").concat(query));
+endpoints.lists.itemById = function (listTitle, itemId, query) {
+  return endpoints.lists.items(listTitle, "(".concat(itemId, ")").concat(stringify(query)));
 };
 /**
  * Return URI to handle list items attachments
  *
- * @param {String} title
+ * @param {String} listTitle
  * @param {Number} itemId
  * @return {String}
  */
 
 
-endpoints.lists.itemAttachments = function (title, itemId) {
-  return "".concat(endpoints.lists.itemById(title, itemId), "/AttachmentFiles");
+endpoints.lists.itemAttachments = function (listTitle, itemId) {
+  return "".concat(endpoints.lists.itemById(listTitle, itemId), "/AttachmentFiles");
 };
 /**
  * Return URI to handle list items attachments
  *
- * @param {String} title
+ * @param {String} listTitle
  * @param {Number} itemId
  * @param {String} fileName
  * @return {String}
  */
 
 
-endpoints.lists.itemAttachmentByName = function (title, itemId, fileName) {
-  return "".concat(endpoints.lists.itemById(title, itemId), "/AttachmentFiles/GetByFileName('").concat(fileName, "')");
+endpoints.lists.itemAttachmentByName = function (listTitle, itemId, fileName) {
+  return "".concat(endpoints.lists.itemById(listTitle, itemId), "/AttachmentFiles/GetByFileName('").concat(fileName, "')");
 };
 /**
  * Return URI to handle upload of list items attachments
  *
- * @param {String} title
+ * @param {String} listTitle
  * @param {Number} itemId
  * @param {String} fileName
  * @return {String}
  */
 
 
-endpoints.lists.itemAttachmentsUpload = function (title, itemId, fileName) {
-  return "".concat(endpoints.lists.itemAttachments(title, itemId), "/Add(filename='").concat(fileName, "')");
+endpoints.lists.itemAttachmentsUpload = function (listTitle, itemId, fileName) {
+  return "".concat(endpoints.lists.itemAttachments(listTitle, itemId), "/Add(filename='").concat(fileName, "')");
 };
 /**
  * Return URI to handle renaming of list items attachments
@@ -1165,9 +1359,8 @@ endpoints.lists.itemAttachmentsRename = function (oldFileUrl, newFileUrl) {
  */
 
 
-endpoints.folders.index = function () {
-  var query = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
-  return "".concat(endpoints.baseApiUri(), "/Folders").concat(query);
+endpoints.folders.index = function (query) {
+  return "".concat(endpoints.baseApiUri(), "/Folders").concat(stringify(query));
 };
 /**
  * Return URI to access folder by relative URL
@@ -1189,9 +1382,8 @@ endpoints.folders.folderByUrl = function (relativeUrl) {
  */
 
 
-endpoints.folders.foldersInFolder = function (relativeUrl) {
-  var query = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
-  return "".concat(endpoints.folders.folderByUrl(relativeUrl), "/Folders").concat(query);
+endpoints.folders.foldersInFolder = function (relativeUrl, query) {
+  return "".concat(endpoints.folders.folderByUrl(relativeUrl), "/Folders").concat(stringify(query));
 };
 /**
  * Return URL to list of files within a given folder
@@ -1202,9 +1394,8 @@ endpoints.folders.foldersInFolder = function (relativeUrl) {
  */
 
 
-endpoints.folders.filesInFolder = function (relativeUrl) {
-  var query = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
-  return "".concat(endpoints.folders.folderByUrl(relativeUrl), "/Files").concat(query);
+endpoints.folders.filesInFolder = function (relativeUrl, query) {
+  return "".concat(endpoints.folders.folderByUrl(relativeUrl), "/Files").concat(stringify(query));
 };
 /**
  * Return URL to upload a file to a folder
@@ -1233,7 +1424,7 @@ endpoints.folders.fileByUrl = function (relativeUrl) {
 };
 
 module.exports = endpoints;
-},{}],"Mtaa":[function(require,module,exports) {
+},{"querystring":"fk5h"}],"Mtaa":[function(require,module,exports) {
 "use strict";
 
 var _defineProperty2 = _interopRequireDefault(require("@babel/runtime/helpers/defineProperty"));
@@ -1248,7 +1439,6 @@ function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (O
 
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { (0, _defineProperty2.default)(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 
-/* eslint-disable arrow-body-style */
 var endpoints = require('./endpoints');
 /**
  * Define all possible requests to the SharePoint API
@@ -1414,64 +1604,66 @@ requests.getLists = function (http) {
  * Create a new list in the site
  *
  * @param {Axios} http
- * @param {String} title
+ * @param {String} listTitle
  * @return {Promise<Object>}
  */
 
 
-requests.createList = function (http, title) {
+requests.createList = function (http, listTitle) {
   return http.post(endpoints.lists.index(), {
     __metadata: {
       type: 'SP.List'
     },
     BaseTemplate: 100,
-    Title: title
+    Title: listTitle
   });
 };
 /**
  * Delete an existing list in the site
  *
  * @param {Axios} http
- * @param {String} title
+ * @param {String} listTitle
  * @return {Promise<Object>}
  */
 
 
-requests.deleteList = function (http, title) {
-  return http.delete(endpoints.lists.byTitle(title));
+requests.deleteList = function (http, listTitle) {
+  return http.delete(endpoints.lists.byTitle(listTitle));
 };
 /**
  * Fetch list metadata
  *
  * @param {Axios} http
- * @param {String} title
+ * @param {String} listTitle
  * @param {String} [query]
  * @return {Promise<Object>}
  */
 
 
-requests.getListByTitle = function (http, title) {
+requests.getListByTitle = function (http, listTitle) {
   var query = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '';
-  return http.get(endpoints.lists.byTitle(title, query));
+  return http.get(endpoints.lists.byTitle(listTitle, query));
 };
 /**
  * Fetch list metadata
  *
  * @param {Axios} http
- * @param {String} title
+ * @param {String} listTitle
  * @return {Promise<String>}
  */
 
 
 requests.getListItemType = /*#__PURE__*/function () {
-  var _ref2 = (0, _asyncToGenerator2.default)( /*#__PURE__*/_regenerator.default.mark(function _callee2(http, title) {
+  var _ref2 = (0, _asyncToGenerator2.default)( /*#__PURE__*/_regenerator.default.mark(function _callee2(http, listTitle) {
     var resp;
     return _regenerator.default.wrap(function _callee2$(_context2) {
       while (1) {
         switch (_context2.prev = _context2.next) {
           case 0:
             _context2.next = 2;
-            return requests.getListByTitle(http, title, '?$select=ListItemEntityTypeFullName');
+            return requests.getListByTitle(http, listTitle, {
+              $select: 'ListItemEntityTypeFullName'
+            });
 
           case 2:
             resp = _context2.sent;
@@ -1493,58 +1685,58 @@ requests.getListItemType = /*#__PURE__*/function () {
  * Fetch list fields metadata
  *
  * @param {Axios} http
- * @param {String} title
+ * @param {String} listTitle
  * @param {String} [query]
  * @return {Promise<Array>}
  */
 
 
-requests.getListFields = function (http, title) {
+requests.getListFields = function (http, listTitle) {
   var query = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '';
-  return http.get(endpoints.lists.fields(title, query));
+  return http.get(endpoints.lists.fields(listTitle, query));
 };
 /**
  * Fetch list items
  *
  * @param {Axios} http
- * @param {String} title
+ * @param {String} listTitle
  * @param {String} [query]
  * @return {Promise<Array>}
  */
 
 
-requests.getListItems = function (http, title) {
+requests.getListItems = function (http, listTitle) {
   var query = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '';
-  return http.get(endpoints.lists.items(title, query));
+  return http.get(endpoints.lists.items(listTitle, query));
 };
 /**
  * Fetch a single list item
  *
  * @param {Axios} http
- * @param {String} title
+ * @param {String} listTitle
  * @param {Number} itemId
  * @param {String} [query]
  * @return {Promise<Object>}
  */
 
 
-requests.getListItemById = function (http, title, itemId) {
+requests.getListItemById = function (http, listTitle, itemId) {
   var query = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : '';
-  return http.get(endpoints.lists.itemById(title, itemId, query));
+  return http.get(endpoints.lists.itemById(listTitle, itemId, query));
 };
 /**
  * Create a new record to the list
  *
  * @param {Axios} http
- * @param {String} title
+ * @param {String} listTitle
  * @param {String} type
  * @param {Object} data
  * @return {Promise<Array>}
  */
 
 
-requests.postListItem = function (http, title, type, data) {
-  return http.post(endpoints.lists.items(title), _objectSpread({
+requests.postListItem = function (http, listTitle, type, data) {
+  return http.post(endpoints.lists.items(listTitle), _objectSpread({
     __metadata: {
       type: type
     }
@@ -1554,7 +1746,7 @@ requests.postListItem = function (http, title, type, data) {
  * Update an existing record in the list
  *
  * @param {Axios} http
- * @param {String} title
+ * @param {String} listTitle
  * @param {Number} itemId
  * @param {String} type
  * @param {Object} data
@@ -1563,14 +1755,14 @@ requests.postListItem = function (http, title, type, data) {
 
 
 requests.patchListItem = /*#__PURE__*/function () {
-  var _ref3 = (0, _asyncToGenerator2.default)( /*#__PURE__*/_regenerator.default.mark(function _callee3(http, title, itemId, type, data) {
+  var _ref3 = (0, _asyncToGenerator2.default)( /*#__PURE__*/_regenerator.default.mark(function _callee3(http, listTitle, itemId, type, data) {
     var patchResp, updatedItem;
     return _regenerator.default.wrap(function _callee3$(_context3) {
       while (1) {
         switch (_context3.prev = _context3.next) {
           case 0:
             _context3.next = 2;
-            return http.patch(endpoints.lists.itemById(title, itemId), _objectSpread({
+            return http.patch(endpoints.lists.itemById(listTitle, itemId), _objectSpread({
               __metadata: {
                 type: type
               }
@@ -1579,7 +1771,7 @@ requests.patchListItem = /*#__PURE__*/function () {
           case 2:
             patchResp = _context3.sent;
             _context3.next = 5;
-            return requests.getListItemById(http, title, itemId);
+            return requests.getListItemById(http, listTitle, itemId);
 
           case 5:
             updatedItem = _context3.sent;
@@ -1603,26 +1795,26 @@ requests.patchListItem = /*#__PURE__*/function () {
  * Update an existing record in the list
  *
  * @param {Axios} http
- * @param {String} title
+ * @param {String} listTitle
  * @param {Number} itemId
  * @return {Promise<Array>}
  */
 
 
 requests.deleteListItem = /*#__PURE__*/function () {
-  var _ref4 = (0, _asyncToGenerator2.default)( /*#__PURE__*/_regenerator.default.mark(function _callee4(http, title, itemId) {
+  var _ref4 = (0, _asyncToGenerator2.default)( /*#__PURE__*/_regenerator.default.mark(function _callee4(http, listTitle, itemId) {
     var originalItem, deleteResp;
     return _regenerator.default.wrap(function _callee4$(_context4) {
       while (1) {
         switch (_context4.prev = _context4.next) {
           case 0:
             _context4.next = 2;
-            return requests.getListItemById(http, title, itemId);
+            return requests.getListItemById(http, listTitle, itemId);
 
           case 2:
             originalItem = _context4.sent;
             _context4.next = 5;
-            return http.delete(endpoints.lists.itemById(title, itemId));
+            return http.delete(endpoints.lists.itemById(listTitle, itemId));
 
           case 5:
             deleteResp = _context4.sent;
@@ -1646,20 +1838,20 @@ requests.deleteListItem = /*#__PURE__*/function () {
  * Fetch attachments of a given list item
  *
  * @param {Axios} http
- * @param {String} title
+ * @param {String} listTitle
  * @param {Number} itemId
  * @return {Promise<Array>}
  */
 
 
-requests.getListItemAttachments = function (http, title, itemId) {
-  return http.get(endpoints.lists.itemAttachments(title, itemId));
+requests.getListItemAttachments = function (http, listTitle, itemId) {
+  return http.get(endpoints.lists.itemAttachments(listTitle, itemId));
 };
 /**
  * Upload an attachment to a given list item
  *
  * @param {Axios} http
- * @param {String} title
+ * @param {String} listTitle
  * @param {Number} itemId
  * @param {String} fileName
  * @param {ArrayBuffer} fileBuffer
@@ -1667,14 +1859,14 @@ requests.getListItemAttachments = function (http, title, itemId) {
  */
 
 
-requests.uploadListItemAttachment = function (http, title, itemId, fileName, fileBuffer) {
-  return http.post(endpoints.lists.itemAttachmentsUpload(title, itemId, fileName), fileBuffer);
+requests.uploadListItemAttachment = function (http, listTitle, itemId, fileName, fileBuffer) {
+  return http.post(endpoints.lists.itemAttachmentsUpload(listTitle, itemId, fileName), fileBuffer);
 };
 /**
  * Rename an existing attachment from a given list item
  *
  * @param {Axios} http
- * @param {String} title
+ * @param {String} listTitle
  * @param {Number} itemId
  * @param {String} oldFileName
  * @param {String} newFileName
@@ -1683,14 +1875,14 @@ requests.uploadListItemAttachment = function (http, title, itemId, fileName, fil
 
 
 requests.renameListItemAttachment = /*#__PURE__*/function () {
-  var _ref5 = (0, _asyncToGenerator2.default)( /*#__PURE__*/_regenerator.default.mark(function _callee5(http, title, itemId, oldFileName, newFileName) {
+  var _ref5 = (0, _asyncToGenerator2.default)( /*#__PURE__*/_regenerator.default.mark(function _callee5(http, listTitle, itemId, oldFileName, newFileName) {
     var attachments, oldFileUrl, newFileUrl;
     return _regenerator.default.wrap(function _callee5$(_context5) {
       while (1) {
         switch (_context5.prev = _context5.next) {
           case 0:
             _context5.next = 2;
-            return requests.getListItemAttachments(http, title, itemId);
+            return requests.getListItemAttachments(http, listTitle, itemId);
 
           case 2:
             attachments = _context5.sent;
@@ -1716,15 +1908,15 @@ requests.renameListItemAttachment = /*#__PURE__*/function () {
  * Delete an attachment of a given list item
  *
  * @param {Axios} http
- * @param {String} title
+ * @param {String} listTitle
  * @param {Number} itemId
  * @param {String} fileName
  * @return {Promise<Object>}
  */
 
 
-requests.deleteListItemAttachment = function (http, title, itemId, fileName) {
-  return http.delete(endpoints.lists.itemAttachmentByName(title, itemId, fileName));
+requests.deleteListItemAttachment = function (http, listTitle, itemId, fileName) {
+  return http.delete(endpoints.lists.itemAttachmentByName(listTitle, itemId, fileName));
 };
 /**
  * Fetch list of all site folders/libraries
@@ -1765,6 +1957,15 @@ requests.getFoldersInFolder = function (http, relativeUrl) {
   var query = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '';
   return http.get(endpoints.folders.foldersInFolder(relativeUrl, query));
 };
+/**
+ * Creates a new folder given library or folder based on its relative URL
+ *
+ * @param {Axios} http
+ * @param {String} relativeUrl
+ * @param {String} folderName
+ * @return {Promise<Object>}
+ */
+
 
 requests.createFolder = function (http, relativeUrl, folderName) {
   return http.post(endpoints.folders.index(), {
@@ -3774,8 +3975,8 @@ module.exports = function (httpInstance) {
 
               config.method = 'post';
               _context.t0 = _objectSpread;
-              _context.t1 = {};
-              _context.t2 = config.headers;
+              _context.t1 = _objectSpread({}, config.headers);
+              _context.t2 = {};
               _context.next = 8;
               return httpInstance.defaults.requestDigest;
 
@@ -3833,7 +4034,7 @@ var commonHeaders = require('./headers-common');
  */
 
 
-module.exports = Object.freeze(_objectSpread({}, commonHeaders, {
+module.exports = Object.freeze(_objectSpread(_objectSpread({}, commonHeaders), {}, {
   'X-Http-Method': 'DELETE',
   'If-Match': '*'
 }));
@@ -3874,7 +4075,7 @@ var commonHeaders = require('./headers-common');
  */
 
 
-module.exports = Object.freeze(_objectSpread({}, commonHeaders, {
+module.exports = Object.freeze(_objectSpread(_objectSpread({}, commonHeaders), {}, {
   'X-Http-Method': 'MERGE',
   'If-Match': '*'
 }));
@@ -4010,176 +4211,90 @@ module.exports = function (siteUrl) {
   http.defaults.requestDigest = getRequestDigest(http);
   return http;
 };
-},{"@babel/runtime/helpers/toConsumableArray":"Fhqp","axios":"dZBD","./transformers/request":"HUC2","./transformers/response":"exFp","./interceptors/request":"rQSW","./interceptors/response":"xSvZ","../facades/requests":"Mtaa"}],"OUZ9":[function(require,module,exports) {
-function _arrayWithHoles(arr) {
-  if (Array.isArray(arr)) return arr;
-}
-
-module.exports = _arrayWithHoles;
-},{}],"vKPt":[function(require,module,exports) {
-function _iterableToArrayLimit(arr, i) {
-  if (typeof Symbol === "undefined" || !(Symbol.iterator in Object(arr))) return;
-  var _arr = [];
-  var _n = true;
-  var _d = false;
-  var _e = undefined;
-
-  try {
-    for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) {
-      _arr.push(_s.value);
-
-      if (i && _arr.length === i) break;
-    }
-  } catch (err) {
-    _d = true;
-    _e = err;
-  } finally {
-    try {
-      if (!_n && _i["return"] != null) _i["return"]();
-    } finally {
-      if (_d) throw _e;
-    }
-  }
-
-  return _arr;
-}
-
-module.exports = _iterableToArrayLimit;
-},{}],"Rom6":[function(require,module,exports) {
-function _nonIterableRest() {
-  throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
-}
-
-module.exports = _nonIterableRest;
-},{}],"HETk":[function(require,module,exports) {
-var arrayWithHoles = require("./arrayWithHoles");
-
-var iterableToArrayLimit = require("./iterableToArrayLimit");
-
-var unsupportedIterableToArray = require("./unsupportedIterableToArray");
-
-var nonIterableRest = require("./nonIterableRest");
-
-function _slicedToArray(arr, i) {
-  return arrayWithHoles(arr) || iterableToArrayLimit(arr, i) || unsupportedIterableToArray(arr, i) || nonIterableRest();
-}
-
-module.exports = _slicedToArray;
-},{"./arrayWithHoles":"OUZ9","./iterableToArrayLimit":"vKPt","./unsupportedIterableToArray":"UyFj","./nonIterableRest":"Rom6"}],"PlsG":[function(require,module,exports) {
+},{"@babel/runtime/helpers/toConsumableArray":"Fhqp","axios":"dZBD","./transformers/request":"HUC2","./transformers/response":"exFp","./interceptors/request":"rQSW","./interceptors/response":"xSvZ","../facades/requests":"Mtaa"}],"BZKQ":[function(require,module,exports) {
 "use strict";
 
-var _slicedToArray2 = _interopRequireDefault(require("@babel/runtime/helpers/slicedToArray"));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
 /**
- * Generate a byte buffer from a HTML file input
+ * Generate the Array Buffer object for target reference provided as parameter.
  *
- * @param {String|HTMLElement|FileList|File} baseInput Some reference of the input type 'file':
- *          String - if it is a query selector;
- *          HTMLElement - if it is a direct reference to the input element;
- *          FileList - if it is direct reference to the 'files' attribute of the element; and
- *          File - if it is a direct reference to the file.
- *        For the three first options, as it will result in a array of files (FileList), only
- *        the first File of the collection will be selected. If you want to get the byte buffer
- *        of other files, provide a File instance explicitaly
+ * @param {String|HTMLElement|FileList|File|ArrayBuffer|Blob} target
  * @return {Promise<ArrayBuffer>}
  */
-module.exports = function genFileBuffer(baseInput) {
-  var input = baseInput;
-  var reader = new FileReader();
-
-  var file = function () {
-    switch (input.constructor.name) {
-      case 'String':
-        input = document.querySelector(input);
-
-      /* fall through */
-
-      case 'HTMLInputElement':
-        input = input.files;
-
-      /* fall through */
-
-      case 'FileList':
-        var _input = input;
-
-        var _input2 = (0, _slicedToArray2.default)(_input, 1);
-
-        input = _input2[0];
-
-      /* fall through */
-
-      case 'File':
-        return input;
-
-      default:
-        throw new TypeError('Type must be an instance of HTMLInputElement, FileList, File or String (input selector)');
-    }
-  }();
-
-  return new Promise(function (resolve, reject) {
-    reader.onloadend = function (ev) {
-      return resolve(ev.target.result);
-    };
-
-    reader.onerror = function (ev) {
-      return reject(ev.target.error);
-    };
-
-    reader.readAsArrayBuffer(file);
-  });
-};
-},{"@babel/runtime/helpers/slicedToArray":"HETk"}],"N2NR":[function(require,module,exports) {
-"use strict";
-
-var _slicedToArray2 = _interopRequireDefault(require("@babel/runtime/helpers/slicedToArray"));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-/**
- * Extract file name based on a given input object
- *
- * @param {String|HTMLElement|FileList|File} baseInput Some reference of the input type 'file':
- *          String - if it is a query selector;
- *          HTMLElement - if it is a direct reference to the input element;
- *          FileList - if it is direct reference to the 'files' attribute of the element; and
- *          File - if it is a direct reference to the file.
- *        For the three first options, as it will result in a array of files (FileList), only
- *        the first File of the collection will be selected
- * @return {String}
- */
-module.exports = function genFileName(baseInput) {
-  var input = baseInput;
-
-  switch (input.constructor.name) {
-    case 'String':
-      input = document.querySelector(input);
-
-    /* fall through */
-
-    case 'HTMLInputElement':
-      input = input.files;
-
-    /* fall through */
-
-    case 'FileList':
-      var _input = input;
-
-      var _input2 = (0, _slicedToArray2.default)(_input, 1);
-
-      input = _input2[0];
-
-    /* fall through */
-
-    case 'File':
-      return input.name;
-
-    default:
-      return null;
+var toArrayBuffer = function toArrayBuffer(target) {
+  if (typeof Promise === 'undefined') {
+    throw new ReferenceError('Your environment does not support Promises.');
+  } else if (typeof ArrayBuffer === 'undefined') {
+    throw new ReferenceError('Your environment does not support ArrayBuffer.');
   }
+
+  if (!target) {
+    // eslint-disable-next-line max-len
+    return Promise.reject(new Error("Parameter to convert to ArrayBuffer is empty (value: '".concat(target, "').")));
+  }
+
+  if (target.constructor === ArrayBuffer) {
+    return Promise.resolve(target);
+  }
+
+  if (typeof Blob !== 'undefined' && target.constructor === Blob) {
+    return target.toArrayBuffer();
+  }
+
+  if (target.constructor === String) {
+    var el = document.querySelector(target);
+
+    if (!el) {
+      // eslint-disable-next-line max-len
+      return Promise.reject(new Error("No HTML found with selector \"".concat(target, "\".")));
+    }
+
+    target = el;
+  }
+
+  if (typeof HTMLInputElement !== 'undefined' && target.constructor === HTMLInputElement) {
+    if (!target.files) {
+      // eslint-disable-next-line max-len
+      return Promise.reject(new Error('HTML input element reference is not of type "file".'));
+    }
+
+    target = target.files;
+  }
+
+  if (typeof FileList !== 'undefined' && target.constructor === FileList) {
+    if (target.length === 0) {
+      // eslint-disable-next-line max-len
+      return Promise.reject(new Error('Object FileList is empty.'));
+    }
+
+    target = target[0];
+  }
+
+  if (typeof File !== 'undefined' && target.constructor === File) {
+    if (typeof FileReader === 'undefined') {
+      throw new TypeError('Your environment does not support FileReader.');
+    }
+
+    var reader = new FileReader();
+    return new Promise(function (resolve, reject) {
+      reader.onloadend = function (ev) {
+        return resolve(ev.target.result);
+      };
+
+      reader.onerror = function (ev) {
+        return reject(ev.target.error);
+      };
+
+      reader.readAsArrayBuffer(target);
+    });
+  } // eslint-disable-next-line max-len
+
+
+  return Promise.reject(new Error('Parameter type must be an instance of HTMLInputElement, FileList, File, String (input selector), Blob or ArrayBuffer'));
 };
-},{"@babel/runtime/helpers/slicedToArray":"HETk"}],"p0uT":[function(require,module,exports) {
+
+module.exports = toArrayBuffer;
+
+},{}],"HXnx":[function(require,module,exports) {
 "use strict";
 
 var _regenerator = _interopRequireDefault(require("@babel/runtime/regenerator"));
@@ -4188,14 +4303,9 @@ var _asyncToGenerator2 = _interopRequireDefault(require("@babel/runtime/helpers/
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-/* eslint-disable arrow-body-style */
+var genFileBuffer = require('@lacussoft/to-arraybuffer');
 
-/* eslint-disable no-underscore-dangle */
-var requests = require('../facades/requests');
-
-var genFileBuffer = require('../utils/gen-file-buffer');
-
-var genFileName = require('../utils/gen-file-name');
+var requests = require('./facades/requests');
 /**
  * Contain the necessary information to stablish a connection to a SharePoint
  * list through its REST API
@@ -4255,7 +4365,9 @@ module.exports = function XomSharePointList(listTitle, httpInstance) {
    */
 
   this.fields = function (customOnly) {
-    var query = customOnly ? '?$filter=(CanBeDeleted eq true)' : '';
+    var query = customOnly ? {
+      $filter: '(CanBeDeleted eq true)'
+    } : null;
     return requests.getListFields(_http, _title, query);
   };
   /**
@@ -4386,35 +4498,33 @@ module.exports = function XomSharePointList(listTitle, httpInstance) {
    * Upload a file attachment to a list item
    *
    * @param {Number} itemId
-   * @param {String|HTMLElement|FileList|File} fileInput Some reference of the input type 'file':
+   * @param {String} fileName Define a custom name to the attached file
+   * @param {String|HTMLInputElement|FileList|File|Blob|ArrayBuffer} fileReference
+   *          ArrayBuffer - raw data ready to be sent;
+   *          Blob - if it is a file reference created on the fly;
    *          String - if it is a query selector;
-   *          HTMLElement - if it is a direct reference to the input element;
-   *          FileList - if it is direct reference to the 'files' attribute of the element; and
-   *          File - if it is a direct reference to the file.
-   *        For the three first options, as it will result in a array of files (FileList), only
-   *        the first File of the collection will be selected. If you want to get the byte buffer
-   *        of other files, provide a File instance explicitaly
-   * @param {String} [attchmentName] Define a custom name to the attached file
+   *          HTMLInputElement - if it is a direct reference to the HTML element of type "file";
+   *          FileList - if it is a direct reference to the "files" attribute of the element;
+   *          File - if it is a direct reference to the file
    * @return {Promise<Object>}
    */
 
 
   this.attachTo = /*#__PURE__*/function () {
-    var _ref3 = (0, _asyncToGenerator2.default)( /*#__PURE__*/_regenerator.default.mark(function _callee3(itemId, fileInput, attchmentName) {
-      var fileName, fileBuffer;
+    var _ref3 = (0, _asyncToGenerator2.default)( /*#__PURE__*/_regenerator.default.mark(function _callee3(itemId, fileName, fileReference) {
+      var fileBuffer;
       return _regenerator.default.wrap(function _callee3$(_context3) {
         while (1) {
           switch (_context3.prev = _context3.next) {
             case 0:
-              fileName = attchmentName || genFileName(fileInput);
-              _context3.next = 3;
-              return genFileBuffer(fileInput);
+              _context3.next = 2;
+              return genFileBuffer(fileReference);
 
-            case 3:
+            case 2:
               fileBuffer = _context3.sent;
               return _context3.abrupt("return", requests.uploadListItemAttachment(_http, _title, itemId, fileName, fileBuffer));
 
-            case 5:
+            case 4:
             case "end":
               return _context3.stop();
           }
@@ -4430,29 +4540,30 @@ module.exports = function XomSharePointList(listTitle, httpInstance) {
    * Rename a given file attachment
    *
    * @param {Number} itemId
-   * @param {String} attachmentName
+   * @param {String} oldName
    * @param {String} newName
    * @return {Promise<Object>}
    */
+  // eslint-disable-next-line max-len
 
 
-  this.renameAttachment = function (itemId, attachmentName, newName) {
-    return requests.renameListItemAttachment(_http, _title, itemId, attachmentName, newName);
+  this.renameAttachment = function (itemId, oldName, newName) {
+    return requests.renameListItemAttachment(_http, _title, itemId, oldName, newName);
   };
   /**
    * Remove a given file attachment from the list item
    *
    * @param {Number} itemId
-   * @param {String} attachmentName
+   * @param {String} fileName
    * @return {Promise<Object>}
    */
 
 
-  this.removeAttachment = function (itemId, attachmentName) {
-    return requests.deleteListItemAttachment(_http, _title, itemId, attachmentName);
+  this.removeAttachment = function (itemId, fileName) {
+    return requests.deleteListItemAttachment(_http, _title, itemId, fileName);
   };
 };
-},{"@babel/runtime/regenerator":"PMvg","@babel/runtime/helpers/asyncToGenerator":"agGE","../facades/requests":"Mtaa","../utils/gen-file-buffer":"PlsG","../utils/gen-file-name":"N2NR"}],"tCvt":[function(require,module,exports) {
+},{"@babel/runtime/regenerator":"PMvg","@babel/runtime/helpers/asyncToGenerator":"agGE","@lacussoft/to-arraybuffer":"BZKQ","./facades/requests":"Mtaa"}],"cXZv":[function(require,module,exports) {
 "use strict";
 
 var _regenerator = _interopRequireDefault(require("@babel/runtime/regenerator"));
@@ -4461,10 +4572,7 @@ var _asyncToGenerator2 = _interopRequireDefault(require("@babel/runtime/helpers/
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-/* eslint-disable arrow-body-style */
-
-/* eslint-disable no-underscore-dangle */
-var requests = require('../facades/requests');
+var requests = require('./facades/requests');
 /**
  * Contain the necessary information to stablish a connection to a SharePoint
  * list through its REST API
@@ -4529,7 +4637,9 @@ module.exports = function XomSharePointSurvey(surveyTitle, httpInstance) {
         switch (_context.prev = _context.next) {
           case 0:
             _context.next = 2;
-            return requests.getListFields(_http, _title, '?$filter=(CanBeDeleted eq true)');
+            return requests.getListFields(_http, _title, {
+              $filter: '(CanBeDeleted eq true)'
+            });
 
           case 2:
             response = _context.sent;
@@ -4668,7 +4778,7 @@ module.exports = function XomSharePointSurvey(surveyTitle, httpInstance) {
     return requests.deleteListItem(_http, _title, id);
   };
 };
-},{"@babel/runtime/regenerator":"PMvg","@babel/runtime/helpers/asyncToGenerator":"agGE","../facades/requests":"Mtaa"}],"aDcs":[function(require,module,exports) {
+},{"@babel/runtime/regenerator":"PMvg","@babel/runtime/helpers/asyncToGenerator":"agGE","./facades/requests":"Mtaa"}],"Ls2T":[function(require,module,exports) {
 "use strict";
 
 var _regenerator = _interopRequireDefault(require("@babel/runtime/regenerator"));
@@ -4677,14 +4787,9 @@ var _asyncToGenerator2 = _interopRequireDefault(require("@babel/runtime/helpers/
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-/* eslint-disable arrow-body-style */
+var genFileBuffer = require('@lacussoft/to-arraybuffer');
 
-/* eslint-disable no-underscore-dangle */
-var requests = require('../facades/requests');
-
-var genFileName = require('../utils/gen-file-name');
-
-var genFileBuffer = require('../utils/gen-file-buffer');
+var requests = require('./facades/requests');
 /**
  * Contain the necessary information to stablish a connection to a SharePoint
  * file library through its REST API
@@ -4695,7 +4800,7 @@ var genFileBuffer = require('../utils/gen-file-buffer');
  */
 
 
-module.exports = function XomSharePointFolder(folderAddress, httpInstance) {
+module.exports = function XomSharePointLibrary(folderAddress, httpInstance) {
   var _this = this;
 
   /**
@@ -4776,41 +4881,39 @@ module.exports = function XomSharePointFolder(folderAddress, httpInstance) {
   /**
    * Upload a file into the folder
    *
-   * @param {String|HTMLElement|FileList|File} fileInput Some reference of the input type 'file':
+   * @param {String} fileName
+   * @param {String|HTMLInputElement|FileList|File|Blob|ArrayBuffer} fileReference
+   *          ArrayBuffer - raw data ready to be sent;
+   *          Blob - if it is a file reference created on the fly;
    *          String - if it is a query selector;
-   *          HTMLElement - if it is a direct reference to the input element;
-   *          FileList - if it is direct reference to the 'files' attribute of the element; and
-   *          File - if it is a direct reference to the file.
-   *        For the three first options, as it will result in a array of files (FileList), only
-   *        the first File of the collection will be selected. If you want to get the byte buffer
-   *        of other files, provide a File instance explicitaly
-   * @param {String} [customFileName] Define a custom name to the attached file
+   *          HTMLInputElement - if it is a direct reference to the HTML element of type "file";
+   *          FileList - if it is a direct reference to the "files" attribute of the element;
+   *          File - if it is a direct reference to the file
    * @return {Promise<Object>}
    */
 
 
   this.upload = /*#__PURE__*/function () {
-    var _ref = (0, _asyncToGenerator2.default)( /*#__PURE__*/_regenerator.default.mark(function _callee(fileInput, customFileName) {
-      var fileName, fileBuffer, result;
+    var _ref = (0, _asyncToGenerator2.default)( /*#__PURE__*/_regenerator.default.mark(function _callee(fileName, fileReference) {
+      var fileBuffer, result;
       return _regenerator.default.wrap(function _callee$(_context) {
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
-              fileName = customFileName || genFileName(fileInput);
-              _context.next = 3;
-              return genFileBuffer(fileInput);
+              _context.next = 2;
+              return genFileBuffer(fileReference);
 
-            case 3:
+            case 2:
               fileBuffer = _context.sent;
-              _context.next = 6;
+              _context.next = 5;
               return requests.uploadFileToFolder(_http, _this.relativeUrl, fileName, fileBuffer);
 
-            case 6:
+            case 5:
               result = _context.sent;
               _filesType = _filesType || result.__metadata.type;
               return _context.abrupt("return", result);
 
-            case 9:
+            case 8:
             case "end":
               return _context.stop();
           }
@@ -4823,19 +4926,16 @@ module.exports = function XomSharePointFolder(folderAddress, httpInstance) {
     };
   }();
 };
-},{"@babel/runtime/regenerator":"PMvg","@babel/runtime/helpers/asyncToGenerator":"agGE","../facades/requests":"Mtaa","../utils/gen-file-name":"N2NR","../utils/gen-file-buffer":"PlsG"}],"DCCh":[function(require,module,exports) {
-/* eslint-disable arrow-body-style */
+},{"@babel/runtime/regenerator":"PMvg","@babel/runtime/helpers/asyncToGenerator":"agGE","@lacussoft/to-arraybuffer":"BZKQ","./facades/requests":"Mtaa"}],"BCxj":[function(require,module,exports) {
+var requests = require('./facades/requests');
 
-/* eslint-disable no-underscore-dangle */
-var requests = require('../facades/requests');
-
-var httpFactory = require('../http/http-factory');
+var httpFactory = require('./http/http-factory');
 
 var XomSharePointList = require('./XomSharePointList');
 
 var XomSharePointSurvey = require('./XomSharePointSurvey');
 
-var XomSharePointFolder = require('./XomSharePointFolder');
+var XomSharePointLibrary = require('./XomSharePointLibrary');
 /**
  * Contain the necessary information to stablish a connection to a SharePoint
  * site through its REST API
@@ -4918,7 +5018,9 @@ module.exports = function XomSharePointSite(baseSiteUrl) {
 
 
   this.searchUser = function (search) {
-    return requests.getSiteUsersListItems(_http, "?$filter=substringof('".concat(search, "',Title) or substringof('").concat(search, "',UserName)"));
+    return requests.getSiteUsersListItems(_http, {
+      $filter: "substringof('".concat(search, "',Title) or substringof('").concat(search, "',UserName)")
+    });
   };
   /**
    * Return a reference to connect to a SharePoint list
@@ -4973,11 +5075,11 @@ module.exports = function XomSharePointSite(baseSiteUrl) {
 
 
   this.getFolder = function (folderAddress) {
-    return new XomSharePointFolder(folderAddress, _http);
+    return new XomSharePointLibrary(folderAddress, _http);
   };
 };
-},{"../facades/requests":"Mtaa","../http/http-factory":"f2bC","./XomSharePointList":"p0uT","./XomSharePointSurvey":"tCvt","./XomSharePointFolder":"aDcs"}],"XVne":[function(require,module,exports) {
-var XomSharePointSite = require('./objects/XomSharePointSite');
+},{"./facades/requests":"Mtaa","./http/http-factory":"f2bC","./XomSharePointList":"HXnx","./XomSharePointSurvey":"cXZv","./XomSharePointLibrary":"Ls2T"}],"XVne":[function(require,module,exports) {
+var XomSharePointSite = require('./XomSharePointSite');
 /**
  * Instantiate a XomSharePoint object to connect to a SharePoint site and,
  * therefore, exchange data with its contents (lists, libraries, permissions)
@@ -4991,7 +5093,7 @@ var XomSharePointSite = require('./objects/XomSharePointSite');
 module.exports = function xomFactory(baseSiteUrl) {
   return new XomSharePointSite(baseSiteUrl);
 };
-},{"./objects/XomSharePointSite":"DCCh"}],"UeJd":[function(require,module,exports) {
+},{"./XomSharePointSite":"BCxj"}],"UeJd":[function(require,module,exports) {
 /*
  * Entry point for browser version
  */

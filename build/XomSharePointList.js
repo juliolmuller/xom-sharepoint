@@ -6,14 +6,9 @@ var _regenerator = _interopRequireDefault(require("@babel/runtime/regenerator"))
 
 var _asyncToGenerator2 = _interopRequireDefault(require("@babel/runtime/helpers/asyncToGenerator"));
 
-/* eslint-disable arrow-body-style */
+var genFileBuffer = require('@lacussoft/to-arraybuffer');
 
-/* eslint-disable no-underscore-dangle */
-var requests = require('../facades/requests');
-
-var genFileBuffer = require('../utils/gen-file-buffer');
-
-var genFileName = require('../utils/gen-file-name');
+var requests = require('./facades/requests');
 /**
  * Contain the necessary information to stablish a connection to a SharePoint
  * list through its REST API
@@ -73,7 +68,9 @@ module.exports = function XomSharePointList(listTitle, httpInstance) {
    */
 
   this.fields = function (customOnly) {
-    var query = customOnly ? '?$filter=(CanBeDeleted eq true)' : '';
+    var query = customOnly ? {
+      $filter: '(CanBeDeleted eq true)'
+    } : null;
     return requests.getListFields(_http, _title, query);
   };
   /**
@@ -204,35 +201,33 @@ module.exports = function XomSharePointList(listTitle, httpInstance) {
    * Upload a file attachment to a list item
    *
    * @param {Number} itemId
-   * @param {String|HTMLElement|FileList|File} fileInput Some reference of the input type 'file':
+   * @param {String} fileName Define a custom name to the attached file
+   * @param {String|HTMLInputElement|FileList|File|Blob|ArrayBuffer} fileReference
+   *          ArrayBuffer - raw data ready to be sent;
+   *          Blob - if it is a file reference created on the fly;
    *          String - if it is a query selector;
-   *          HTMLElement - if it is a direct reference to the input element;
-   *          FileList - if it is direct reference to the 'files' attribute of the element; and
-   *          File - if it is a direct reference to the file.
-   *        For the three first options, as it will result in a array of files (FileList), only
-   *        the first File of the collection will be selected. If you want to get the byte buffer
-   *        of other files, provide a File instance explicitaly
-   * @param {String} [attchmentName] Define a custom name to the attached file
+   *          HTMLInputElement - if it is a direct reference to the HTML element of type "file";
+   *          FileList - if it is a direct reference to the "files" attribute of the element;
+   *          File - if it is a direct reference to the file
    * @return {Promise<Object>}
    */
 
 
   this.attachTo = /*#__PURE__*/function () {
-    var _ref3 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee3(itemId, fileInput, attchmentName) {
-      var fileName, fileBuffer;
+    var _ref3 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee3(itemId, fileName, fileReference) {
+      var fileBuffer;
       return _regenerator["default"].wrap(function _callee3$(_context3) {
         while (1) {
           switch (_context3.prev = _context3.next) {
             case 0:
-              fileName = attchmentName || genFileName(fileInput);
-              _context3.next = 3;
-              return genFileBuffer(fileInput);
+              _context3.next = 2;
+              return genFileBuffer(fileReference);
 
-            case 3:
+            case 2:
               fileBuffer = _context3.sent;
               return _context3.abrupt("return", requests.uploadListItemAttachment(_http, _title, itemId, fileName, fileBuffer));
 
-            case 5:
+            case 4:
             case "end":
               return _context3.stop();
           }
@@ -248,25 +243,26 @@ module.exports = function XomSharePointList(listTitle, httpInstance) {
    * Rename a given file attachment
    *
    * @param {Number} itemId
-   * @param {String} attachmentName
+   * @param {String} oldName
    * @param {String} newName
    * @return {Promise<Object>}
    */
+  // eslint-disable-next-line max-len
 
 
-  this.renameAttachment = function (itemId, attachmentName, newName) {
-    return requests.renameListItemAttachment(_http, _title, itemId, attachmentName, newName);
+  this.renameAttachment = function (itemId, oldName, newName) {
+    return requests.renameListItemAttachment(_http, _title, itemId, oldName, newName);
   };
   /**
    * Remove a given file attachment from the list item
    *
    * @param {Number} itemId
-   * @param {String} attachmentName
+   * @param {String} fileName
    * @return {Promise<Object>}
    */
 
 
-  this.removeAttachment = function (itemId, attachmentName) {
-    return requests.deleteListItemAttachment(_http, _title, itemId, attachmentName);
+  this.removeAttachment = function (itemId, fileName) {
+    return requests.deleteListItemAttachment(_http, _title, itemId, fileName);
   };
 };

@@ -16,7 +16,7 @@ var commonHeaders = require('./headers-common');
  */
 
 
-module.exports = Object.freeze(_objectSpread({}, commonHeaders, {
+module.exports = Object.freeze(_objectSpread(_objectSpread({}, commonHeaders), {}, {
   'X-Http-Method': 'DELETE',
   'If-Match': '*'
 }));

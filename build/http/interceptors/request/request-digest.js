@@ -38,8 +38,8 @@ module.exports = function (httpInstance) {
 
               config.method = 'post';
               _context.t0 = _objectSpread;
-              _context.t1 = {};
-              _context.t2 = config.headers;
+              _context.t1 = _objectSpread({}, config.headers);
+              _context.t2 = {};
               _context.next = 8;
               return httpInstance.defaults.requestDigest;
 

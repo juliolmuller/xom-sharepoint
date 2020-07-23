@@ -6,10 +6,7 @@ var _regenerator = _interopRequireDefault(require("@babel/runtime/regenerator"))
 
 var _asyncToGenerator2 = _interopRequireDefault(require("@babel/runtime/helpers/asyncToGenerator"));
 
-/* eslint-disable arrow-body-style */
-
-/* eslint-disable no-underscore-dangle */
-var requests = require('../facades/requests');
+var requests = require('./facades/requests');
 /**
  * Contain the necessary information to stablish a connection to a SharePoint
  * list through its REST API
@@ -74,7 +71,9 @@ module.exports = function XomSharePointSurvey(surveyTitle, httpInstance) {
         switch (_context.prev = _context.next) {
           case 0:
             _context.next = 2;
-            return requests.getListFields(_http, _title, '?$filter=(CanBeDeleted eq true)');
+            return requests.getListFields(_http, _title, {
+              $filter: '(CanBeDeleted eq true)'
+            });
 
           case 2:
             response = _context.sent;

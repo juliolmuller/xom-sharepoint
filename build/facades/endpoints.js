@@ -1,10 +1,31 @@
 "use strict";
 
+var qs = require('querystring');
+/**
+ * Function to easily convert an object into a query string
+ *
+ * @param {any} query
+ */
+
+
+var stringify = function stringify(query) {
+  if (!query) {
+    return '';
+  }
+
+  if (typeof query === 'string') {
+    return query[0] === '$' ? "?".concat(query) : query;
+  }
+
+  return "?".concat(qs.stringify(query));
+};
 /**
  * Group of functions to get SharePoint API URI endpoints
  *
  * @const {Object}
  */
+
+
 var endpoints = {
   site: {},
   users: {},
@@ -108,9 +129,8 @@ endpoints.users.listMetadata = function () {
  */
 
 
-endpoints.users.listFields = function () {
-  var query = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
-  return "".concat(endpoints.users.listMetadata(), "/Fields").concat(query);
+endpoints.users.listFields = function (query) {
+  return "".concat(endpoints.users.listMetadata(), "/Fields").concat(stringify(query));
 };
 /**
  * Return URI to get users records
@@ -120,9 +140,8 @@ endpoints.users.listFields = function () {
  */
 
 
-endpoints.users.listItems = function () {
-  var query = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
-  return "".concat(endpoints.users.listMetadata(), "/Items").concat(query);
+endpoints.users.listItems = function (query) {
+  return "".concat(endpoints.users.listMetadata(), "/Items").concat(stringify(query));
 };
 /**
  * Return URI to get a given user information
@@ -143,100 +162,95 @@ endpoints.users.byId = function (id) {
  */
 
 
-endpoints.lists.index = function () {
-  var query = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
-  return "".concat(endpoints.baseApiUri(), "/Lists").concat(query);
+endpoints.lists.index = function (query) {
+  return "".concat(endpoints.baseApiUri(), "/Lists").concat(stringify(query));
 };
 /**
  * Return URI to get a given list metadata
  *
- * @param {String} title
+ * @param {String} listTitle
  * @param {String} [query]
  * @return {String}
  */
 
 
-endpoints.lists.byTitle = function (title) {
-  var query = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
-  return "".concat(endpoints.lists.index(), "/GetByTitle('").concat(title, "')").concat(query);
+endpoints.lists.byTitle = function (listTitle, query) {
+  return "".concat(endpoints.lists.index(), "/GetByTitle('").concat(listTitle, "')").concat(stringify(query));
 };
 /**
  * Return URI to get a given list fields
  *
- * @param {String} title
+ * @param {String} listTitle
  * @param {String} [query]
  * @return {String}
  */
 
 
-endpoints.lists.fields = function (title) {
-  var query = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
-  return "".concat(endpoints.lists.byTitle(title), "/Fields").concat(query);
+endpoints.lists.fields = function (listTitle, query) {
+  return "".concat(endpoints.lists.byTitle(listTitle), "/Fields").concat(stringify(query));
 };
 /**
  * Return URI to get a given list items
  *
- * @param {String} title
+ * @param {String} listTitle
  * @param {String} [query]
  * @return {String}
  */
 
 
-endpoints.lists.items = function (title) {
-  var query = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
-  return "".concat(endpoints.lists.byTitle(title), "/Items").concat(query);
+endpoints.lists.items = function (listTitle, query) {
+  return "".concat(endpoints.lists.byTitle(listTitle), "/Items").concat(stringify(query));
 };
 /**
  * Return URI to get an specific list item
  *
- * @param {String} title
+ * @param {String} listTitle
  * @param {Number} itemId
  * @param {String} [query]
  * @return {String}
  */
 
 
-endpoints.lists.itemById = function (title, itemId) {
-  var query = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '';
-  return endpoints.lists.items(title, "(".concat(itemId, ")").concat(query));
+endpoints.lists.itemById = function (listTitle, itemId, query) {
+  return endpoints.lists.items(listTitle, "(".concat(itemId, ")").concat(stringify(query)));
 };
 /**
  * Return URI to handle list items attachments
  *
- * @param {String} title
+ * @param {String} listTitle
  * @param {Number} itemId
  * @return {String}
  */
 
 
-endpoints.lists.itemAttachments = function (title, itemId) {
-  return "".concat(endpoints.lists.itemById(title, itemId), "/AttachmentFiles");
+endpoints.lists.itemAttachments = function (listTitle, itemId) {
+  return "".concat(endpoints.lists.itemById(listTitle, itemId), "/AttachmentFiles");
 };
 /**
  * Return URI to handle list items attachments
  *
- * @param {String} title
+ * @param {String} listTitle
  * @param {Number} itemId
  * @param {String} fileName
  * @return {String}
  */
 
 
-endpoints.lists.itemAttachmentByName = function (title, itemId, fileName) {
-  return "".concat(endpoints.lists.itemById(title, itemId), "/AttachmentFiles/GetByFileName('").concat(fileName, "')");
+endpoints.lists.itemAttachmentByName = function (listTitle, itemId, fileName) {
+  return "".concat(endpoints.lists.itemById(listTitle, itemId), "/AttachmentFiles/GetByFileName('").concat(fileName, "')");
 };
 /**
  * Return URI to handle upload of list items attachments
  *
- * @param {String} title
+ * @param {String} listTitle
  * @param {Number} itemId
  * @param {String} fileName
  * @return {String}
  */
 
 
-endpoints.lists.itemAttachmentsUpload = function (title, itemId, fileName) {
-  return "".concat(endpoints.lists.itemAttachments(title, itemId), "/Add(filename='").concat(fileName, "')");
+endpoints.lists.itemAttachmentsUpload = function (listTitle, itemId, fileName) {
+  return "".concat(endpoints.lists.itemAttachments(listTitle, itemId), "/Add(filename='").concat(fileName, "')");
 };
 /**
  * Return URI to handle renaming of list items attachments
@@ -258,9 +272,8 @@ endpoints.lists.itemAttachmentsRename = function (oldFileUrl, newFileUrl) {
  */
 
 
-endpoints.folders.index = function () {
-  var query = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
-  return "".concat(endpoints.baseApiUri(), "/Folders").concat(query);
+endpoints.folders.index = function (query) {
+  return "".concat(endpoints.baseApiUri(), "/Folders").concat(stringify(query));
 };
 /**
  * Return URI to access folder by relative URL
@@ -282,9 +295,8 @@ endpoints.folders.folderByUrl = function (relativeUrl) {
  */
 
 
-endpoints.folders.foldersInFolder = function (relativeUrl) {
-  var query = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
-  return "".concat(endpoints.folders.folderByUrl(relativeUrl), "/Folders").concat(query);
+endpoints.folders.foldersInFolder = function (relativeUrl, query) {
+  return "".concat(endpoints.folders.folderByUrl(relativeUrl), "/Folders").concat(stringify(query));
 };
 /**
  * Return URL to list of files within a given folder
@@ -295,9 +307,8 @@ endpoints.folders.foldersInFolder = function (relativeUrl) {
  */
 
 
-endpoints.folders.filesInFolder = function (relativeUrl) {
-  var query = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
-  return "".concat(endpoints.folders.folderByUrl(relativeUrl), "/Files").concat(query);
+endpoints.folders.filesInFolder = function (relativeUrl, query) {
+  return "".concat(endpoints.folders.folderByUrl(relativeUrl), "/Files").concat(stringify(query));
 };
 /**
  * Return URL to upload a file to a folder

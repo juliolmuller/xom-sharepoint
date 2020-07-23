@@ -6,14 +6,9 @@ var _regenerator = _interopRequireDefault(require("@babel/runtime/regenerator"))
 
 var _asyncToGenerator2 = _interopRequireDefault(require("@babel/runtime/helpers/asyncToGenerator"));
 
-/* eslint-disable arrow-body-style */
+var genFileBuffer = require('@lacussoft/to-arraybuffer');
 
-/* eslint-disable no-underscore-dangle */
-var requests = require('../facades/requests');
-
-var genFileName = require('../utils/gen-file-name');
-
-var genFileBuffer = require('../utils/gen-file-buffer');
+var requests = require('./facades/requests');
 /**
  * Contain the necessary information to stablish a connection to a SharePoint
  * file library through its REST API
@@ -120,26 +115,25 @@ module.exports = function XomSharePointFolder(folderAddress, httpInstance) {
 
   this.upload = /*#__PURE__*/function () {
     var _ref = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee(fileInput, customFileName) {
-      var fileName, fileBuffer, result;
+      var fileBuffer, result;
       return _regenerator["default"].wrap(function _callee$(_context) {
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
-              fileName = customFileName || genFileName(fileInput);
-              _context.next = 3;
+              _context.next = 2;
               return genFileBuffer(fileInput);
 
-            case 3:
+            case 2:
               fileBuffer = _context.sent;
-              _context.next = 6;
-              return requests.uploadFileToFolder(_http, _this.relativeUrl, fileName, fileBuffer);
+              _context.next = 5;
+              return requests.uploadFileToFolder(_http, _this.relativeUrl, customFileName, fileBuffer);
 
-            case 6:
+            case 5:
               result = _context.sent;
               _filesType = _filesType || result.__metadata.type;
               return _context.abrupt("return", result);
 
-            case 9:
+            case 8:
             case "end":
               return _context.stop();
           }
