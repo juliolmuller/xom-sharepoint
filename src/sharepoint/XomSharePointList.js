@@ -58,7 +58,7 @@ module.exports = function XomSharePointList(listTitle, httpInstance) {
    * @return {Promise<Object>}
    */
   this.fields = (customOnly) => {
-    const query = customOnly ? '?$filter=(CanBeDeleted eq true)' : ''
+    const query = customOnly ? '$filter=(CanBeDeleted eq true)' : ''
     return requests.getListFields(_http, _title, query)
   }
 

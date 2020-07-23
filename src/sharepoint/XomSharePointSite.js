@@ -75,7 +75,7 @@ module.exports = function XomSharePointSite(baseSiteUrl) {
    * @param {String} search Partial name/userID of the user
    * @return {Promise}
    */
-  this.searchUser = (search) => requests.getSiteUsersListItems(_http, `?$filter=substringof('${search}',Title) or substringof('${search}',UserName)`)
+  this.searchUser = (search) => requests.getSiteUsersListItems(_http, `$filter=substringof('${search}',Title) or substringof('${search}',UserName)`)
 
   /**
    * Return a reference to connect to a SharePoint list
