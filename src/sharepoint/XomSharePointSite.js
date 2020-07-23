@@ -2,7 +2,7 @@ const requests = require('./facades/requests')
 const httpFactory = require('./http/http-factory')
 const XomSharePointList = require('./XomSharePointList')
 const XomSharePointSurvey = require('./XomSharePointSurvey')
-const XomSharePointFolder = require('./XomSharePointFolder')
+const XomSharePointLibrary = require('./XomSharePointLibrary')
 
 /**
  * Contain the necessary information to stablish a connection to a SharePoint
@@ -116,5 +116,5 @@ module.exports = function XomSharePointSite(baseSiteUrl) {
    * @param {String} folderAddress SharePoint library/folder title
    * @return {XomSharePointLibrary}
    */
-  this.getFolder = (folderAddress) => new XomSharePointFolder(folderAddress, _http)
+  this.getFolder = (folderAddress) => new XomSharePointLibrary(folderAddress, _http)
 }

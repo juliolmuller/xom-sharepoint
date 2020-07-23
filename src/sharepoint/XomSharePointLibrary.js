@@ -9,7 +9,7 @@ const requests = require('./facades/requests')
  * @param {String} folderAddress Library title to connect to
  * @param {Axios} httpInstance Customized Axios instance to perform HTTP requests
  */
-module.exports = function XomSharePointFolder(folderAddress, httpInstance) {
+module.exports = function XomSharePointLibrary(folderAddress, httpInstance) {
 
   /**
    * Store the SharePoint folder relative URL
