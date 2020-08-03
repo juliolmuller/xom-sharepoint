@@ -137,13 +137,21 @@ utils.expandPictureURL = function (userObject) {
   var LARGE_PICTURE_CODE = '_LThumb';
 
   if (userObject && typeof userObject.Picture !== 'undefined') {
-    var url = encodeURI(userObject.Picture.Url);
-    var targetExpression = new RegExp("".concat(SMALL_PICTURE_CODE, "|").concat(MEDIUM_PICTURE_CODE, "|").concat(LARGE_PICTURE_CODE), 'i');
-    userObject.Picture = {
-      Small: url.replace(targetExpression, SMALL_PICTURE_CODE),
-      Medium: url.replace(targetExpression, MEDIUM_PICTURE_CODE),
-      Large: url.replace(targetExpression, LARGE_PICTURE_CODE)
-    };
+    if (userObject.Picture === null) {
+      userObject.Picture = {
+        Small: null,
+        Medium: null,
+        Large: null
+      };
+    } else {
+      var url = encodeURI(userObject.Picture.Url);
+      var targetExpression = new RegExp("".concat(SMALL_PICTURE_CODE, "|").concat(MEDIUM_PICTURE_CODE, "|").concat(LARGE_PICTURE_CODE), 'i');
+      userObject.Picture = {
+        Small: url.replace(targetExpression, SMALL_PICTURE_CODE),
+        Medium: url.replace(targetExpression, MEDIUM_PICTURE_CODE),
+        Large: url.replace(targetExpression, LARGE_PICTURE_CODE)
+      };
+    }
   }
 
   return userObject;
