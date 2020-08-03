@@ -31,4 +31,19 @@ utils.expandPictureURL = (userObject) => {
   return userObject
 }
 
+/**
+ * Provide the query to find searched term with user properties
+ *
+ * @param {String} search
+ */
+utils.userSearchQuery = (search) => {
+  const title = `substringof('${search}',Title)`
+  const email = `substringof('${search}',EMail)`
+  const lastName = `substringof('${search}',LastName)`
+  const firstName = `substringof('${search}',FirstName)`
+  const account = `substringof('${search}',AccountName)`
+
+  return { $filter: `${title} or ${email} or ${lastName} or ${firstName} or ${account}` }
+}
+
 module.exports = utils

@@ -1,3 +1,4 @@
+const utils = require('./facades/utils')
 const requests = require('./facades/requests')
 const httpFactory = require('./http/http-factory')
 const XomSharePointList = require('./XomSharePointList')
@@ -78,9 +79,7 @@ module.exports = function XomSharePointSite(baseSiteUrl) {
    * @return {Promise}
    */
   this.searchUser = (search) => {
-    return requests.getSiteUsersListItems(_http, {
-      $filter: `substringof('${search}',Title) or substringof('${search}',UserName)`,
-    })
+    return requests.getSiteUsersListItems(_http, utils.userSearchQuery(search))
   }
 
   /**
@@ -130,7 +129,7 @@ module.exports = function XomSharePointSite(baseSiteUrl) {
    * @param {String} folderAddress SharePoint library/folder title
    * @return {XomSharePointLibrary}
    */
-  this.getFolder = (folderAddress) => {
+  this.getLibrary = (folderAddress) => {
     return new XomSharePointLibrary(folderAddress, _http)
   }
 }
