@@ -67,7 +67,9 @@ requests.getSiteRegionalSettings = (http) => {
  */
 requests.getSiteCurrentUser = async (http) => {
   const user = await http.get(endpoints.users.current())
-  return utils.expandPictureURL(user)
+  utils.expandPictureURL(user)
+
+  return user
 }
 
 /**
@@ -100,7 +102,9 @@ requests.getSiteUsersListFields = (http, query = '') => {
  */
 requests.getSiteUsersListItems = async (http, query = '') => {
   const users = await http.get(endpoints.users.listItems(query))
-  return users.map(utils.expandPictureURL)
+  users.forEach(utils.expandPictureURL)
+
+  return users
 }
 
 /**
@@ -112,7 +116,9 @@ requests.getSiteUsersListItems = async (http, query = '') => {
  */
 requests.getSiteUserById = async (http, id) => {
   const user = await http.get(endpoints.users.byId(id))
-  return utils.expandPictureURL(user)
+  utils.expandPictureURL(user)
+
+  return user
 }
 
 /**
