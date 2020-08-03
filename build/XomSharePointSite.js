@@ -1,5 +1,7 @@
 "use strict";
 
+var utils = require('./facades/utils');
+
 var requests = require('./facades/requests');
 
 var httpFactory = require('./http/http-factory');
@@ -91,9 +93,7 @@ module.exports = function XomSharePointSite(baseSiteUrl) {
 
 
   this.searchUser = function (search) {
-    return requests.getSiteUsersListItems(_http, {
-      $filter: "substringof('".concat(search, "',Title) or substringof('").concat(search, "',UserName)")
-    });
+    return requests.getSiteUsersListItems(_http, utils.userSearchQuery(search));
   };
   /**
    * Return a reference to connect to a SharePoint list
@@ -147,7 +147,7 @@ module.exports = function XomSharePointSite(baseSiteUrl) {
    */
 
 
-  this.getFolder = function (folderAddress) {
+  this.getLibrary = function (folderAddress) {
     return new XomSharePointLibrary(folderAddress, _http);
   };
 };

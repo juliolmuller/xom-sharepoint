@@ -13,6 +13,8 @@ function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (O
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { (0, _defineProperty2["default"])(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 
 var endpoints = require('./endpoints');
+
+var utils = require('./utils');
 /**
  * Define all possible requests to the SharePoint API
  *
@@ -108,9 +110,33 @@ requests.getSiteRegionalSettings = function (http) {
  */
 
 
-requests.getSiteCurrentUser = function (http) {
-  return http.get(endpoints.users.current());
-};
+requests.getSiteCurrentUser = /*#__PURE__*/function () {
+  var _ref2 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee2(http) {
+    var user;
+    return _regenerator["default"].wrap(function _callee2$(_context2) {
+      while (1) {
+        switch (_context2.prev = _context2.next) {
+          case 0:
+            _context2.next = 2;
+            return http.get(endpoints.users.current());
+
+          case 2:
+            user = _context2.sent;
+            utils.expandPictureURL(user);
+            return _context2.abrupt("return", user);
+
+          case 5:
+          case "end":
+            return _context2.stop();
+        }
+      }
+    }, _callee2);
+  }));
+
+  return function (_x2) {
+    return _ref2.apply(this, arguments);
+  };
+}();
 /**
  * Fetch list metadata for site users
  *
@@ -144,10 +170,36 @@ requests.getSiteUsersListFields = function (http) {
  */
 
 
-requests.getSiteUsersListItems = function (http) {
-  var query = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
-  return http.get(endpoints.users.listItems(query));
-};
+requests.getSiteUsersListItems = /*#__PURE__*/function () {
+  var _ref3 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee3(http) {
+    var query,
+        users,
+        _args3 = arguments;
+    return _regenerator["default"].wrap(function _callee3$(_context3) {
+      while (1) {
+        switch (_context3.prev = _context3.next) {
+          case 0:
+            query = _args3.length > 1 && _args3[1] !== undefined ? _args3[1] : '';
+            _context3.next = 3;
+            return http.get(endpoints.users.listItems(query));
+
+          case 3:
+            users = _context3.sent;
+            users.forEach(utils.expandPictureURL);
+            return _context3.abrupt("return", users);
+
+          case 6:
+          case "end":
+            return _context3.stop();
+        }
+      }
+    }, _callee3);
+  }));
+
+  return function (_x3) {
+    return _ref3.apply(this, arguments);
+  };
+}();
 /**
  * Fetch a single list item with user information
  *
@@ -157,9 +209,33 @@ requests.getSiteUsersListItems = function (http) {
  */
 
 
-requests.getSiteUserById = function (http, id) {
-  return http.get(endpoints.users.byId(id));
-};
+requests.getSiteUserById = /*#__PURE__*/function () {
+  var _ref4 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee4(http, id) {
+    var user;
+    return _regenerator["default"].wrap(function _callee4$(_context4) {
+      while (1) {
+        switch (_context4.prev = _context4.next) {
+          case 0:
+            _context4.next = 2;
+            return http.get(endpoints.users.byId(id));
+
+          case 2:
+            user = _context4.sent;
+            utils.expandPictureURL(user);
+            return _context4.abrupt("return", user);
+
+          case 5:
+          case "end":
+            return _context4.stop();
+        }
+      }
+    }, _callee4);
+  }));
+
+  return function (_x4, _x5) {
+    return _ref4.apply(this, arguments);
+  };
+}();
 /**
  * Fetch list of all site lists
  *
@@ -227,31 +303,31 @@ requests.getListByTitle = function (http, listTitle) {
 
 
 requests.getListItemType = /*#__PURE__*/function () {
-  var _ref2 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee2(http, listTitle) {
+  var _ref5 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee5(http, listTitle) {
     var resp;
-    return _regenerator["default"].wrap(function _callee2$(_context2) {
+    return _regenerator["default"].wrap(function _callee5$(_context5) {
       while (1) {
-        switch (_context2.prev = _context2.next) {
+        switch (_context5.prev = _context5.next) {
           case 0:
-            _context2.next = 2;
+            _context5.next = 2;
             return requests.getListByTitle(http, listTitle, {
               $select: 'ListItemEntityTypeFullName'
             });
 
           case 2:
-            resp = _context2.sent;
-            return _context2.abrupt("return", resp.ListItemEntityTypeFullName);
+            resp = _context5.sent;
+            return _context5.abrupt("return", resp.ListItemEntityTypeFullName);
 
           case 4:
           case "end":
-            return _context2.stop();
+            return _context5.stop();
         }
       }
-    }, _callee2);
+    }, _callee5);
   }));
 
-  return function (_x2, _x3) {
-    return _ref2.apply(this, arguments);
+  return function (_x6, _x7) {
+    return _ref5.apply(this, arguments);
   };
 }();
 /**
@@ -328,13 +404,13 @@ requests.postListItem = function (http, listTitle, type, data) {
 
 
 requests.patchListItem = /*#__PURE__*/function () {
-  var _ref3 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee3(http, listTitle, itemId, type, data) {
+  var _ref6 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee6(http, listTitle, itemId, type, data) {
     var patchResp, updatedItem;
-    return _regenerator["default"].wrap(function _callee3$(_context3) {
+    return _regenerator["default"].wrap(function _callee6$(_context6) {
       while (1) {
-        switch (_context3.prev = _context3.next) {
+        switch (_context6.prev = _context6.next) {
           case 0:
-            _context3.next = 2;
+            _context6.next = 2;
             return http.patch(endpoints.lists.itemById(listTitle, itemId), _objectSpread({
               __metadata: {
                 type: type
@@ -342,26 +418,26 @@ requests.patchListItem = /*#__PURE__*/function () {
             }, data));
 
           case 2:
-            patchResp = _context3.sent;
-            _context3.next = 5;
+            patchResp = _context6.sent;
+            _context6.next = 5;
             return requests.getListItemById(http, listTitle, itemId);
 
           case 5:
-            updatedItem = _context3.sent;
+            updatedItem = _context6.sent;
             delete patchResp.data;
             updatedItem.__response = patchResp;
-            return _context3.abrupt("return", updatedItem);
+            return _context6.abrupt("return", updatedItem);
 
           case 9:
           case "end":
-            return _context3.stop();
+            return _context6.stop();
         }
       }
-    }, _callee3);
+    }, _callee6);
   }));
 
-  return function (_x4, _x5, _x6, _x7, _x8) {
-    return _ref3.apply(this, arguments);
+  return function (_x8, _x9, _x10, _x11, _x12) {
+    return _ref6.apply(this, arguments);
   };
 }();
 /**
@@ -375,36 +451,36 @@ requests.patchListItem = /*#__PURE__*/function () {
 
 
 requests.deleteListItem = /*#__PURE__*/function () {
-  var _ref4 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee4(http, listTitle, itemId) {
+  var _ref7 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee7(http, listTitle, itemId) {
     var originalItem, deleteResp;
-    return _regenerator["default"].wrap(function _callee4$(_context4) {
+    return _regenerator["default"].wrap(function _callee7$(_context7) {
       while (1) {
-        switch (_context4.prev = _context4.next) {
+        switch (_context7.prev = _context7.next) {
           case 0:
-            _context4.next = 2;
+            _context7.next = 2;
             return requests.getListItemById(http, listTitle, itemId);
 
           case 2:
-            originalItem = _context4.sent;
-            _context4.next = 5;
+            originalItem = _context7.sent;
+            _context7.next = 5;
             return http["delete"](endpoints.lists.itemById(listTitle, itemId));
 
           case 5:
-            deleteResp = _context4.sent;
+            deleteResp = _context7.sent;
             delete deleteResp.data;
             originalItem.__response = deleteResp;
-            return _context4.abrupt("return", originalItem);
+            return _context7.abrupt("return", originalItem);
 
           case 9:
           case "end":
-            return _context4.stop();
+            return _context7.stop();
         }
       }
-    }, _callee4);
+    }, _callee7);
   }));
 
-  return function (_x9, _x10, _x11) {
-    return _ref4.apply(this, arguments);
+  return function (_x13, _x14, _x15) {
+    return _ref7.apply(this, arguments);
   };
 }();
 /**
@@ -448,33 +524,33 @@ requests.uploadListItemAttachment = function (http, listTitle, itemId, fileName,
 
 
 requests.renameListItemAttachment = /*#__PURE__*/function () {
-  var _ref5 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee5(http, listTitle, itemId, oldFileName, newFileName) {
+  var _ref8 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee8(http, listTitle, itemId, oldFileName, newFileName) {
     var attachments, oldFileUrl, newFileUrl;
-    return _regenerator["default"].wrap(function _callee5$(_context5) {
+    return _regenerator["default"].wrap(function _callee8$(_context8) {
       while (1) {
-        switch (_context5.prev = _context5.next) {
+        switch (_context8.prev = _context8.next) {
           case 0:
-            _context5.next = 2;
+            _context8.next = 2;
             return requests.getListItemAttachments(http, listTitle, itemId);
 
           case 2:
-            attachments = _context5.sent;
+            attachments = _context8.sent;
             oldFileUrl = attachments.find(function (att) {
               return att.FileName === oldFileName;
             }).ServerRelativeUrl;
             newFileUrl = oldFileUrl.replace(oldFileName, newFileName);
-            return _context5.abrupt("return", http.patch(endpoints.lists.itemAttachmentsRename(oldFileUrl, newFileUrl)));
+            return _context8.abrupt("return", http.patch(endpoints.lists.itemAttachmentsRename(oldFileUrl, newFileUrl)));
 
           case 6:
           case "end":
-            return _context5.stop();
+            return _context8.stop();
         }
       }
-    }, _callee5);
+    }, _callee8);
   }));
 
-  return function (_x12, _x13, _x14, _x15, _x16) {
-    return _ref5.apply(this, arguments);
+  return function (_x16, _x17, _x18, _x19, _x20) {
+    return _ref8.apply(this, arguments);
   };
 }();
 /**

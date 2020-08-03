@@ -16,7 +16,6 @@ module.exports = function (data) {
       value: d.__next,
       writable: true
     });
-    return data;
   }
 
   return data;
