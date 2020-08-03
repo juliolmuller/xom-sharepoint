@@ -18,13 +18,17 @@ utils.expandPictureURL = (userObject) => {
   const LARGE_PICTURE_CODE = '_LThumb'
 
   if (userObject && typeof userObject.Picture !== 'undefined') {
-    const url = encodeURI(userObject.Picture.Url)
-    const targetExpression = new RegExp(`${SMALL_PICTURE_CODE}|${MEDIUM_PICTURE_CODE}|${LARGE_PICTURE_CODE}`, 'i')
+    if (userObject.Picture === null) {
+      userObject.Picture = { Small: null, Medium: null, Large: null }
+    } else {
+      const url = encodeURI(userObject.Picture.Url)
+      const targetExpression = new RegExp(`${SMALL_PICTURE_CODE}|${MEDIUM_PICTURE_CODE}|${LARGE_PICTURE_CODE}`, 'i')
 
-    userObject.Picture = {
-      Small: url.replace(targetExpression, SMALL_PICTURE_CODE),
-      Medium: url.replace(targetExpression, MEDIUM_PICTURE_CODE),
-      Large: url.replace(targetExpression, LARGE_PICTURE_CODE),
+      userObject.Picture = {
+        Small: url.replace(targetExpression, SMALL_PICTURE_CODE),
+        Medium: url.replace(targetExpression, MEDIUM_PICTURE_CODE),
+        Large: url.replace(targetExpression, LARGE_PICTURE_CODE),
+      }
     }
   }
 
