@@ -1,4 +1,5 @@
 const endpoints = require('./endpoints')
+const utils = require('./utils')
 
 /**
  * Define all possible requests to the SharePoint API
@@ -64,8 +65,9 @@ requests.getSiteRegionalSettings = (http) => {
  * @param {Axios} http
  * @return {Promise<Object>}
  */
-requests.getSiteCurrentUser = (http) => {
-  return http.get(endpoints.users.current())
+requests.getSiteCurrentUser = async (http) => {
+  const user = await http.get(endpoints.users.current())
+  return utils.expandPictureURL(user)
 }
 
 /**
@@ -96,8 +98,9 @@ requests.getSiteUsersListFields = (http, query = '') => {
  * @param {String} [query]
  * @return {Promise<Array>}
  */
-requests.getSiteUsersListItems = (http, query = '') => {
-  return http.get(endpoints.users.listItems(query))
+requests.getSiteUsersListItems = async (http, query = '') => {
+  const users = await http.get(endpoints.users.listItems(query))
+  return users.map(utils.expandPictureURL)
 }
 
 /**
@@ -107,8 +110,9 @@ requests.getSiteUsersListItems = (http, query = '') => {
  * @param {Number} id
  * @return {Promise<Object>}
  */
-requests.getSiteUserById = (http, id) => {
-  return http.get(endpoints.users.byId(id))
+requests.getSiteUserById = async (http, id) => {
+  const user = await http.get(endpoints.users.byId(id))
+  return utils.expandPictureURL(user)
 }
 
 /**
