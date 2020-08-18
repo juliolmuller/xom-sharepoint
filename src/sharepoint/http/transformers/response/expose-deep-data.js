@@ -11,7 +11,7 @@ export default (data) => {
     const { d } = data
     // eslint-disable-next-line no-param-reassign
     data = d.results || d
-    Object.defineProperty(data, '__next', { value: d.__next, writable: true })
+    Object.defineProperty(data, '__next', { value: d.__next || null, writable: true })
   }
 
   return data
