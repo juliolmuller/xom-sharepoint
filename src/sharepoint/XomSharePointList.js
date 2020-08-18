@@ -1,5 +1,5 @@
-const genFileBuffer = require('@lacussoft/to-arraybuffer')
-const requests = require('./facades/requests')
+import genFileBuffer from '@lacussoft/to-arraybuffer'
+import requests from './facades/requests'
 
 /**
  * Contain the necessary information to stablish a connection to a SharePoint
@@ -9,7 +9,7 @@ const requests = require('./facades/requests')
  * @param {String} listTitle List title to connect to
  * @param {Axios} httpInstance Customized Axios instance to perform HTTP requests
  */
-module.exports = function XomSharePointList(listTitle, httpInstance) {
+function XomSharePointList(listTitle, httpInstance) {
 
   /**
    * Store the SharePoint list title
@@ -170,3 +170,5 @@ module.exports = function XomSharePointList(listTitle, httpInstance) {
     return requests.deleteListItemAttachment(_http, _title, itemId, fileName)
   }
 }
+
+export default XomSharePointList

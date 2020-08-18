@@ -1,5 +1,5 @@
-const genFileBuffer = require('@lacussoft/to-arraybuffer')
-const requests = require('./facades/requests')
+import genFileBuffer from '@lacussoft/to-arraybuffer'
+import requests from './facades/requests'
 
 /**
  * Contain the necessary information to stablish a connection to a SharePoint
@@ -9,7 +9,7 @@ const requests = require('./facades/requests')
  * @param {String} folderAddress Library title to connect to
  * @param {Axios} httpInstance Customized Axios instance to perform HTTP requests
  */
-module.exports = function XomSharePointLibrary(folderAddress, httpInstance) {
+function XomSharePointLibrary(folderAddress, httpInstance) {
 
   /**
    * Store the SharePoint folder relative URL
@@ -102,3 +102,5 @@ module.exports = function XomSharePointLibrary(folderAddress, httpInstance) {
     return result
   }
 }
+
+export default XomSharePointLibrary

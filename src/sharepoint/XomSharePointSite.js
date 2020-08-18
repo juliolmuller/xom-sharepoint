@@ -1,9 +1,9 @@
-const utils = require('./facades/utils')
-const requests = require('./facades/requests')
-const httpFactory = require('./http/http-factory')
-const XomSharePointList = require('./XomSharePointList')
-const XomSharePointSurvey = require('./XomSharePointSurvey')
-const XomSharePointLibrary = require('./XomSharePointLibrary')
+import utils from './facades/utils'
+import requests from './facades/requests'
+import httpFactory from './http/http-factory'
+import XomSharePointList from './XomSharePointList'
+import XomSharePointSurvey from './XomSharePointSurvey'
+import XomSharePointLibrary from './XomSharePointLibrary'
 
 /**
  * Contain the necessary information to stablish a connection to a SharePoint
@@ -14,7 +14,7 @@ const XomSharePointLibrary = require('./XomSharePointLibrary')
  *                               If none URL is provided, the instance will assume
  *                               the current site/subsite
  */
-module.exports = function XomSharePointSite(baseSiteUrl) {
+function XomSharePointSite(baseSiteUrl) {
 
   /**
    * Base custom instance of Axios
@@ -133,3 +133,5 @@ module.exports = function XomSharePointSite(baseSiteUrl) {
     return new XomSharePointLibrary(folderAddress, _http)
   }
 }
+
+export default XomSharePointSite

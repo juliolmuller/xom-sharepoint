@@ -4,7 +4,7 @@
  *
  * @var {Array<Function>}
  */
-module.exports = [
+export default [
 
   // on success
   (response) => {

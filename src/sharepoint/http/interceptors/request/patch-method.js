@@ -1,11 +1,11 @@
-const headers = require('../../config/headers-patch')
+import headers from '../../config/headers-patch'
 
 /**
  * Replace the PATCH method by POST and add the required headers
  *
  * @var {Array<Function>}
  */
-module.exports = [
+export default [
 
   // on success
   (config) => {

@@ -5,7 +5,7 @@
  * @param {*} data
  * @return {*}
  */
-module.exports = (data) => {
+export default (data) => {
 
   if (data && data.d) {
     const { d } = data

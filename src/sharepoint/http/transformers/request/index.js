@@ -1,11 +1,11 @@
-const axios = require('axios').default
+import axios from 'axios'
 
 /**
  * Chain of functions to transform request
  *
  * @var {Array<Function>}
  */
-module.exports = [
+export default [
   // custom functions
   // ...
 

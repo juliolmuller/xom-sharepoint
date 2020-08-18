@@ -1,4 +1,4 @@
-const requests = require('./facades/requests')
+import requests from './facades/requests'
 
 /**
  * Contain the necessary information to stablish a connection to a SharePoint
@@ -8,7 +8,7 @@ const requests = require('./facades/requests')
  * @param {String} surveyTitle Survey title to connect to
  * @param {Axios} httpInstance Customized Axios instance to perform HTTP requests
  */
-module.exports = function XomSharePointSurvey(surveyTitle, httpInstance) {
+function XomSharePointSurvey(surveyTitle, httpInstance) {
 
   /**
    * Store the SharePoint list name
@@ -114,3 +114,5 @@ module.exports = function XomSharePointSurvey(surveyTitle, httpInstance) {
    */
   this.delete = (id) => requests.deleteListItem(_http, _title, id)
 }
+
+export default XomSharePointSurvey

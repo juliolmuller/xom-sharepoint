@@ -1,11 +1,11 @@
-const commonHeaders = require('./headers-common')
+import commonHeaders from './headers-common'
 
 /**
  * Define headers for PATCH method
  *
  * @constant {Object}
  */
-module.exports = Object.freeze({
+export default Object.freeze({
   ...commonHeaders,
   'X-Http-Method': 'MERGE',
   'If-Match': '*',

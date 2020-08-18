@@ -1,11 +1,11 @@
-const headers = require('../../config/headers-delete')
+import headers from '../../config/headers-delete'
 
 /**
  * Replace the DELETE method by POST and add the required headers
  *
  * @var {Array<Function>}
  */
-module.exports = [
+export default [
 
   // on success
   (config) => {

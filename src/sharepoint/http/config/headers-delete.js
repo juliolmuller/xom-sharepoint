@@ -1,11 +1,11 @@
-const commonHeaders = require('./headers-common')
+import commonHeaders from './headers-common'
 
 /**
  * Define headers for DELETE method
  *
  * @constant {Object}
  */
-module.exports = Object.freeze({
+export default Object.freeze({
   ...commonHeaders,
   'X-Http-Method': 'DELETE',
   'If-Match': '*',

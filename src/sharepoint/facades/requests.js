@@ -1,5 +1,5 @@
-const endpoints = require('./endpoints')
-const utils = require('./utils')
+import endpoints from './endpoints'
+import utils from './utils'
 
 /**
  * Define all possible requests to the SharePoint API
@@ -415,4 +415,4 @@ requests.uploadFileToFolder = (http, relativeUrl, fileName, fileBuffer) => {
   return http.post(endpoints.folders.newFileToFolder(relativeUrl, fileName), fileBuffer)
 }
 
-module.exports = requests
+export default requests

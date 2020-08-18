@@ -1,11 +1,11 @@
-const rewrap = require('./rewrap')
+import rewrap from './rewrap'
 
 /**
  * Consolidate all functions to be run on response interception
  *
  * @var {Array<Array|Function>}
  */
-module.exports = [
+export default [
 
   // custom functions
   rewrap,

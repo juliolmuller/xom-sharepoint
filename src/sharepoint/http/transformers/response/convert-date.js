@@ -23,7 +23,7 @@ const lookForDates = (obj) => {
  *
  * @param {*} data
  */
-module.exports = (data) => {
+export default (data) => {
 
   if (data) {
     try {

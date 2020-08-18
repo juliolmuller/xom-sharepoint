@@ -1,11 +1,11 @@
-const headers = require('../../config/headers-common')
+import headers from '../../config/headers-common'
 
 /**
  * Add the default headers to all requests
  *
  * @var {Array<Function>}
  */
-module.exports = [
+export default [
 
   // on success
   (config) => {

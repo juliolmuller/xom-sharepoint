@@ -1,4 +1,4 @@
-const qs = require('querystring')
+import qs from 'querystring'
 
 /**
  * Function to easily convert an object into a query string
@@ -249,4 +249,4 @@ endpoints.folders.newFileToFolder = (relativeUrl, fileName, overwrite = true) =>
  */
 endpoints.folders.fileByUrl = (relativeUrl) => `${endpoints.baseApiUri()}/GetFileByServerRelativeUrl('${relativeUrl}')`
 
-module.exports = endpoints
+export default endpoints

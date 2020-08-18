@@ -1,4 +1,4 @@
-const XomSharePointSite = require('./XomSharePointSite')
+import XomSharePointSite from './XomSharePointSite'
 
 /**
  * Instantiate a XomSharePoint object to connect to a SharePoint site and,
@@ -8,6 +8,4 @@ const XomSharePointSite = require('./XomSharePointSite')
  * @param {string} [baseSiteUrl] Base URL of the SharePoint site to connect to
  * @return {XomSharePoint}
  */
-module.exports = function xomFactory(baseSiteUrl) {
-  return new XomSharePointSite(baseSiteUrl)
-}
+export default (baseSiteUrl) => new XomSharePointSite(baseSiteUrl)

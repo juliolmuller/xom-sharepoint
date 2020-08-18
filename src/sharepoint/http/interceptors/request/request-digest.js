@@ -5,7 +5,7 @@
  * @param {Axios} httpInstance
  * @return {Array<Function>}
  */
-module.exports = (httpInstance) => [
+export default (httpInstance) => [
 
   // on success
   async (config) => {

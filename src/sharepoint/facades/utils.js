@@ -50,4 +50,4 @@ utils.userSearchQuery = (search) => {
   return { $filter: `${title} or ${email} or ${lastName} or ${firstName} or ${account}` }
 }
 
-module.exports = utils
+export default utils

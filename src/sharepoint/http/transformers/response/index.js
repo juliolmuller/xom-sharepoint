@@ -1,13 +1,13 @@
-const axios = require('axios').default
-const exposeDeepData = require('./expose-deep-data')
-const convertDate = require('./convert-date')
+import axios from 'axios'
+import exposeDeepData from './expose-deep-data'
+import convertDate from './convert-date'
 
 /**
  * Chain of functions to transform response
  *
  * @var {Array<Function>}
  */
-module.exports = [
+export default [
   // custom functions
   // ...
 

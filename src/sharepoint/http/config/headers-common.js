@@ -4,7 +4,7 @@
  *
  * @constant {Object}
  */
-module.exports = Object.freeze({
+export default Object.freeze({
   'Accept': 'application/json;odata=verbose',
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'Content-Type',
