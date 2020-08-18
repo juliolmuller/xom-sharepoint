@@ -43,29 +43,5 @@
     "axios": "~0.19.2",
     "eslint": "^6.8.0",
     "parcel-bundler": "^1.12.4"
-  },
-  "eslintConfig": {
-    "env": {
-      "browser": true,
-      "node": true,
-      "es6": true
-    },
-    "parserOptions": {
-      "ecmaVersion": 2018,
-      "sourceType": "module"
-    },
-    "extends": "@lacussoft/standard",
-    "rules": {
-      "arrow-body-style": "off",
-      "no-underscore-dangle": "off"
-    }
-  },
-  "babel": {
-    "presets": [
-      "@babel/preset-env"
-    ],
-    "plugins": [
-      "@babel/plugin-transform-runtime"
-    ]
   }
 }

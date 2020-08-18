@@ -1,5 +1,7 @@
 **/.*
 *.iml
 *.log
+.cahce/
+.git/
 node_modules/
 test/
