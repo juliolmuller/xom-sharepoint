@@ -22,26 +22,31 @@
   },
   "homepage": "https://github.com/juliolmuller/xom-sharepoint#readme",
   "main": "build/index.js",
+  "types": "build/",
   "scripts": {
     "build": "npm run build:node && npm run build:dist",
     "build:dist": "parcel build src/dist.js --no-minify -o xom-sharepoint.js && parcel build src/dist.js -o xom-sharepoint.min.js",
-    "build:node": "babel src/sharepoint --out-dir build",
-    "watch": "parcel watch src/sharepoint/XomSharePoint.js"
+    "build:node": "tsc -p . && babel build/ --out-dir build/",
+    "test:manual": "parcel watch src/dist.js -o xom-sharepoint.js"
   },
   "peerDependencies": {
-    "axios": "~0.19.2"
+    "axios": "~0.20.0"
   },
   "dependencies": {
-    "@lacussoft/to-arraybuffer": "^1.0.0"
+    "@lacussoft/to-arraybuffer": "^1.1.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.10.5",
-    "@babel/core": "^7.11.1",
+    "@babel/core": "^7.11.4",
     "@babel/plugin-transform-runtime": "^7.11.0",
     "@babel/preset-env": "^7.11.0",
-    "@lacussoft/eslint-config-standard": "^1.0.6",
-    "axios": "~0.19.2",
-    "eslint": "^6.8.0",
-    "parcel-bundler": "^1.12.4"
+    "@lacussoft/eslint-config-standard": "^1.0.7",
+    "@types/node": "^14.6.0",
+    "@typescript-eslint/eslint-plugin": "^3.10.1",
+    "@typescript-eslint/parser": "^3.10.1",
+    "axios": "~0.20.0",
+    "eslint": "^7.7.0",
+    "parcel-bundler": "^1.12.4",
+    "typescript": "^3.9.7"
   }
 }
