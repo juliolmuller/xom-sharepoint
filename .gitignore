@@ -101,3 +101,9 @@ typings/
 
 # TernJS port file
 .tern-port
+
+# IDE & Text Editors
+.vscode/
+
+# Local testing files
+test/testing-page/
