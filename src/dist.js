@@ -1,6 +1,7 @@
 /* global window */
+/* eslint-disable @typescript-eslint/no-var-requires */
 
 /**
  * Entry point for browser version
  */
-window.xomSharePoint = require('./sharepoint').default
+window.xomSharePoint = require('./index').default
