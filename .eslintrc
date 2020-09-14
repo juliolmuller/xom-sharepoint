@@ -27,6 +27,9 @@
     }],
     "@typescript-eslint/no-explicit-any": "off",
     "arrow-body-style": "off",
+    "lines-between-class-members": "off",
+    "no-dupe-class-members": "off",
+    "no-restricted-globals": "off",
     "no-underscore-dangle": "off"
   }
 }
