@@ -1,12 +1,8 @@
 "use strict";
 
-var rewrap = require('./rewrap');
-/**
- * Consolidate all functions to be run on response interception
- *
- * @var {Array<Array|Function>}
- */
-
-
-module.exports = [// custom functions
-rewrap];
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+var responseInterceptors = [// custom functions
+];
+exports["default"] = responseInterceptors;

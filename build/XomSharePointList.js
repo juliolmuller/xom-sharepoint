@@ -6,263 +6,289 @@ var _regenerator = _interopRequireDefault(require("@babel/runtime/regenerator"))
 
 var _asyncToGenerator2 = _interopRequireDefault(require("@babel/runtime/helpers/asyncToGenerator"));
 
-var genFileBuffer = require('@lacussoft/to-arraybuffer');
+var _objectWithoutProperties2 = _interopRequireDefault(require("@babel/runtime/helpers/objectWithoutProperties"));
 
-var requests = require('./facades/requests');
+var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
+
+var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
+
+var __createBinding = void 0 && (void 0).__createBinding || (Object.create ? function (o, m, k, k2) {
+  if (k2 === undefined) k2 = k;
+  Object.defineProperty(o, k2, {
+    enumerable: true,
+    get: function get() {
+      return m[k];
+    }
+  });
+} : function (o, m, k, k2) {
+  if (k2 === undefined) k2 = k;
+  o[k2] = m[k];
+});
+
+var __setModuleDefault = void 0 && (void 0).__setModuleDefault || (Object.create ? function (o, v) {
+  Object.defineProperty(o, "default", {
+    enumerable: true,
+    value: v
+  });
+} : function (o, v) {
+  o["default"] = v;
+});
+
+var __importStar = void 0 && (void 0).__importStar || function (mod) {
+  if (mod && mod.__esModule) return mod;
+  var result = {};
+  if (mod != null) for (var k in mod) {
+    if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+  }
+
+  __setModuleDefault(result, mod);
+
+  return result;
+};
+
+var __importDefault = void 0 && (void 0).__importDefault || function (mod) {
+  return mod && mod.__esModule ? mod : {
+    "default": mod
+  };
+};
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var to_arraybuffer_1 = __importDefault(require("@lacussoft/to-arraybuffer"));
+
+var requests = __importStar(require("./facades/requests"));
+
+var exceptions = __importStar(require("./facades/exceptions"));
 /**
- * Contain the necessary information to stablish a connection to a SharePoint
- * list through its REST API
- *
- * @constructor
- * @param {String} listTitle List title to connect to
- * @param {Axios} httpInstance Customized Axios instance to perform HTTP requests
+ * Instantiate the object with the necessary information to connect to a SharePoint list through its REST API.
  */
 
 
-module.exports = function XomSharePointList(listTitle, httpInstance) {
-  /**
-   * Store the SharePoint list title
-   *
-   * @private
-   * @var {String}
-   */
-  var _title = listTitle;
-  /**
-   * Private instance of Axios
-   *
-   * @private
-   * @final
-   * @var {Axios}
-   */
+var XomSharePointList = /*#__PURE__*/function () {
+  function XomSharePointList(listTitle, httpInstance) {
+    (0, _classCallCheck2["default"])(this, XomSharePointList);
+    this._title = listTitle;
+    this._http = httpInstance;
+    this._itemsType = requests.getListItemType(this._http, this._title);
+  }
 
-  var _http = httpInstance;
-  /**
-   * Eagerly fetches list metadata to get list items type
-   *
-   * @private
-   * @final
-   * @var {Promise<String>}
-   */
+  (0, _createClass2["default"])(XomSharePointList, [{
+    key: "getFields",
 
-  var _itemsType = requests.getListItemType(_http, _title);
-  /**
-   * Define property to get & set 'title' value
-   *
-   * @property {String} title
-   */
-
-
-  Object.defineProperty(this, 'title', {
-    get: function get() {
-      return _title;
-    },
-    set: function set(title) {
-      _title = String(title);
+    /**
+     * Returns the list fields metadata;
+     */
+    value: function getFields(params) {
+      return requests.getListFields(this._http, this._title, params);
     }
-  });
-  /**
-   * Retrun the list fields metadata
-   *
-   * @param {Boolean} [customOnly]
-   * @return {Promise<Object>}
-   */
+    /**
+     * Returns a list of the items stored in the list.
+     */
 
-  this.fields = function (customOnly) {
-    var query = customOnly ? {
-      $filter: '(CanBeDeleted eq true)'
-    } : null;
-    return requests.getListFields(_http, _title, query);
-  };
-  /**
-   * Return a list of the items stored in the list. If no additional parameter
-   * is provided, all records are returned. For your reference, check out
-   * https://social.technet.microsoft.com/wiki/contents/articles/35796.sharepoint-2013-using-rest-api-for-selecting-filtering-sorting-and-pagination-in-sharepoint-list.aspx
-   * on how to build parameters
-   *
-   * @param {String} [params]
-   * @return {Promise<Array>}
-   */
+  }, {
+    key: "getItems",
+    value: function getItems(params) {
+      return requests.getListItems(this._http, this._title, params);
+    }
+    /**
+     * Returns a single list item with the given ID.
+     */
 
+  }, {
+    key: "findItem",
+    value: function findItem(itemId, params) {
+      return requests.getListItemById(this._http, this._title, itemId, params);
+    }
+  }, {
+    key: "saveItem",
+    value: function saveItem(param1, param2) {
+      var _ref = param2 || param1,
+          id = _ref.Id,
+          rest = (0, _objectWithoutProperties2["default"])(_ref, ["Id"]);
 
-  this.get = function (params) {
-    return requests.getListItems(_http, _title, params);
-  };
-  /**
-   * Retrun a single list item with the given ID
-   *
-   * @param {Number} id
-   * @param {String} [params]
-   * @return {Promise<Object>}
-   */
+      return id ? this.updateItem(id, rest) : this.createItem(rest);
+    }
+    /**
+     * Saves a new record in the SharePoint list.
+     */
 
+  }, {
+    key: "createItem",
+    value: function () {
+      var _createItem = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee(data) {
+        return _regenerator["default"].wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                _context.t0 = requests;
+                _context.t1 = this._http;
+                _context.t2 = this._title;
+                _context.next = 5;
+                return this._itemsType;
 
-  this.find = function (id, params) {
-    return requests.getListItemById(_http, _title, id, params);
-  };
-  /**
-   * Save a new record in the SharePoint list
-   *
-   * @param {Object} data Use literal objects to send data
-   * @return {Promise<Object>}
-   */
+              case 5:
+                _context.t3 = _context.sent;
+                _context.t4 = data;
+                return _context.abrupt("return", _context.t0.postListItem.call(_context.t0, _context.t1, _context.t2, _context.t3, _context.t4));
 
-
-  this.create = /*#__PURE__*/function () {
-    var _ref = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee(data) {
-      return _regenerator["default"].wrap(function _callee$(_context) {
-        while (1) {
-          switch (_context.prev = _context.next) {
-            case 0:
-              _context.t0 = requests;
-              _context.t1 = _http;
-              _context.t2 = _title;
-              _context.next = 5;
-              return _itemsType;
-
-            case 5:
-              _context.t3 = _context.sent;
-              _context.t4 = data;
-              return _context.abrupt("return", _context.t0.postListItem.call(_context.t0, _context.t1, _context.t2, _context.t3, _context.t4));
-
-            case 8:
-            case "end":
-              return _context.stop();
+              case 8:
+              case "end":
+                return _context.stop();
+            }
           }
-        }
-      }, _callee);
-    }));
+        }, _callee, this);
+      }));
 
-    return function (_x) {
-      return _ref.apply(this, arguments);
-    };
-  }();
-  /**
-   * Update data of an existing record in the SharePoint list
-   *
-   * @param {Number} id
-   * @param {Object} data Use literal objects to send data
-   * @return {Promise<Object>}
-   */
+      function createItem(_x) {
+        return _createItem.apply(this, arguments);
+      }
 
+      return createItem;
+    }()
+  }, {
+    key: "updateItem",
+    value: function () {
+      var _updateItem = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee2(param1, param2) {
+        var _ref2, _ref2$Id, id, rest;
 
-  this.update = /*#__PURE__*/function () {
-    var _ref2 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee2(id, data) {
-      return _regenerator["default"].wrap(function _callee2$(_context2) {
-        while (1) {
-          switch (_context2.prev = _context2.next) {
-            case 0:
-              _context2.t0 = requests;
-              _context2.t1 = _http;
-              _context2.t2 = _title;
-              _context2.t3 = id;
-              _context2.next = 6;
-              return _itemsType;
+        return _regenerator["default"].wrap(function _callee2$(_context2) {
+          while (1) {
+            switch (_context2.prev = _context2.next) {
+              case 0:
+                _ref2 = param2 || param1, _ref2$Id = _ref2.Id, id = _ref2$Id === void 0 ? param1 : _ref2$Id, rest = (0, _objectWithoutProperties2["default"])(_ref2, ["Id"]);
 
-            case 6:
-              _context2.t4 = _context2.sent;
-              _context2.t5 = data;
-              return _context2.abrupt("return", _context2.t0.patchListItem.call(_context2.t0, _context2.t1, _context2.t2, _context2.t3, _context2.t4, _context2.t5));
+                if (!isNaN(id)) {
+                  _context2.next = 3;
+                  break;
+                }
 
-            case 9:
-            case "end":
-              return _context2.stop();
+                throw exceptions.missingItemId();
+
+              case 3:
+                _context2.t0 = requests;
+                _context2.t1 = this._http;
+                _context2.t2 = this._title;
+                _context2.t3 = id;
+                _context2.next = 9;
+                return this._itemsType;
+
+              case 9:
+                _context2.t4 = _context2.sent;
+                _context2.t5 = rest;
+                return _context2.abrupt("return", _context2.t0.patchListItem.call(_context2.t0, _context2.t1, _context2.t2, _context2.t3, _context2.t4, _context2.t5));
+
+              case 12:
+              case "end":
+                return _context2.stop();
+            }
           }
-        }
-      }, _callee2);
-    }));
+        }, _callee2, this);
+      }));
 
-    return function (_x2, _x3) {
-      return _ref2.apply(this, arguments);
-    };
-  }();
-  /**
-   * Delete an existing record from the SharePoint list
-   *
-   * @param {Number} id
-   * @return {Promise<Object>}
-   */
+      function updateItem(_x2, _x3) {
+        return _updateItem.apply(this, arguments);
+      }
 
+      return updateItem;
+    }()
+  }, {
+    key: "deleteItem",
+    value: function deleteItem(param1) {
+      var _param1$Id = param1.Id,
+          id = _param1$Id === void 0 ? param1 : _param1$Id;
 
-  this["delete"] = function (id) {
-    return requests.deleteListItem(_http, _title, id);
-  };
-  /**
-   * Return a list of the attached files in the list item
-   *
-   * @param {Number} itemId
-   * @return {Promise<Array>}
-   */
+      if (isNaN(id)) {
+        throw exceptions.missingItemId();
+      }
 
+      return requests.deleteListItem(this._http, this._title, id);
+    }
+  }, {
+    key: "getAttachments",
+    value: function getAttachments(param1) {
+      var _param1$Id2 = param1.Id,
+          id = _param1$Id2 === void 0 ? param1 : _param1$Id2;
 
-  this.getAttachmentsFrom = function (itemId) {
-    return requests.getListItemAttachments(_http, _title, itemId);
-  };
-  /**
-   * Upload a file attachment to a list item
-   *
-   * @param {Number} itemId
-   * @param {String} fileName Define a custom name to the attached file
-   * @param {String|HTMLInputElement|FileList|File|Blob|ArrayBuffer} fileReference
-   *          ArrayBuffer - raw data ready to be sent;
-   *          Blob - if it is a file reference created on the fly;
-   *          String - if it is a query selector;
-   *          HTMLInputElement - if it is a direct reference to the HTML element of type "file";
-   *          FileList - if it is a direct reference to the "files" attribute of the element;
-   *          File - if it is a direct reference to the file
-   * @return {Promise<Object>}
-   */
+      if (isNaN(id)) {
+        throw exceptions.missingItemId();
+      }
 
+      return requests.getListItemAttachments(this._http, this._title, id);
+    }
+  }, {
+    key: "addAttachment",
+    value: function () {
+      var _addAttachment = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee3(param1, fileName, fileReference) {
+        var fileBuffer, _param1$Id3, id;
 
-  this.attachTo = /*#__PURE__*/function () {
-    var _ref3 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee3(itemId, fileName, fileReference) {
-      var fileBuffer;
-      return _regenerator["default"].wrap(function _callee3$(_context3) {
-        while (1) {
-          switch (_context3.prev = _context3.next) {
-            case 0:
-              _context3.next = 2;
-              return genFileBuffer(fileReference);
+        return _regenerator["default"].wrap(function _callee3$(_context3) {
+          while (1) {
+            switch (_context3.prev = _context3.next) {
+              case 0:
+                _context3.next = 2;
+                return to_arraybuffer_1["default"](fileReference);
 
-            case 2:
-              fileBuffer = _context3.sent;
-              return _context3.abrupt("return", requests.uploadListItemAttachment(_http, _title, itemId, fileName, fileBuffer));
+              case 2:
+                fileBuffer = _context3.sent;
+                _param1$Id3 = param1.Id, id = _param1$Id3 === void 0 ? param1 : _param1$Id3;
 
-            case 4:
-            case "end":
-              return _context3.stop();
+                if (!isNaN(id)) {
+                  _context3.next = 6;
+                  break;
+                }
+
+                throw exceptions.missingItemId();
+
+              case 6:
+                return _context3.abrupt("return", requests.uploadListItemAttachment(this._http, this._title, id, fileName, fileBuffer));
+
+              case 7:
+              case "end":
+                return _context3.stop();
+            }
           }
-        }
-      }, _callee3);
-    }));
+        }, _callee3, this);
+      }));
 
-    return function (_x4, _x5, _x6) {
-      return _ref3.apply(this, arguments);
-    };
-  }();
-  /**
-   * Rename a given file attachment
-   *
-   * @param {Number} itemId
-   * @param {String} oldName
-   * @param {String} newName
-   * @return {Promise<Object>}
-   */
-  // eslint-disable-next-line max-len
+      function addAttachment(_x4, _x5, _x6) {
+        return _addAttachment.apply(this, arguments);
+      }
 
+      return addAttachment;
+    }()
+  }, {
+    key: "renameAttachment",
+    value: function renameAttachment(param1, currentName, newName) {
+      var _param1$Id4 = param1.Id,
+          id = _param1$Id4 === void 0 ? param1 : _param1$Id4;
 
-  this.renameAttachment = function (itemId, oldName, newName) {
-    return requests.renameListItemAttachment(_http, _title, itemId, oldName, newName);
-  };
-  /**
-   * Remove a given file attachment from the list item
-   *
-   * @param {Number} itemId
-   * @param {String} fileName
-   * @return {Promise<Object>}
-   */
+      if (isNaN(id)) {
+        throw exceptions.missingItemId();
+      }
 
+      return requests.renameListItemAttachment(this._http, this._title, id, currentName, newName);
+    }
+  }, {
+    key: "deleteAttachment",
+    value: function deleteAttachment(param1, fileName) {
+      var _param1$Id5 = param1.Id,
+          id = _param1$Id5 === void 0 ? param1 : _param1$Id5;
 
-  this.removeAttachment = function (itemId, fileName) {
-    return requests.deleteListItemAttachment(_http, _title, itemId, fileName);
-  };
-};
+      if (isNaN(id)) {
+        throw exceptions.missingItemId();
+      }
+
+      return requests.deleteListItemAttachment(this._http, this._title, id, fileName);
+    }
+  }, {
+    key: "title",
+    get: function get() {
+      return this._title;
+    }
+  }]);
+  return XomSharePointList;
+}();
+
+exports["default"] = XomSharePointList;

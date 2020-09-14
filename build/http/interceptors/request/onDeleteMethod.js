@@ -8,15 +8,26 @@ function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (O
 
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { (0, _defineProperty2["default"])(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 
-var commonHeaders = require('./headers-common');
-/**
- * Define headers for PATCH method
- *
- * @constant {Object}
- */
+var __importDefault = void 0 && (void 0).__importDefault || function (mod) {
+  return mod && mod.__esModule ? mod : {
+    "default": mod
+  };
+};
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
-module.exports = Object.freeze(_objectSpread(_objectSpread({}, commonHeaders), {}, {
-  'X-Http-Method': 'MERGE',
-  'If-Match': '*'
-}));
+var deleteHeaders_1 = __importDefault(require("../../config/deleteHeaders"));
+
+var onDeleteMethod = [function (config) {
+  var method = config.method;
+
+  if (method.match(/delete/i)) {
+    config.method = 'post';
+    config.headers = _objectSpread(_objectSpread({}, config.headers), deleteHeaders_1["default"]);
+  }
+
+  return config;
+}];
+exports["default"] = onDeleteMethod;

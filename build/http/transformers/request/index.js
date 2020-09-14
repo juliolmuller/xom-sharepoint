@@ -4,12 +4,18 @@ var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefau
 
 var _toConsumableArray2 = _interopRequireDefault(require("@babel/runtime/helpers/toConsumableArray"));
 
-var axios = require('axios')["default"];
-/**
- * Chain of functions to transform request
- *
- * @var {Array<Function>}
- */
+var __importDefault = void 0 && (void 0).__importDefault || function (mod) {
+  return mod && mod.__esModule ? mod : {
+    "default": mod
+  };
+};
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
-module.exports = (0, _toConsumableArray2["default"])(axios.defaults.transformRequest);
+var axios_1 = __importDefault(require("axios"));
+
+var defaultTransformers = axios_1["default"].defaults.transformRequest;
+var requestTransformers = (0, _toConsumableArray2["default"])(defaultTransformers);
+exports["default"] = requestTransformers;

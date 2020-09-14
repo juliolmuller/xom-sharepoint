@@ -2,9 +2,9 @@
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
 
-var _defineProperty2 = _interopRequireDefault(require("@babel/runtime/helpers/defineProperty"));
-
 var _regenerator = _interopRequireDefault(require("@babel/runtime/regenerator"));
+
+var _defineProperty2 = _interopRequireDefault(require("@babel/runtime/helpers/defineProperty"));
 
 var _asyncToGenerator2 = _interopRequireDefault(require("@babel/runtime/helpers/asyncToGenerator"));
 
@@ -12,657 +12,567 @@ function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (O
 
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { (0, _defineProperty2["default"])(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 
-var endpoints = require('./endpoints');
+var __createBinding = void 0 && (void 0).__createBinding || (Object.create ? function (o, m, k, k2) {
+  if (k2 === undefined) k2 = k;
+  Object.defineProperty(o, k2, {
+    enumerable: true,
+    get: function get() {
+      return m[k];
+    }
+  });
+} : function (o, m, k, k2) {
+  if (k2 === undefined) k2 = k;
+  o[k2] = m[k];
+});
 
-var utils = require('./utils');
-/**
- * Define all possible requests to the SharePoint API
- *
- * @var {Object<Function>}
- */
+var __setModuleDefault = void 0 && (void 0).__setModuleDefault || (Object.create ? function (o, v) {
+  Object.defineProperty(o, "default", {
+    enumerable: true,
+    value: v
+  });
+} : function (o, v) {
+  o["default"] = v;
+});
 
+var __importStar = void 0 && (void 0).__importStar || function (mod) {
+  if (mod && mod.__esModule) return mod;
+  var result = {};
+  if (mod != null) for (var k in mod) {
+    if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+  }
 
-var requests = {};
+  __setModuleDefault(result, mod);
+
+  return result;
+};
+
+var __importDefault = void 0 && (void 0).__importDefault || function (mod) {
+  return mod && mod.__esModule ? mod : {
+    "default": mod
+  };
+};
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.uploadFileToFolder = exports.getFileByUrl = exports.getFilesInFolder = exports.createFolder = exports.getFoldersInFolder = exports.getFolderByUrl = exports.getFolders = exports.deleteListItemAttachment = exports.renameListItemAttachment = exports.uploadListItemAttachment = exports.getListItemAttachments = exports.deleteListItem = exports.patchListItem = exports.postListItem = exports.getListItemById = exports.getListItems = exports.getListFields = exports.getListItemType = exports.getListByTitle = exports.deleteList = exports.createList = exports.getLists = exports.getSiteUserById = exports.getSiteUsersListItems = exports.getSiteUsersListFields = exports.getSiteUsersList = exports.getSiteCurrentUser = exports.getSiteRegionalSettings = exports.getSiteRecycleBin = exports.getSiteParent = exports.getRequestDigest = exports.getSite = void 0;
+
+var endpoints = __importStar(require("../endpoints"));
+
+var rewrapResponse_1 = __importDefault(require("../utils/rewrapResponse"));
+
+var expandPictureURL_1 = __importDefault(require("../utils/expandPictureURL"));
 /**
  * Fetch site root API
- *
- * @param {Axios} http
- * @return {Promise<Object>}
  */
 
-requests.getSite = function (http) {
-  return http.get(endpoints.site.info());
-};
+
+function getSite(http) {
+  var uri = endpoints.site.info();
+  return http.get(uri).then(rewrapResponse_1["default"]);
+}
+
+exports.getSite = getSite;
 /**
  * Fetch site context API for the request digest
- *
- * @param {Axios} http
- * @return {Promise<String>}
  */
 
+function getRequestDigest(_x) {
+  return _getRequestDigest.apply(this, arguments);
+}
 
-requests.getRequestDigest = /*#__PURE__*/function () {
-  var _ref = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee(http) {
-    var resp;
+function _getRequestDigest() {
+  _getRequestDigest = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee(http) {
+    var uri, response;
     return _regenerator["default"].wrap(function _callee$(_context) {
       while (1) {
         switch (_context.prev = _context.next) {
           case 0:
-            _context.next = 2;
-            return http.post(endpoints.site.contextInfo(), null, {
+            uri = endpoints.site.contextInfo();
+            _context.next = 3;
+            return http.post(uri, null, {
               digest: false
-            });
+            }).then(rewrapResponse_1["default"]);
 
-          case 2:
-            resp = _context.sent;
-            return _context.abrupt("return", resp.FormDigestValue || resp.GetContextWebInformation.FormDigestValue);
+          case 3:
+            response = _context.sent;
+            return _context.abrupt("return", response.FormDigestValue || response.GetContextWebInformation.FormDigestValue);
 
-          case 4:
+          case 5:
           case "end":
             return _context.stop();
         }
       }
     }, _callee);
   }));
+  return _getRequestDigest.apply(this, arguments);
+}
 
-  return function (_x) {
-    return _ref.apply(this, arguments);
-  };
-}();
+exports.getRequestDigest = getRequestDigest;
 /**
  * Fetch for site parent metadata
- *
- * @param {Axios} http
- * @return {Promise<Object>}
  */
 
+function getSiteParent(http) {
+  var uri = endpoints.site.parentSite();
+  return http.get(uri).then(rewrapResponse_1["default"]);
+}
 
-requests.getSiteParent = function (http) {
-  return http.get(endpoints.site.parentSite());
-};
+exports.getSiteParent = getSiteParent;
 /**
  * Fetch list of content in site Recycle Bin
- *
- * @param {Axios} http
- * @return {Promise<Object>}
  */
 
+function getSiteRecycleBin(http) {
+  var uri = endpoints.site.recycleBin();
+  return http.get(uri).then(rewrapResponse_1["default"]);
+}
 
-requests.getSiteRecycleBin = function (http) {
-  return http.get(endpoints.site.recycleBin());
-};
+exports.getSiteRecycleBin = getSiteRecycleBin;
 /**
  * Fetch for site Regional Settings
- *
- * @param {Axios} http
- * @return {Promise<Object>}
  */
 
+function getSiteRegionalSettings(http) {
+  var uri = endpoints.site.regionalSettings();
+  return http.get(uri).then(rewrapResponse_1["default"]);
+}
 
-requests.getSiteRegionalSettings = function (http) {
-  return http.get(endpoints.site.regionalSettings());
-};
+exports.getSiteRegionalSettings = getSiteRegionalSettings;
 /**
  * Fetch for basic current user information
- *
- * @param {Axios} http
- * @return {Promise<Object>}
  */
 
+function getSiteCurrentUser(http) {
+  var uri = endpoints.users.current();
+  return http.get(uri).then(rewrapResponse_1["default"]).then(expandPictureURL_1["default"]);
+}
 
-requests.getSiteCurrentUser = /*#__PURE__*/function () {
-  var _ref2 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee2(http) {
-    var user;
+exports.getSiteCurrentUser = getSiteCurrentUser;
+/**
+ * Fetch list metadata for site users
+ */
+
+function getSiteUsersList(http) {
+  var uri = endpoints.users.listMetadata();
+  return http.get(uri).then(rewrapResponse_1["default"]);
+}
+
+exports.getSiteUsersList = getSiteUsersList;
+/**
+ * Fetch list fields metadata for site users
+ */
+
+function getSiteUsersListFields(http, query) {
+  var uri = endpoints.users.listFields(query);
+  return http.get(uri).then(rewrapResponse_1["default"]);
+}
+
+exports.getSiteUsersListFields = getSiteUsersListFields;
+/**
+ * Fetch list items for site users
+ */
+
+function getSiteUsersListItems(_x2, _x3) {
+  return _getSiteUsersListItems.apply(this, arguments);
+}
+
+function _getSiteUsersListItems() {
+  _getSiteUsersListItems = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee2(http, query) {
+    var uri, users;
     return _regenerator["default"].wrap(function _callee2$(_context2) {
       while (1) {
         switch (_context2.prev = _context2.next) {
           case 0:
-            _context2.next = 2;
-            return http.get(endpoints.users.current());
+            uri = endpoints.users.listItems(query);
+            _context2.next = 3;
+            return http.get(uri).then(rewrapResponse_1["default"]);
 
-          case 2:
-            user = _context2.sent;
-            utils.expandPictureURL(user);
-            return _context2.abrupt("return", user);
+          case 3:
+            users = _context2.sent;
+            users.forEach(expandPictureURL_1["default"]);
+            return _context2.abrupt("return", users);
 
-          case 5:
+          case 6:
           case "end":
             return _context2.stop();
         }
       }
     }, _callee2);
   }));
+  return _getSiteUsersListItems.apply(this, arguments);
+}
 
-  return function (_x2) {
-    return _ref2.apply(this, arguments);
+exports.getSiteUsersListItems = getSiteUsersListItems;
+/**
+ * Fetch a single list item with user information
+ */
+
+function getSiteUserById(http, id) {
+  var uri = endpoints.users.byId(id);
+  return http.get(uri).then(rewrapResponse_1["default"]).then(expandPictureURL_1["default"]);
+}
+
+exports.getSiteUserById = getSiteUserById;
+/**
+ * Fetch list of all site lists
+ */
+
+function getLists(http, query) {
+  var uri = endpoints.lists.index(query);
+  return http.get(uri).then(rewrapResponse_1["default"]);
+}
+
+exports.getLists = getLists;
+/**
+ * Create a new list in the site
+ */
+
+function createList(http, listTitle) {
+  var uri = endpoints.lists.index();
+  var metadata = {
+    __metadata: {
+      type: 'SP.List'
+    },
+    BaseTemplate: 100,
+    Title: listTitle
   };
-}();
+  return http.post(uri, metadata).then(rewrapResponse_1["default"]);
+}
+
+exports.createList = createList;
 /**
- * Fetch list metadata for site users
- *
- * @param {Axios} http
- * @return {Promise<Object>}
+ * Delete an existing list in the site
  */
 
+function deleteList(http, listTitle) {
+  var uri = endpoints.lists.byTitle(listTitle);
+  return http["delete"](uri).then(rewrapResponse_1["default"]);
+}
 
-requests.getSiteUsersList = function (http) {
-  return http.get(endpoints.users.listMetadata());
-};
+exports.deleteList = deleteList;
 /**
- * Fetch list fields metadata for site users
- *
- * @param {Axios} http
- * @param {String} [query]
- * @return {Promise<Array>}
+ * Fetch list metadata
  */
 
+function getListByTitle(http, listTitle, query) {
+  var uri = endpoints.lists.byTitle(listTitle, query);
+  return http.get(uri).then(rewrapResponse_1["default"]);
+}
 
-requests.getSiteUsersListFields = function (http) {
-  var query = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
-  return http.get(endpoints.users.listFields(query));
-};
+exports.getListByTitle = getListByTitle;
 /**
- * Fetch list items for site users
- *
- * @param {Axios} http
- * @param {String} [query]
- * @return {Promise<Array>}
+ * Fetch list metadata
  */
 
+function getListItemType(_x4, _x5) {
+  return _getListItemType.apply(this, arguments);
+}
 
-requests.getSiteUsersListItems = /*#__PURE__*/function () {
-  var _ref3 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee3(http) {
-    var query,
-        users,
-        _args3 = arguments;
+function _getListItemType() {
+  _getListItemType = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee3(http, listTitle) {
+    var response;
     return _regenerator["default"].wrap(function _callee3$(_context3) {
       while (1) {
         switch (_context3.prev = _context3.next) {
           case 0:
-            query = _args3.length > 1 && _args3[1] !== undefined ? _args3[1] : '';
-            _context3.next = 3;
-            return http.get(endpoints.users.listItems(query));
+            _context3.next = 2;
+            return getListByTitle(http, listTitle, {
+              $select: 'ListItemEntityTypeFullName'
+            });
 
-          case 3:
-            users = _context3.sent;
-            users.forEach(utils.expandPictureURL);
-            return _context3.abrupt("return", users);
+          case 2:
+            response = _context3.sent;
+            return _context3.abrupt("return", response.ListItemEntityTypeFullName);
 
-          case 6:
+          case 4:
           case "end":
             return _context3.stop();
         }
       }
     }, _callee3);
   }));
+  return _getListItemType.apply(this, arguments);
+}
 
-  return function (_x3) {
-    return _ref3.apply(this, arguments);
-  };
-}();
+exports.getListItemType = getListItemType;
 /**
- * Fetch a single list item with user information
- *
- * @param {Axios} http
- * @param {Number} id
- * @return {Promise<Object>}
+ * Fetch list fields metadata
  */
 
+function getListFields(http, listTitle, query) {
+  var uri = endpoints.lists.fields(listTitle, query);
+  return http.get(uri).then(rewrapResponse_1["default"]);
+}
 
-requests.getSiteUserById = /*#__PURE__*/function () {
-  var _ref4 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee4(http, id) {
-    var user;
+exports.getListFields = getListFields;
+/**
+ * Fetch list items
+ */
+
+function getListItems(http, listTitle, query) {
+  var uri = endpoints.lists.items(listTitle, query);
+  return http.get(uri).then(rewrapResponse_1["default"]);
+}
+
+exports.getListItems = getListItems;
+/**
+ * Fetch a single list item
+ */
+
+function getListItemById(http, listTitle, itemId, query) {
+  var uri = endpoints.lists.itemById(listTitle, itemId, query);
+  return http.get(uri).then(rewrapResponse_1["default"]);
+}
+
+exports.getListItemById = getListItemById;
+/**
+ * Create a new record to the list
+ */
+
+function postListItem(http, listTitle, type, data) {
+  var uri = endpoints.lists.items(listTitle);
+
+  var metadata = _objectSpread({
+    __metadata: {
+      type: type
+    }
+  }, data);
+
+  return http.post(uri, metadata).then(rewrapResponse_1["default"]);
+}
+
+exports.postListItem = postListItem;
+/**
+ * Update an existing record in the list
+ */
+
+function patchListItem(_x6, _x7, _x8, _x9, _x10) {
+  return _patchListItem.apply(this, arguments);
+}
+
+function _patchListItem() {
+  _patchListItem = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee4(http, listTitle, itemId, type, data) {
+    var uri, metadata, _yield$http$patch$the, patchResponse, updatedItem;
+
     return _regenerator["default"].wrap(function _callee4$(_context4) {
       while (1) {
         switch (_context4.prev = _context4.next) {
           case 0:
-            _context4.next = 2;
-            return http.get(endpoints.users.byId(id));
+            uri = endpoints.lists.itemById(listTitle, itemId);
+            metadata = _objectSpread({
+              __metadata: {
+                type: type
+              }
+            }, data);
+            _context4.next = 4;
+            return http.patch(uri, metadata).then(rewrapResponse_1["default"]);
 
-          case 2:
-            user = _context4.sent;
-            utils.expandPictureURL(user);
-            return _context4.abrupt("return", user);
+          case 4:
+            _yield$http$patch$the = _context4.sent;
+            patchResponse = _yield$http$patch$the.__response;
+            _context4.next = 8;
+            return getListItemById(http, listTitle, itemId);
 
-          case 5:
+          case 8:
+            updatedItem = _context4.sent;
+            updatedItem.__response = patchResponse;
+            return _context4.abrupt("return", updatedItem);
+
+          case 11:
           case "end":
             return _context4.stop();
         }
       }
     }, _callee4);
   }));
+  return _patchListItem.apply(this, arguments);
+}
 
-  return function (_x4, _x5) {
-    return _ref4.apply(this, arguments);
-  };
-}();
+exports.patchListItem = patchListItem;
 /**
- * Fetch list of all site lists
- *
- * @param {Axios} http
- * @param {String} [query]
- * @return {Promise<Array>}
+ * Update an existing record in the list
  */
 
+function deleteListItem(_x11, _x12, _x13) {
+  return _deleteListItem.apply(this, arguments);
+}
 
-requests.getLists = function (http) {
-  var query = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
-  return http.get(endpoints.lists.index(query));
-};
-/**
- * Create a new list in the site
- *
- * @param {Axios} http
- * @param {String} listTitle
- * @return {Promise<Object>}
- */
+function _deleteListItem() {
+  _deleteListItem = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee5(http, listTitle, itemId) {
+    var uri, originalItem, _yield$http$delete$th, deleteResponse;
 
-
-requests.createList = function (http, listTitle) {
-  return http.post(endpoints.lists.index(), {
-    __metadata: {
-      type: 'SP.List'
-    },
-    BaseTemplate: 100,
-    Title: listTitle
-  });
-};
-/**
- * Delete an existing list in the site
- *
- * @param {Axios} http
- * @param {String} listTitle
- * @return {Promise<Object>}
- */
-
-
-requests.deleteList = function (http, listTitle) {
-  return http["delete"](endpoints.lists.byTitle(listTitle));
-};
-/**
- * Fetch list metadata
- *
- * @param {Axios} http
- * @param {String} listTitle
- * @param {String} [query]
- * @return {Promise<Object>}
- */
-
-
-requests.getListByTitle = function (http, listTitle) {
-  var query = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '';
-  return http.get(endpoints.lists.byTitle(listTitle, query));
-};
-/**
- * Fetch list metadata
- *
- * @param {Axios} http
- * @param {String} listTitle
- * @return {Promise<String>}
- */
-
-
-requests.getListItemType = /*#__PURE__*/function () {
-  var _ref5 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee5(http, listTitle) {
-    var resp;
     return _regenerator["default"].wrap(function _callee5$(_context5) {
       while (1) {
         switch (_context5.prev = _context5.next) {
           case 0:
-            _context5.next = 2;
-            return requests.getListByTitle(http, listTitle, {
-              $select: 'ListItemEntityTypeFullName'
-            });
+            uri = endpoints.lists.itemById(listTitle, itemId);
+            _context5.next = 3;
+            return getListItemById(http, listTitle, itemId);
 
-          case 2:
-            resp = _context5.sent;
-            return _context5.abrupt("return", resp.ListItemEntityTypeFullName);
+          case 3:
+            originalItem = _context5.sent;
+            _context5.next = 6;
+            return http["delete"](uri).then(rewrapResponse_1["default"]);
 
-          case 4:
+          case 6:
+            _yield$http$delete$th = _context5.sent;
+            deleteResponse = _yield$http$delete$th.__response;
+            originalItem.__response = deleteResponse;
+            return _context5.abrupt("return", originalItem);
+
+          case 10:
           case "end":
             return _context5.stop();
         }
       }
     }, _callee5);
   }));
+  return _deleteListItem.apply(this, arguments);
+}
 
-  return function (_x6, _x7) {
-    return _ref5.apply(this, arguments);
-  };
-}();
+exports.deleteListItem = deleteListItem;
 /**
- * Fetch list fields metadata
- *
- * @param {Axios} http
- * @param {String} listTitle
- * @param {String} [query]
- * @return {Promise<Array>}
+ * Fetch attachments of a given list item
  */
 
+function getListItemAttachments(http, listTitle, itemId) {
+  var uri = endpoints.lists.itemAttachments(listTitle, itemId);
+  return http.get(uri).then(rewrapResponse_1["default"]);
+}
 
-requests.getListFields = function (http, listTitle) {
-  var query = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '';
-  return http.get(endpoints.lists.fields(listTitle, query));
-};
+exports.getListItemAttachments = getListItemAttachments;
 /**
- * Fetch list items
- *
- * @param {Axios} http
- * @param {String} listTitle
- * @param {String} [query]
- * @return {Promise<Array>}
+ * Upload an attachment to a given list item
  */
 
+function uploadListItemAttachment(http, listTitle, itemId, fileName, fileBuffer) {
+  var uri = endpoints.lists.itemAttachmentsUpload(listTitle, itemId, fileName);
+  return http.post(uri, fileBuffer).then(rewrapResponse_1["default"]);
+}
 
-requests.getListItems = function (http, listTitle) {
-  var query = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '';
-  return http.get(endpoints.lists.items(listTitle, query));
-};
+exports.uploadListItemAttachment = uploadListItemAttachment;
 /**
- * Fetch a single list item
- *
- * @param {Axios} http
- * @param {String} listTitle
- * @param {Number} itemId
- * @param {String} [query]
- * @return {Promise<Object>}
+ * Rename an existing attachment from a given list item
  */
 
+function renameListItemAttachment(_x14, _x15, _x16, _x17, _x18) {
+  return _renameListItemAttachment.apply(this, arguments);
+}
 
-requests.getListItemById = function (http, listTitle, itemId) {
-  var query = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : '';
-  return http.get(endpoints.lists.itemById(listTitle, itemId, query));
-};
-/**
- * Create a new record to the list
- *
- * @param {Axios} http
- * @param {String} listTitle
- * @param {String} type
- * @param {Object} data
- * @return {Promise<Array>}
- */
-
-
-requests.postListItem = function (http, listTitle, type, data) {
-  return http.post(endpoints.lists.items(listTitle), _objectSpread({
-    __metadata: {
-      type: type
-    }
-  }, data));
-};
-/**
- * Update an existing record in the list
- *
- * @param {Axios} http
- * @param {String} listTitle
- * @param {Number} itemId
- * @param {String} type
- * @param {Object} data
- * @return {Promise<Array>}
- */
-
-
-requests.patchListItem = /*#__PURE__*/function () {
-  var _ref6 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee6(http, listTitle, itemId, type, data) {
-    var patchResp, updatedItem;
+function _renameListItemAttachment() {
+  _renameListItemAttachment = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee6(http, listTitle, itemId, currentFileName, newFileName) {
+    var attachments, oldFileUrl, newFileUrl, uri;
     return _regenerator["default"].wrap(function _callee6$(_context6) {
       while (1) {
         switch (_context6.prev = _context6.next) {
           case 0:
             _context6.next = 2;
-            return http.patch(endpoints.lists.itemById(listTitle, itemId), _objectSpread({
-              __metadata: {
-                type: type
-              }
-            }, data));
+            return getListItemAttachments(http, listTitle, itemId);
 
           case 2:
-            patchResp = _context6.sent;
-            _context6.next = 5;
-            return requests.getListItemById(http, listTitle, itemId);
+            attachments = _context6.sent;
+            oldFileUrl = attachments.find(function (att) {
+              return att.FileName === currentFileName;
+            }).ServerRelativeUrl;
+            newFileUrl = oldFileUrl.replace(currentFileName, newFileName);
+            uri = endpoints.lists.itemAttachmentsRename(oldFileUrl, newFileUrl);
+            return _context6.abrupt("return", http.patch(uri).then(rewrapResponse_1["default"]));
 
-          case 5:
-            updatedItem = _context6.sent;
-            delete patchResp.data;
-            updatedItem.__response = patchResp;
-            return _context6.abrupt("return", updatedItem);
-
-          case 9:
+          case 7:
           case "end":
             return _context6.stop();
         }
       }
     }, _callee6);
   }));
+  return _renameListItemAttachment.apply(this, arguments);
+}
 
-  return function (_x8, _x9, _x10, _x11, _x12) {
-    return _ref6.apply(this, arguments);
-  };
-}();
-/**
- * Update an existing record in the list
- *
- * @param {Axios} http
- * @param {String} listTitle
- * @param {Number} itemId
- * @return {Promise<Array>}
- */
-
-
-requests.deleteListItem = /*#__PURE__*/function () {
-  var _ref7 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee7(http, listTitle, itemId) {
-    var originalItem, deleteResp;
-    return _regenerator["default"].wrap(function _callee7$(_context7) {
-      while (1) {
-        switch (_context7.prev = _context7.next) {
-          case 0:
-            _context7.next = 2;
-            return requests.getListItemById(http, listTitle, itemId);
-
-          case 2:
-            originalItem = _context7.sent;
-            _context7.next = 5;
-            return http["delete"](endpoints.lists.itemById(listTitle, itemId));
-
-          case 5:
-            deleteResp = _context7.sent;
-            delete deleteResp.data;
-            originalItem.__response = deleteResp;
-            return _context7.abrupt("return", originalItem);
-
-          case 9:
-          case "end":
-            return _context7.stop();
-        }
-      }
-    }, _callee7);
-  }));
-
-  return function (_x13, _x14, _x15) {
-    return _ref7.apply(this, arguments);
-  };
-}();
-/**
- * Fetch attachments of a given list item
- *
- * @param {Axios} http
- * @param {String} listTitle
- * @param {Number} itemId
- * @return {Promise<Array>}
- */
-
-
-requests.getListItemAttachments = function (http, listTitle, itemId) {
-  return http.get(endpoints.lists.itemAttachments(listTitle, itemId));
-};
-/**
- * Upload an attachment to a given list item
- *
- * @param {Axios} http
- * @param {String} listTitle
- * @param {Number} itemId
- * @param {String} fileName
- * @param {ArrayBuffer} fileBuffer
- * @return {Promise<Object>}
- */
-
-
-requests.uploadListItemAttachment = function (http, listTitle, itemId, fileName, fileBuffer) {
-  return http.post(endpoints.lists.itemAttachmentsUpload(listTitle, itemId, fileName), fileBuffer);
-};
-/**
- * Rename an existing attachment from a given list item
- *
- * @param {Axios} http
- * @param {String} listTitle
- * @param {Number} itemId
- * @param {String} oldFileName
- * @param {String} newFileName
- * @return {Promise<Object>}
- */
-
-
-requests.renameListItemAttachment = /*#__PURE__*/function () {
-  var _ref8 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee8(http, listTitle, itemId, oldFileName, newFileName) {
-    var attachments, oldFileUrl, newFileUrl;
-    return _regenerator["default"].wrap(function _callee8$(_context8) {
-      while (1) {
-        switch (_context8.prev = _context8.next) {
-          case 0:
-            _context8.next = 2;
-            return requests.getListItemAttachments(http, listTitle, itemId);
-
-          case 2:
-            attachments = _context8.sent;
-            oldFileUrl = attachments.find(function (att) {
-              return att.FileName === oldFileName;
-            }).ServerRelativeUrl;
-            newFileUrl = oldFileUrl.replace(oldFileName, newFileName);
-            return _context8.abrupt("return", http.patch(endpoints.lists.itemAttachmentsRename(oldFileUrl, newFileUrl)));
-
-          case 6:
-          case "end":
-            return _context8.stop();
-        }
-      }
-    }, _callee8);
-  }));
-
-  return function (_x16, _x17, _x18, _x19, _x20) {
-    return _ref8.apply(this, arguments);
-  };
-}();
+exports.renameListItemAttachment = renameListItemAttachment;
 /**
  * Delete an attachment of a given list item
- *
- * @param {Axios} http
- * @param {String} listTitle
- * @param {Number} itemId
- * @param {String} fileName
- * @return {Promise<Object>}
  */
 
+function deleteListItemAttachment(http, listTitle, itemId, fileName) {
+  var uri = endpoints.lists.itemAttachmentByName(listTitle, itemId, fileName);
+  return http["delete"](uri).then(rewrapResponse_1["default"]);
+}
 
-requests.deleteListItemAttachment = function (http, listTitle, itemId, fileName) {
-  return http["delete"](endpoints.lists.itemAttachmentByName(listTitle, itemId, fileName));
-};
+exports.deleteListItemAttachment = deleteListItemAttachment;
 /**
  * Fetch list of all site folders/libraries
- *
- * @param {Axios} http
- * @param {String} [query]
- * @return {Promise<Array>}
  */
 
+function getFolders(http, query) {
+  var uri = endpoints.folders.index(query);
+  return http.get(uri).then(rewrapResponse_1["default"]);
+}
 
-requests.getFolders = function (http) {
-  var query = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
-  return http.get(endpoints.folders.index(query));
-};
+exports.getFolders = getFolders;
 /**
  * Fetch the content with a given folder/library based on its relative URL
- *
- * @param {Axios} http
- * @param {String} relativeUrl
- * @return {Promise<Object>}
  */
 
+function getFolderByUrl(http, relativeUrl) {
+  var uri = endpoints.folders.folderByUrl(relativeUrl);
+  return http.get(uri).then(rewrapResponse_1["default"]);
+}
 
-requests.getFolderByUrl = function (http, relativeUrl) {
-  return http.get(endpoints.folders.folderByUrl(relativeUrl));
-};
+exports.getFolderByUrl = getFolderByUrl;
 /**
  * Fetch the existing folders within a given folder based on its relative URL
- *
- * @param {Axios} http
- * @param {String} relativeUrl
- * @param {String} [query]
- * @return {Promise<Object>}
  */
 
+function getFoldersInFolder(http, relativeUrl, query) {
+  var uri = endpoints.folders.foldersInFolder(relativeUrl, query);
+  return http.get(uri).then(rewrapResponse_1["default"]);
+}
 
-requests.getFoldersInFolder = function (http, relativeUrl) {
-  var query = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '';
-  return http.get(endpoints.folders.foldersInFolder(relativeUrl, query));
-};
+exports.getFoldersInFolder = getFoldersInFolder;
 /**
  * Creates a new folder given library or folder based on its relative URL
- *
- * @param {Axios} http
- * @param {String} relativeUrl
- * @param {String} folderName
- * @return {Promise<Object>}
  */
 
-
-requests.createFolder = function (http, relativeUrl, folderName) {
-  return http.post(endpoints.folders.index(), {
+function createFolder(http, relativeUrl, folderName) {
+  var uri = endpoints.folders.index();
+  var metadata = {
     ServerRelativeUrl: "".concat(relativeUrl, "/").concat(folderName),
     __metadata: {
       type: 'SP.Folder'
     }
-  });
-};
+  };
+  return http.post(uri, metadata).then(rewrapResponse_1["default"]);
+}
+
+exports.createFolder = createFolder;
 /**
  * Fetch the existing folders within a given folder based on its relative URL
- *
- * @param {Axios} http
- * @param {String} relativeUrl
- * @param {String} [query]
- * @return {Promise<Object>}
  */
 
+function getFilesInFolder(http, relativeUrl, query) {
+  var uri = endpoints.folders.filesInFolder(relativeUrl, query);
+  return http.get(uri).then(rewrapResponse_1["default"]);
+}
 
-requests.getFilesInFolder = function (http, relativeUrl) {
-  var query = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '';
-  return http.get(endpoints.folders.filesInFolder(relativeUrl, query));
-};
+exports.getFilesInFolder = getFilesInFolder;
 /**
  * Fetch the content with a given file within a library based on its relative URL
- *
- * @param {Axios} http
- * @param {String} relativeUrl
- * @return {Promise<Object>}
  */
 
+function getFileByUrl(http, relativeUrl) {
+  var uri = endpoints.folders.fileByUrl(relativeUrl);
+  return http.get(uri).then(rewrapResponse_1["default"]);
+}
 
-requests.getFileByUrl = function (http, relativeUrl) {
-  return http.get(endpoints.folders.fileByUrl(relativeUrl));
-};
+exports.getFileByUrl = getFileByUrl;
 /**
  * Fetch the existing folders within a given folder based on its relative URL
- *
- * @param {Axios} http
- * @param {String} relativeUrl
- * @param {String} fileName
- * @param {ArrayBuffer} fileBuffer
- * @return {Promise<Object>}
  */
 
+function uploadFileToFolder(http, relativeUrl, fileName, fileBuffer) {
+  var uri = endpoints.folders.newFileToFolder(relativeUrl, fileName);
+  return http.post(uri, fileBuffer).then(rewrapResponse_1["default"]);
+}
 
-requests.uploadFileToFolder = function (http, relativeUrl, fileName, fileBuffer) {
-  return http.post(endpoints.folders.newFileToFolder(relativeUrl, fileName), fileBuffer);
-};
-
-module.exports = requests;
+exports.uploadFileToFolder = uploadFileToFolder;

@@ -12,31 +12,26 @@ function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (O
 
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { (0, _defineProperty2["default"])(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 
-/**
- * Add the header for the request digest token
- *
- * @param {Axios} httpInstance
- * @return {Array<Function>}
- */
-module.exports = function (httpInstance) {
-  return [
-  /*#__PURE__*/
-  // on success
-  function () {
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+function addRequestDigest(httpInstance) {
+  return [/*#__PURE__*/function () {
     var _ref = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee(config) {
-      var digest, method;
+      var method, digest;
       return _regenerator["default"].wrap(function _callee$(_context) {
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
-              digest = config.digest, method = config.method;
+              method = config.method;
+              digest = config.digest;
 
-              if (!(digest !== false && /post/i.test(method))) {
+              if (!(digest !== false && method.match(/post/i))) {
                 _context.next = 11;
                 break;
               }
 
-              config.method = 'post';
               _context.t0 = _objectSpread;
               _context.t1 = _objectSpread({}, config.headers);
               _context.t2 = {};
@@ -65,4 +60,6 @@ module.exports = function (httpInstance) {
       return _ref.apply(this, arguments);
     };
   }()];
-};
+}
+
+exports["default"] = addRequestDigest;

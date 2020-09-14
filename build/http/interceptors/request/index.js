@@ -1,18 +1,20 @@
 "use strict";
 
-var requestDigest = require('./request-digest');
+var __importDefault = void 0 && (void 0).__importDefault || function (mod) {
+  return mod && mod.__esModule ? mod : {
+    "default": mod
+  };
+};
 
-var deleteMethod = require('./delete-method');
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
-var patchMethod = require('./patch-method');
+var addRequestDigest_1 = __importDefault(require("./addRequestDigest"));
 
-var addHeaders = require('./default-headers');
-/**
- * Consolidate all functions to be run on request interception
- *
- * @var {Array<Array|Function>}
- */
+var onDeleteMethod_1 = __importDefault(require("./onDeleteMethod"));
 
+var onPatchMethod_1 = __importDefault(require("./onPatchMethod"));
 
-module.exports = [// custom functions
-requestDigest, deleteMethod, patchMethod, addHeaders];
+var requestInterceptors = [addRequestDigest_1["default"], onDeleteMethod_1["default"], onPatchMethod_1["default"]];
+exports["default"] = requestInterceptors;
