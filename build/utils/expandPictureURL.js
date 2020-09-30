@@ -11,14 +11,16 @@ var LARGE_PICTURE_CODE = '_LThumb';
  */
 
 function expandPictureURL(userObject) {
-  if (userObject && typeof userObject.Picture !== 'undefined') {
-    var url = userObject.Picture.Url; // encodeURI(userObject.Picture.Url)
+  if (userObject) {
+    var _userObject$Picture;
+
+    var url = (_userObject$Picture = userObject.Picture) === null || _userObject$Picture === void 0 ? void 0 : _userObject$Picture.Url; // encodeURI(userObject.Picture.Url)
 
     var targetExpression = new RegExp("".concat(SMALL_PICTURE_CODE, "|").concat(MEDIUM_PICTURE_CODE, "|").concat(LARGE_PICTURE_CODE), 'i');
     userObject.Picture = {
-      Small: userObject.Picture && url.replace(targetExpression, SMALL_PICTURE_CODE),
-      Medium: userObject.Picture && url.replace(targetExpression, MEDIUM_PICTURE_CODE),
-      Large: userObject.Picture && url.replace(targetExpression, LARGE_PICTURE_CODE)
+      Small: (url === null || url === void 0 ? void 0 : url.replace(targetExpression, SMALL_PICTURE_CODE)) || null,
+      Medium: (url === null || url === void 0 ? void 0 : url.replace(targetExpression, MEDIUM_PICTURE_CODE)) || null,
+      Large: (url === null || url === void 0 ? void 0 : url.replace(targetExpression, LARGE_PICTURE_CODE)) || null
     };
   }
 
