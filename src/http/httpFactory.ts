@@ -1,5 +1,4 @@
 import axios from 'axios'
-import { XomApiClient } from '../@types'
 import * as requests from '../facades/requests'
 import commonHeaders from './config/commonHeaders'
 import reqTransformers from './transformers/request'
@@ -7,6 +6,8 @@ import respTransformers from './transformers/response'
 import requestInterceptors from './interceptors/request'
 import responseInterceptors from './interceptors/response'
 import registerInterceptor from '../utils/registerInterceptor'
+
+import type { XomApiClient } from '../types'
 
 function httpFactory(siteUrl: string): XomApiClient {
   const http: XomApiClient = axios.create({

@@ -1,4 +1,4 @@
-import { AxiosTransformer } from 'axios'
+import type { AxiosTransformer } from 'axios'
 
 function exposeDeepData(data: any): AxiosTransformer {
   if (data?.d) {

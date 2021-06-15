@@ -5,6 +5,6 @@ import XomSharePointSite from './XomSharePointSite'
  * therefore, exchange data with its contents (lists, libraries, permissions)
  * through SharePoint native REST API
  */
-export default function xomSharePoint(baseSiteUrl: string): XomSharePointSite {
+export default function xomSharePoint(baseSiteUrl: string) {
   return new XomSharePointSite(baseSiteUrl)
 }

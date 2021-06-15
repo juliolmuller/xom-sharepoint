@@ -1,14 +1,8 @@
-import { XomApiQueryString, XomApiResponse } from '../@types'
-import { XomApiClient } from '../@types'
 import * as endpoints from '../endpoints'
 import rewrapResponse from '../utils/rewrapResponse'
 import expandPictureURL from '../utils/expandPictureURL'
 
-interface Blah {
-  name: string;
-  code: number,
-  admin?: boolean
-}
+import type { XomApiClient, XomApiQueryString, XomApiResponse } from '../types'
 
 /**
  * Fetch site root API

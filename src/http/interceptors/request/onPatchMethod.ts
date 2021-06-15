@@ -1,5 +1,6 @@
-import { XomApiRequestConfig, XomApiInterceptor } from '../../../@types'
 import patchHeaders from '../../config//patchHeaders'
+
+import type { XomApiRequestConfig, XomApiInterceptor } from '../../../types'
 
 const onPatchMethod: XomApiInterceptor<XomApiRequestConfig> = [
   (config: XomApiRequestConfig): XomApiRequestConfig => {

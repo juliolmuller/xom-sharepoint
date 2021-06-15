@@ -1,6 +1,7 @@
-import { XomApiClient, XomApiResponse, XomApiQueryString } from './@types'
 import genFileBuffer from '@lacussoft/to-arraybuffer'
 import * as requests from './facades/requests'
+
+import type { XomApiClient, XomApiQueryString } from './types'
 
 /**
  * Instantiate the object with the necessary information to connect to a SharePoint file library through its REST API.
@@ -19,7 +20,7 @@ class XomSharePointLibrary {
     this._filesType = ''
   }
 
-  public get relativeUrl(): string {
+  public get relativeUrl() {
     const baseUrl = new URL(this._http.defaults.baseURL as string)
 
     return `${baseUrl.pathname}/${this._address}`
@@ -28,31 +29,28 @@ class XomSharePointLibrary {
   /**
    * Returns a list of the folders within the folder.
    */
-  public listSubfolders(params?: XomApiQueryString): Promise<XomApiResponse> {
+  public listSubfolders(params?: XomApiQueryString) {
     return requests.getFoldersInFolder(this._http, this.relativeUrl, params)
   }
 
   /**
    * Creates a folder within this folder.
    */
-  public createSubfolder(folderName: string): Promise<XomApiResponse> {
+  public createSubfolder(folderName: string) {
     return requests.createFolder(this._http, this.relativeUrl, folderName)
   }
 
   /**
    * Returns a list of the files within this folder.
    */
-  public listFiles(params?: XomApiQueryString): Promise<XomApiResponse> {
+  public listFiles(params?: XomApiQueryString) {
     return requests.getFilesInFolder(this._http, this.relativeUrl, params)
   }
 
   /**
    * Uploads a file into the folder.
    */
-  public async uploadFile(
-    fileName: string,
-    fileReference: string | HTMLInputElement | FileList | File | ArrayBuffer | Blob,
-  ): Promise<XomApiResponse> {
+  public async uploadFile(fileName: string, fileReference: string | HTMLInputElement | FileList | File | ArrayBuffer | Blob) {
     const fileBuffer = await genFileBuffer(fileReference)
     const result = await requests.uploadFileToFolder(this._http, this.relativeUrl, fileName, fileBuffer)
 

@@ -1,4 +1,4 @@
-import { XomApiClient, XomApiRequestConfig, XomApiInterceptor } from '../../../@types'
+import type { XomApiClient, XomApiRequestConfig, XomApiInterceptor } from '../../../types'
 
 function addRequestDigest(httpInstance: XomApiClient): XomApiInterceptor<XomApiRequestConfig> {
   return [

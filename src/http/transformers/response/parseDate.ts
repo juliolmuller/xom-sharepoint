@@ -1,4 +1,4 @@
-import { AxiosTransformer } from 'axios'
+import type { AxiosTransformer } from 'axios'
 
 function lookForDates(obj: Record<string, unknown>) {
   const SP_DATE_STR_LENGTH = 20

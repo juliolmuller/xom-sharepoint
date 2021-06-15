@@ -1,6 +1,8 @@
-import axios, { AxiosTransformer } from 'axios'
-import exposeDeepData from './exposeDeepData'
+import axios from 'axios'
 import parseDates from './parseDate'
+import exposeDeepData from './exposeDeepData'
+
+import type { AxiosTransformer } from 'axios'
 
 const defaultTransformers = axios.defaults.transformResponse as AxiosTransformer[]
 

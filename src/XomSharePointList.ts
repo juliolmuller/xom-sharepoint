@@ -1,7 +1,8 @@
-import { XomApiClient, XomApiResponse, XomApiQueryString } from './@types'
 import genFileBuffer from '@lacussoft/to-arraybuffer'
-import * as requests from './facades/requests'
 import * as exceptions from './facades/exceptions'
+import * as requests from './facades/requests'
+
+import type { XomApiClient, XomApiResponse, XomApiQueryString } from './types'
 
 /**
  * Instantiate the object with the necessary information to connect to a SharePoint list through its REST API.
@@ -9,7 +10,9 @@ import * as exceptions from './facades/exceptions'
 class XomSharePointList {
 
   private _title: string
+
   private _http: XomApiClient
+
   private _itemsType: Promise<string>
 
   constructor(listTitle: string, httpInstance: XomApiClient) {
@@ -18,28 +21,28 @@ class XomSharePointList {
     this._itemsType = requests.getListItemType(this._http, this._title)
   }
 
-  public get title(): string {
+  public get title() {
     return this._title
   }
 
   /**
    * Returns the list fields metadata;
    */
-  public getFields(params?: XomApiQueryString): Promise<XomApiResponse> {
+  public getFields(params?: XomApiQueryString) {
     return requests.getListFields(this._http, this._title, params)
   }
 
   /**
    * Returns a list of the items stored in the list.
    */
-  public getItems(params?: XomApiQueryString): Promise<XomApiResponse> {
+  public getItems(params?: XomApiQueryString) {
     return requests.getListItems(this._http, this._title, params)
   }
 
   /**
    * Returns a single list item with the given ID.
    */
-  public findItem(itemId: number, params?: XomApiQueryString): Promise<XomApiResponse> {
+  public findItem(itemId: number, params?: XomApiQueryString) {
     return requests.getListItemById(this._http, this._title, itemId, params)
   }
 
@@ -48,7 +51,7 @@ class XomSharePointList {
    */
   public saveItem(data: any): Promise<XomApiResponse>
   public saveItem(itemId: number, data: any): Promise<XomApiResponse>
-  public saveItem(param1: any, param2?: any): Promise<XomApiResponse> {
+  public saveItem(param1: any, param2?: any) {
     const { Id: id, ...rest } = param2 || param1
 
     return id
@@ -59,7 +62,7 @@ class XomSharePointList {
   /**
    * Saves a new record in the SharePoint list.
    */
-  public async createItem(data: any): Promise<XomApiResponse> {
+  public async createItem(data: any) {
     return requests.postListItem(this._http, this._title, await this._itemsType, data)
   }
 
@@ -68,7 +71,7 @@ class XomSharePointList {
    */
   public updateItem(item: any): Promise<XomApiResponse>
   public updateItem(itemId: number, data: any): Promise<XomApiResponse>
-  public async updateItem(param1: any, param2?: any): Promise<XomApiResponse> {
+  public async updateItem(param1: any, param2?: any) {
     const { Id: id = param1, ...rest } = param2 || param1
 
     if (isNaN(id)) {
@@ -83,7 +86,7 @@ class XomSharePointList {
    */
   public deleteItem(item: any): Promise<XomApiResponse>
   public deleteItem(itemId: number): Promise<XomApiResponse>
-  public deleteItem(param1: any): Promise<XomApiResponse> {
+  public deleteItem(param1: any) {
     const { Id: id = param1 } = param1
 
     if (isNaN(id)) {
@@ -98,7 +101,7 @@ class XomSharePointList {
    */
   public getAttachments(item: any): Promise<XomApiResponse>
   public getAttachments(itemId: number): Promise<XomApiResponse>
-  public getAttachments(param1: any): Promise<XomApiResponse> {
+  public getAttachments(param1: any) {
     const { Id: id = param1 } = param1
 
     if (isNaN(id)) {
@@ -125,7 +128,7 @@ class XomSharePointList {
     param1: any,
     fileName: string,
     fileReference: string | HTMLInputElement | FileList | File | ArrayBuffer | Blob,
-  ): Promise<XomApiResponse> {
+  ) {
     const fileBuffer = await genFileBuffer(fileReference)
     const { Id: id = param1 } = param1
 
@@ -141,7 +144,7 @@ class XomSharePointList {
    */
   public renameAttachment(item: any, currentName: string, newName: string): Promise<XomApiResponse>
   public renameAttachment(itemId: number, currentName: string, newName: string): Promise<XomApiResponse>
-  public renameAttachment(param1: any, currentName: string, newName: string): Promise<XomApiResponse> {
+  public renameAttachment(param1: any, currentName: string, newName: string) {
     const { Id: id = param1 } = param1
 
     if (isNaN(id)) {
@@ -156,7 +159,7 @@ class XomSharePointList {
    */
   public deleteAttachment(item: any, fileName: string): Promise<XomApiResponse>
   public deleteAttachment(itemId: number, fileName: string): Promise<XomApiResponse>
-  public deleteAttachment(param1: any, fileName: string): Promise<XomApiResponse> {
+  public deleteAttachment(param1: any, fileName: string) {
     const { Id: id = param1 } = param1
 
     if (isNaN(id)) {

@@ -1,4 +1,4 @@
-import { XomApiClient, XomApiResponse, XomApiQueryString } from './@types'
+import { XomApiClient, XomApiResponse, XomApiQueryString } from './types'
 import * as requests from './facades/requests'
 
 /**

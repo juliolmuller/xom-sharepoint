@@ -1,10 +1,11 @@
 import qs from 'querystring'
-import { XomApiQueryString } from '../@types'
+
+import type { XomApiQueryString } from '../types'
 
 /**
  * Converts possible query string inputs into
  */
-function stringifyQuery(query: XomApiQueryString | undefined): string {
+function stringifyQuery(query: XomApiQueryString | undefined) {
   if (!query) {
     return ''
   }

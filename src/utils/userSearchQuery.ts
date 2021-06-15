@@ -1,4 +1,4 @@
-import { XomApiQueryParams } from '../@types'
+import type { XomApiQueryParams } from '../types'
 
 /**
  * Provide the query to find searched term with user properties

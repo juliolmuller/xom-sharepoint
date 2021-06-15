@@ -1,5 +1,6 @@
-import { XomApiRequestConfig, XomApiInterceptor } from '../../../@types'
 import deleteHeaders from '../../config/deleteHeaders'
+
+import type { XomApiRequestConfig, XomApiInterceptor } from '../../../types'
 
 const onDeleteMethod: XomApiInterceptor<XomApiRequestConfig> = [
   (config: XomApiRequestConfig): XomApiRequestConfig => {

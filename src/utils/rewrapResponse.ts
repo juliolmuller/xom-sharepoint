@@ -1,5 +1,5 @@
-import { AxiosResponse } from 'axios'
-import { XomApiResponse } from '../@types'
+import type { AxiosResponse } from 'axios'
+import type { XomApiResponse } from '../types'
 
 /**
  * Taxes an AxiosResponse and rewrap it as a XomApiRawResponse object.
