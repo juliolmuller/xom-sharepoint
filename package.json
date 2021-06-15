@@ -22,7 +22,7 @@
   },
   "homepage": "https://github.com/juliolmuller/xom-sharepoint#readme",
   "main": "build/index.js",
-  "types": "build/",
+  "types": "build/types.d.ts",
   "scripts": {
     "build": "npm run build:node && npm run build:dist",
     "build:dist": "parcel build src/dist.js --no-minify -o xom-sharepoint.js && parcel build src/dist.js -o xom-sharepoint.min.js",
