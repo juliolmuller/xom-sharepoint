@@ -1,9 +1,9 @@
-import type { XomApiQueryParams } from '../types'
+import type { XomApiQueryString } from '../types'
 
 /**
  * Provide the query to find searched term with user properties
  */
-function userSearchQuery(search: string): XomApiQueryParams {
+function userSearchQuery(search: string): XomApiQueryString {
   const title = `substringof('${search}',Title)`
   const email = `substringof('${search}',EMail)`
   const lastName = `substringof('${search}',LastName)`
