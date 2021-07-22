@@ -3,11 +3,14 @@
     "rootDir": ".",
     "baseUrl": ".",
     "paths": {},
-    // "lib": [],
-    // "types": [],
     "sourceMap": false,
     "target": "ES5",
-    "module": "esnext",
+    "module": "ESnext",
+    "lib": [
+      "DOM",
+      "ES2015.Promise"
+    ],
+    // "types": [],
     "moduleResolution": "node",
     "useDefineForClassFields": false,
     "allowSyntheticDefaultImports": true,
