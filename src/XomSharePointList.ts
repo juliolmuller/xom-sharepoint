@@ -114,29 +114,31 @@ class XomSharePointList {
   /**
    * Uploads a file attachment to a list item.
    */
-  public addAttachment(
-    item: any,
-    fileName: string,
-    fileReference: string | HTMLInputElement | FileList | File | ArrayBuffer | Blob,
-  ): Promise<XomApiResponse>
-  public async addAttachment(
-    itemId: number,
-    fileName: string,
-    fileReference: string | HTMLInputElement | FileList | File | ArrayBuffer | Blob,
-  ): Promise<XomApiResponse>
+  public addAttachment(item: any, fileName: string, fileArrayBuffer: ArrayBuffer): Promise<XomApiResponse>
+  public addAttachment(item: any, fileName: string, blobInstance: Blob): Promise<XomApiResponse>
+  public addAttachment(item: any, fileName: string, querySelector: string): Promise<XomApiResponse>
+  public addAttachment(item: any, fileName: string, fileInputElement: HTMLInputElement): Promise<XomApiResponse>
+  public addAttachment(item: any, fileName: string, fileInputContent: FileList): Promise<XomApiResponse>
+  public addAttachment(item: any, fileName: string, fileInstance: File): Promise<XomApiResponse>
+  public addAttachment(itemId: number, fileName: string, fileArrayBuffer: ArrayBuffer): Promise<XomApiResponse>
+  public addAttachment(itemId: number, fileName: string, blobInstance: Blob): Promise<XomApiResponse>
+  public addAttachment(itemId: number, fileName: string, querySelector: string): Promise<XomApiResponse>
+  public addAttachment(itemId: number, fileName: string, fileInputElement: HTMLInputElement): Promise<XomApiResponse>
+  public addAttachment(itemId: number, fileName: string, fileInputContent: FileList): Promise<XomApiResponse>
+  public addAttachment(itemId: number, fileName: string, fileInstance: File): Promise<XomApiResponse>
   public async addAttachment(
     param1: any,
     fileName: string,
-    fileReference: string | HTMLInputElement | FileList | File | ArrayBuffer | Blob,
+    fileReference: any,
   ) {
-    const fileBuffer = await genFileBuffer(fileReference)
+    const fileBufferPromise = genFileBuffer(fileReference)
     const { Id: id = param1 } = param1
 
     if (isNaN(id)) {
       throw exceptions.missingItemId()
     }
 
-    return requests.uploadListItemAttachment(this._http, this._title, id, fileName, fileBuffer)
+    return requests.uploadListItemAttachment(this._http, this._title, id, fileName, await fileBufferPromise)
   }
 
   /**

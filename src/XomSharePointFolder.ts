@@ -1,7 +1,7 @@
 import genFileBuffer from 'file2arraybuffer'
 import * as requests from './facades/requests'
 
-import type { XomApiClient, XomApiQueryString } from './types'
+import type { XomApiClient, XomApiResponse, XomApiQueryString } from './types'
 
 /**
  * Instantiate the object with the necessary information to connect to a SharePoint file library through its REST API.
@@ -50,7 +50,13 @@ class XomSharePointLibrary {
   /**
    * Uploads a file into the folder.
    */
-  public async uploadFile(fileName: string, fileReference: string | HTMLInputElement | FileList | File | ArrayBuffer | Blob) {
+  public uploadFile(fileName: string, fileArrayBuffer: ArrayBuffer): Promise<XomApiResponse>
+  public uploadFile(fileName: string, blobInstance: Blob): Promise<XomApiResponse>
+  public uploadFile(fileName: string, querySelector: string): Promise<XomApiResponse>
+  public uploadFile(fileName: string, fileInputElement: HTMLInputElement): Promise<XomApiResponse>
+  public uploadFile(fileName: string, fileInputContent: FileList): Promise<XomApiResponse>
+  public uploadFile(fileName: string, fileInstance: File): Promise<XomApiResponse>
+  public async uploadFile(fileName: string, fileReference: any) {
     const fileBuffer = await genFileBuffer(fileReference)
     const result = await requests.uploadFileToFolder(this._http, this.relativeUrl, fileName, fileBuffer)
 
