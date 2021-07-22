@@ -1,6 +1,6 @@
 {
   "name": "xom-sharepoint",
-  "version": "0.16.0",
+  "version": "0.16.1",
   "description": "HTTP client based on Axios to easily fetch SharePoint through its REST API.",
   "license": "MIT",
   "author": "Julio L. Muller",
@@ -32,7 +32,7 @@
     "axios": "~0.21.1"
   },
   "dependencies": {
-    "@lacussoft/to-arraybuffer": "^1.1.3",
+    "file2arraybuffer": "^1.2.1",
     "qs": "^6.10.1"
   },
   "devDependencies": {

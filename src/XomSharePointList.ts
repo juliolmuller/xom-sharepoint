@@ -1,4 +1,4 @@
-import genFileBuffer from '@lacussoft/to-arraybuffer'
+import genFileBuffer from 'file2arraybuffer'
 import * as exceptions from './facades/exceptions'
 import * as requests from './facades/requests'
 
