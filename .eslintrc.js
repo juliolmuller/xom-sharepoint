@@ -16,7 +16,6 @@ module.exports = {
   ],
   rules: {
     '@typescript-eslint/no-explicit-any': 'off',
-    'linebreak-style': ['error', 'unix'],
     'no-underscore-dangle': 'off',
   },
-};
+}
